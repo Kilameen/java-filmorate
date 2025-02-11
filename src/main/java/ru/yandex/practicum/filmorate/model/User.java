@@ -14,7 +14,7 @@ public class User {
     private Long id;
 
     @Email
-    @NotNull(message = "Не передан параметр email'а")
+    @NotNull(message = "Email должен быть заполнен")
     @NotBlank(message = "Email должен быть заполнен")
     private String email;
 

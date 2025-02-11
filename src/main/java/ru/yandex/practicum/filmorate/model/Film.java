@@ -13,7 +13,7 @@ import jakarta.validation.constraints.Size;
 public class Film {
     private Long id;
 
-    @NotNull(message = "Не передан параметр названия")
+    @NotNull(message = "Название не может быть пустым")
     @NotBlank(message = "Название не может быть пустым")
     private String name;
 
