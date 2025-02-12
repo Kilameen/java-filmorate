@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user){
+    public User create(@Valid @RequestBody User user) {
         log.info("Зарос на создание нового пользователя.");
         log.debug(user.toString());
         validate(user);
@@ -35,30 +35,30 @@ public class UserController {
             user.setName(user.getLogin());
         }
         user.setId(getNextId());
-        users.put(user.getId(),user);
+        users.put(user.getId(), user);
         log.info("Пользователь создан");
         log.debug(user.toString());
         return user;
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User updateUser){
-        if(updateUser.getId() == null){
+    public User update(@Valid @RequestBody User updateUser) {
+        if (updateUser.getId() == null) {
             log.error("Id пользователя не указан!");
             throw new ValidationException("Id пользователя должен быть указан!");
         }
         validate(updateUser);
 
-if(users.containsKey(updateUser.getId())){
-    User oldUserInformation = users.get(updateUser.getId());
-    oldUserInformation.setName(updateUser.getName());
-    oldUserInformation.setLogin(updateUser.getLogin());
-    oldUserInformation.setEmail(updateUser.getEmail());
-    oldUserInformation.setBirthday(updateUser.getBirthday());
-    log.info("Информация пользователя обновлена!");
-    log.debug(updateUser.toString());
-    return oldUserInformation;
-}
+        if (users.containsKey(updateUser.getId())) {
+            User oldUserInformation = users.get(updateUser.getId());
+            oldUserInformation.setName(updateUser.getName());
+            oldUserInformation.setLogin(updateUser.getLogin());
+            oldUserInformation.setEmail(updateUser.getEmail());
+            oldUserInformation.setBirthday(updateUser.getBirthday());
+            log.info("Информация пользователя обновлена!");
+            log.debug(updateUser.toString());
+            return oldUserInformation;
+        }
         log.error("Пользователя с Id = {} не найдено.", updateUser.getId());
         throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
     }

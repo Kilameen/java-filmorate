@@ -61,11 +61,11 @@ class FilmControllerTest {
 	}
 
 	@Test
-		void filmValidatesBlankName() {
-        film.setName("");
+	void filmValidatesBlankName() {
+		film.setName("");
 		Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
-}
+		assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
+	}
 
 	@Test
 	void filmValidatesNullName() {
@@ -94,8 +94,6 @@ class FilmControllerTest {
 	@Test
 	void filmValidatesReleaseDateThrowsException() {
 		film.setReleaseDate(LocalDate.of(1890, 1, 1));
-		assertThrows(ValidationException.class, () -> filmController.create(film),"Не пройдена валидация, дата релиза не может быть раньше 28.12.1895");
+		assertThrows(ValidationException.class, () -> filmController.create(film), "Не пройдена валидация, дата релиза не может быть раньше 28.12.1895");
 	}
 }
-
-

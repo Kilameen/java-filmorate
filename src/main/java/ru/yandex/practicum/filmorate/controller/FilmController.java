@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/films")
@@ -28,12 +27,13 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-
         log.info("Запрашиваем добавление фильма");
         log.debug(film.toString());
+
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
+
         log.info("Фильм добавлен");
         log.debug(film.toString());
         return film;
