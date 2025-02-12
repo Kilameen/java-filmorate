@@ -71,7 +71,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserWithDuplicateEmailThrowsDuplicatedDataException() {
+    void testCreateUserWithDuplicateEmail() {
         userController.create(user);
         User userWithSameEmail = new User();
         userWithSameEmail.setEmail("test@yandex.ru");
@@ -87,7 +87,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserWithDuplicateLoginThrowsDuplicatedDataException() {
+    void testCreateUserWithDuplicateLogin() {
         userController.create(user);
         User userWithSameLogin = new User();
         userWithSameLogin.setEmail("another@yandex.ru");
@@ -96,8 +96,29 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserWithInvalidLoginThrowsValidationException() {
+    void testCreateUserLoginWithSpace() {
         user.setLogin("Login with space");
         assertThrows(ValidationException.class, () -> userController.create(user), "Логин добавлен с пробелами");
+    }
+
+    @Test
+    void testCreateUserNameIsEmpty() {
+        user.setName("");
+        userController.create(user);
+        assertEquals("TestLogin", user.getName(), "Пустое имя пользователя не было заменено на логин");
+    }
+
+    @Test
+    void testCreateUserLoginIsEmpty() {
+        user.setLogin("");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Не пройдена валидация на пустой логин");
+    }
+
+    @Test
+    void testCreateUserEmailIsEmpty() {
+        user.setEmail("");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Не пройдена валидация на пустой email");
     }
 }

@@ -18,6 +18,7 @@ public class User {
     @NotBlank(message = "Email должен быть заполнен")
     private String email;
 
+    @NotNull(message = "Логин должен быть заполнен")
     @NotBlank(message = "Логин должен быть заполнен")
     private String login;
 

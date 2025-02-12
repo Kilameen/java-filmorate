@@ -82,6 +82,10 @@ public class UserController {
             log.error("Логин {} содержит пробелы", user.getLogin());
             throw new ValidationException("Логин не может содержать пробелы");
         }
+        if (user.getEmail().contains(" ")) {
+            log.error("Email {} содержит пробелы", user.getEmail());
+            throw new ValidationException("Email не может содержать пробелы");
+        }
     }
 
     private long getNextId() {

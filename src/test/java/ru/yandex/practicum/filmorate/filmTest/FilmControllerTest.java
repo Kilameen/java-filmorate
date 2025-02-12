@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -92,7 +93,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void filmValidatesReleaseDateThrowsException() {
+	void filmValidatesReleaseDate() {
 		film.setReleaseDate(LocalDate.of(1890, 1, 1));
 		assertThrows(ValidationException.class, () -> filmController.create(film), "Не пройдена валидация, дата релиза не может быть раньше 28.12.1895");
 	}
