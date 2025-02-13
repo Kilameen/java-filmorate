@@ -38,14 +38,14 @@ public class UserController {
         }
         user.setId(getNextId());
         users.put(user.getId(), user);
-        log.info("Пользователь создан");
-        log.debug(user.toString());
+        log.info("Пользователь {} создан", user);
         return user;
     }
 
     @PutMapping
-    @Validated(User.Marker.OnUpdate.class) // Валидация для обновления
+    @Validated(User.Marker.OnUpdate.class)
     public User update(@Valid @RequestBody User updateUser) {
+        log.info("Запрос на добавление данных пользователя {}", updateUser);
         if (updateUser.getId() == null) {
             log.error("Id пользователя не указан!");
             throw new ValidationException("Id пользователя должен быть указан!");
@@ -58,7 +58,7 @@ public class UserController {
             oldUserInformation.setLogin(updateUser.getLogin());
             oldUserInformation.setEmail(updateUser.getEmail());
             oldUserInformation.setBirthday(updateUser.getBirthday());
-            log.info("Информация пользователя обновлена!");
+            log.info("Информация пользователя {} обновлена!", updateUser);
             log.debug(updateUser.toString());
             return oldUserInformation;
         }

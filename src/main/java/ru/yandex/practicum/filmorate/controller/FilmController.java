@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
-    private final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -31,23 +31,20 @@ public class FilmController {
     @PostMapping
     @Validated(Film.Marker.OnCreate.class)
     public Film create(@Valid @RequestBody Film film) {
-        log.info("Запрашиваем добавление фильма");
-        log.debug(film.toString());
+        log.info("Добавление фильма {}", film);
 
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
 
-        log.info("Фильм добавлен");
-        log.debug(film.toString());
+        log.info("Фильм {} добавлен", film);
         return film;
     }
 
     @PutMapping
     @Validated(Film.Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
-        log.info("Запрос на обновление информации о фильме");
-        log.debug(updateFilm.toString());
+        log.info("Запрос на обновление информации о фильме {}", updateFilm);
 
         if (updateFilm.getId() == null) {
             log.error("Id фильма не указан!");
@@ -61,15 +58,14 @@ public class FilmController {
             oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
             oldFilmInformation.setDuration(updateFilm.getDuration());
 
-            log.info("Информация о фильме обновлена!");
-            log.debug(updateFilm.toString());
+            log.info("Информация о фильме {} обновлена!", updateFilm);
             return oldFilmInformation;
         }
         log.error("Фильма с Id = {} не найдено.", updateFilm.getId());
         throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
     }
 
-    private void validate(Film film) throws DuplicatedDataException, ValidationException {
+    private void validate(Film film) {
         if (films.values()
                 .stream()
                 .anyMatch(f -> f.getName().equals(film.getName())
@@ -78,9 +74,9 @@ public class FilmController {
             log.error("Фильм с названием {} и датой релиза {} уже существует", film.getName(), film.getReleaseDate());
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует");
         }
-        if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
-            log.error("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE );
-            throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
+        if (STARTEDREALISEDATE.isAfter(film.getReleaseDate())) {
+            log.error("Дата релиза фильма не может быть раньше: " + STARTEDREALISEDATE);
+            throw new ValidationException("Дата релиза фильма раньше: " + STARTEDREALISEDATE);
         }
     }
 
