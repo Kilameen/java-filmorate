@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -14,10 +15,12 @@ import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
+    private final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -26,6 +29,7 @@ public class FilmController {
     }
 
     @PostMapping
+    @Validated(Film.Marker.OnCreate.class)
     public Film create(@Valid @RequestBody Film film) {
         log.info("Запрашиваем добавление фильма");
         log.debug(film.toString());
@@ -40,6 +44,7 @@ public class FilmController {
     }
 
     @PutMapping
+    @Validated(Film.Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
         log.info("Запрос на обновление информации о фильме");
         log.debug(updateFilm.toString());
@@ -73,9 +78,9 @@ public class FilmController {
             log.error("Фильм с названием {} и датой релиза {} уже существует", film.getName(), film.getReleaseDate());
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует");
         }
-        if (LocalDate.of(1895, 12, 28).isAfter(film.getReleaseDate())) {
-            log.error("Дата релиза фильма не может быть раньше 28.12.1895");
-            throw new ValidationException("Дата релиза фильма раньше 28.12.1895");
+        if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
+            log.error("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE );
+            throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
     }
 

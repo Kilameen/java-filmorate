@@ -82,7 +82,7 @@ public class UserControllerTest {
     @Test
     void userValidatesBirthdayCannotBeInTheFuture() {
         user.setBirthday(LocalDate.of(2027, 1, 1));
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация, дата рождения не может быть в будущем");
     }
 
@@ -111,14 +111,14 @@ public class UserControllerTest {
     @Test
     void testCreateUserLoginIsEmpty() {
         user.setLogin("");
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация на пустой логин");
     }
 
     @Test
     void testCreateUserEmailIsEmpty() {
         user.setEmail("");
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация на пустой email");
     }
 }

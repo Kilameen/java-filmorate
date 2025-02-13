@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = FilmController.class)
 class FilmControllerTest {
+
 	private static Validator validator;
 	private FilmController filmController;
 	private Film film;
@@ -63,7 +64,7 @@ class FilmControllerTest {
 	@Test
 	void filmValidatesBlankName() {
 		film.setName("");
-		Set<ConstraintViolation<Film>> violations = validator.validate(film);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
 	}
 
@@ -73,27 +74,27 @@ class FilmControllerTest {
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
-		Set<ConstraintViolation<Film>> violations = validator.validate(film);
-		assertEquals(2, violations.size(), "Не пройдена валидация на null название");
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
+		assertEquals(1, violations.size(), "Не пройдена валидация на null название");
 	}
 
 	@Test
 	void filmValidatesLongDescription() {
 		film.setDescription("a".repeat(201));
-		Set<ConstraintViolation<Film>> violations = validator.validate(film);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на слишком длинное описание");
 	}
 
 	@Test
 	void filmValidatesNegativeDuration() {
 		film.setDuration(-1);
-		Set<ConstraintViolation<Film>> violations = validator.validate(film);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на отрицательную продолжительность");
 	}
 
 	@Test
 	void filmValidatesReleaseDate() {
 		film.setReleaseDate(LocalDate.of(1890, 1, 1));
-		assertThrows(ValidationException.class, () -> filmController.create(film), "Не пройдена валидация, дата релиза не может быть раньше 28.12.1895");
+		assertThrows(ValidationException.class, () -> filmController.create(film), "Дата релиза фильма не может быть раньше 28.12.1895");
 	}
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -14,6 +15,7 @@ import java.util.Objects;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/users")
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
@@ -25,9 +27,9 @@ public class UserController {
     }
 
     @PostMapping
+    @Validated(User.Marker.OnCreate.class) // Валидация для создания
     public User create(@Valid @RequestBody User user) {
-        log.info("Зарос на создание нового пользователя.");
-        log.debug(user.toString());
+        log.info("Создаем пользователя {}", user);
         validate(user);
 
         if (user.getName() == null || user.getName().isBlank()) {
@@ -42,6 +44,7 @@ public class UserController {
     }
 
     @PutMapping
+    @Validated(User.Marker.OnUpdate.class) // Валидация для обновления
     public User update(@Valid @RequestBody User updateUser) {
         if (updateUser.getId() == null) {
             log.error("Id пользователя не указан!");
