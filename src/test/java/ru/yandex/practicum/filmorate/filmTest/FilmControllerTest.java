@@ -21,7 +21,7 @@ class FilmControllerTest {
 	private static Validator validator;
 	private FilmController filmController;
 	private Film film;
-	private final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
+	private static final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
 
 	@BeforeEach
 	void setUp() {

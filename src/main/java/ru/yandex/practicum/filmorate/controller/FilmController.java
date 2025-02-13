@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
-    private final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
