@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
-    private static final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -74,9 +74,9 @@ public class FilmController {
             log.error("Фильм с названием {} и датой релиза {} уже существует", film.getName(), film.getReleaseDate());
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует");
         }
-        if (STARTEDREALISEDATE.isAfter(film.getReleaseDate())) {
-            log.error("Дата релиза фильма не может быть раньше: " + STARTEDREALISEDATE);
-            throw new ValidationException("Дата релиза фильма раньше: " + STARTEDREALISEDATE);
+        if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
+            log.error("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
+            throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
     }
 

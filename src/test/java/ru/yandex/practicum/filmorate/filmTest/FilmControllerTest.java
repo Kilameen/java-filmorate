@@ -21,7 +21,7 @@ class FilmControllerTest {
 	private static Validator validator;
 	private FilmController filmController;
 	private Film film;
-	private static final LocalDate STARTEDREALISEDATE = LocalDate.of(1895, 12, 28);
+	private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
 	@BeforeEach
 	void setUp() {
@@ -96,6 +96,6 @@ class FilmControllerTest {
 	@Test
 	void filmValidatesReleaseDate() {
 		film.setReleaseDate(LocalDate.of(1890, 1, 1));
-		assertThrows(ValidationException.class, () -> filmController.create(film), "Дата релиза фильма не может быть раньше: " + STARTEDREALISEDATE);
+		assertThrows(ValidationException.class, () -> filmController.create(film), "Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
 	}
 }
