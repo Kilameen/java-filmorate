@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.model.Marker;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +31,7 @@ public class FilmController {
     }
 
     @PostMapping
-    @Validated(Film.Marker.OnCreate.class)
+    @Validated(Marker.OnCreate.class)
     public Film create(@Valid @RequestBody Film film) {
         log.info("Добавление фильма {}", film);
 
@@ -42,7 +44,7 @@ public class FilmController {
     }
 
     @PutMapping
-    @Validated(Film.Marker.OnUpdate.class)
+    @Validated(Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
         log.info("Запрос на обновление информации о фильме {}", updateFilm);
 
@@ -75,7 +77,7 @@ public class FilmController {
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует");
         }
         if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
-            log.error("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
+            log.error("Дата релиза фильма не может быть раньше: {}", STARTED_REALISE_DATE);
             throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
     }

@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Marker;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
@@ -65,7 +67,7 @@ class FilmControllerTest {
 	@Test
 	void filmValidatesBlankName() {
 		film.setName("");
-		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
 	}
 
@@ -75,21 +77,21 @@ class FilmControllerTest {
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
-		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на null название");
 	}
 
 	@Test
 	void filmValidatesLongDescription() {
 		film.setDescription("a".repeat(201));
-		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на слишком длинное описание");
 	}
 
 	@Test
 	void filmValidatesNegativeDuration() {
 		film.setDuration(-1);
-		Set<ConstraintViolation<Film>> violations = validator.validate(film, Film.Marker.OnCreate.class);
+		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на отрицательную продолжительность");
 	}
 

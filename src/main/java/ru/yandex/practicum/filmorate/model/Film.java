@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 @Data
-public class Film {
+public class Film implements Marker {
     private Long id;
 
     @NotBlank(message = "Название не может быть пустым",
@@ -24,12 +24,4 @@ public class Film {
     @Positive(message = "Длительность не может быть отрицательной",
             groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
     private Integer duration;
-
-    public interface Marker {
-        interface OnCreate {
-        }
-
-        interface OnUpdate {
-        }
-    }
 }

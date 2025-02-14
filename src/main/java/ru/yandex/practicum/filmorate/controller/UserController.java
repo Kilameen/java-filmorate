@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class UserController {
     }
 
     @PostMapping
-    @Validated(User.Marker.OnCreate.class) // Валидация для создания
+    @Validated(Marker.OnCreate.class) // Валидация для создания
     public User create(@Valid @RequestBody User user) {
         log.info("Создаем пользователя {}", user);
         validate(user);
@@ -38,14 +39,14 @@ public class UserController {
         }
         user.setId(getNextId());
         users.put(user.getId(), user);
-        log.info("Пользователь {} создан", user);
+        log.info("Пользователь создан");
+        log.debug(user.toString());
         return user;
     }
 
     @PutMapping
-    @Validated(User.Marker.OnUpdate.class)
+    @Validated(Marker.OnUpdate.class) // Валидация для обновления
     public User update(@Valid @RequestBody User updateUser) {
-        log.info("Запрос на добавление данных пользователя {}", updateUser);
         if (updateUser.getId() == null) {
             log.error("Id пользователя не указан!");
             throw new ValidationException("Id пользователя должен быть указан!");
@@ -58,7 +59,7 @@ public class UserController {
             oldUserInformation.setLogin(updateUser.getLogin());
             oldUserInformation.setEmail(updateUser.getEmail());
             oldUserInformation.setBirthday(updateUser.getBirthday());
-            log.info("Информация пользователя {} обновлена!", updateUser);
+            log.info("Информация пользователя обновлена!");
             log.debug(updateUser.toString());
             return oldUserInformation;
         }

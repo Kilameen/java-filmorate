@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -82,7 +83,7 @@ public class UserControllerTest {
     @Test
     void userValidatesBirthdayCannotBeInTheFuture() {
         user.setBirthday(LocalDate.of(2027, 1, 1));
-        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация, дата рождения не может быть в будущем");
     }
 
@@ -111,14 +112,14 @@ public class UserControllerTest {
     @Test
     void testCreateUserLoginIsEmpty() {
         user.setLogin("");
-        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация на пустой логин");
     }
 
     @Test
     void testCreateUserEmailIsEmpty() {
         user.setEmail("");
-        Set<ConstraintViolation<User>> violations = validator.validate(user, User.Marker.OnCreate.class);
+        Set<ConstraintViolation<User>> violations = validator.validate(user, Marker.OnCreate.class);
         assertEquals(1, violations.size(), "Не пройдена валидация на пустой email");
     }
 }
