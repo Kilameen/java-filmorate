@@ -2,45 +2,52 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
-@RestController
 @Validated
+@RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+
+    @Autowired
+    private final UserStorage userStorage;
+
+    @Autowired
+    private final UserService userService;
+
+//Storage
 
     @GetMapping
     public Collection<User> findAll() {
-        log.debug("Список фильмов: {}", users);
-        return users.values();
+        Collection<User> userCollection = userStorage.findAll();
+        log.debug("Список пользователей: {}", userCollection);
+        return userCollection;
     }
 
     @PostMapping
     @Validated(Marker.OnCreate.class) // Валидация для создания
     public User create(@Valid @RequestBody User user) {
         log.info("Создаем пользователя {}", user);
-        validate(user);
 
         if (user.getName() == null || user.getName().isBlank()) {
             log.warn("Не указано имя пользователя. Приравниваем его к логину");
             user.setName(user.getLogin());
         }
-        user.setId(getNextId());
-        users.put(user.getId(), user);
+        User createUser = userStorage.create(user);
         log.info("Пользователь {} создан", user);
-        return user;
+        return createUser;
     }
 
     @PutMapping
@@ -50,53 +57,42 @@ public class UserController {
             log.error("Id пользователя не указан!");
             throw new ValidationException("Id пользователя должен быть указан!");
         }
-        validate(updateUser);
-
-        if (users.containsKey(updateUser.getId())) {
-            User oldUserInformation = users.get(updateUser.getId());
-            oldUserInformation.setName(updateUser.getName());
-            oldUserInformation.setLogin(updateUser.getLogin());
-            oldUserInformation.setEmail(updateUser.getEmail());
-            oldUserInformation.setBirthday(updateUser.getBirthday());
+        try {
+            User userUpdate = userStorage.update(updateUser);
             log.info("Информация пользователя {} обновлена!", updateUser);
             log.debug(updateUser.toString());
-            return oldUserInformation;
-        }
-        log.error("Пользователя с Id = {} не найдено.", updateUser.getId());
-        throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
-    }
-
-    private void validate(User user) throws DuplicatedDataException {
-        if (users.values()
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()) && !Objects.equals(u.getId(), user.getId()))) {
-            log.error("Email {} уже используется", user.getEmail());
-            throw new DuplicatedDataException("Этот email уже используется");
-        }
-
-        if (users.values()
-                .stream()
-                .anyMatch(u -> u.getLogin().equals(user.getLogin()) && !Objects.equals(u.getId(), user.getId()))) {
-            log.error("Логин {} уже используется", user.getLogin());
-            throw new DuplicatedDataException("Этот логин уже используется");
-        }
-
-        if (user.getLogin().contains(" ")) {
-            log.error("Логин {} содержит пробелы", user.getLogin());
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
-        if (user.getEmail().contains(" ")) {
-            log.error("Email {} содержит пробелы", user.getEmail());
-            throw new ValidationException("Email не может содержать пробелы");
+            return userUpdate;
+        } catch (NotFoundException e) {
+            log.error("Пользователя с Id = {} не найдено.", updateUser.getId());
+            throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
         }
     }
 
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    //Service
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long userFriendId) {
+        log.info("Пользователь {} , хочет добавить в друзья {}.", userId, userFriendId);
+        userService.addFriend(userId, userFriendId);
+        log.info("{} и {}, теперь друзья!", userId, userFriendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> getFriends(@PathVariable("id") Long userId) {
+        log.info("Ваш список друзей");
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getListOfMutualFriends(@PathVariable("id") Long userId, @PathVariable("otherId") Long userFriendId) {
+        log.info("Cписок друзей, общих с пользователем {}.", userFriendId);
+        return userService.getListOfMutualFriends(userId, userFriendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long userFriendId) {
+        log.info("Пользователь {}, хочет удалить из друзей {}", userId, userFriendId);
+        userService.deleteFriend(userId, userFriendId);
+        log.info("Пользователь {} удален из вашего списка друзей.", userFriendId);
     }
 }
