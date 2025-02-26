@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import java.util.Collection;
 
@@ -40,6 +41,7 @@ public class FilmController {
     }
 
     @PostMapping
+    @Validated(Marker.OnCreate.class)
     public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
         Film createdFilm = filmService.create(film);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
@@ -47,6 +49,7 @@ public class FilmController {
 
     // Обновление информации о фильме
     @PutMapping
+    @Validated(Marker.OnUpdate.class)
     public ResponseEntity<Film> update(@Valid @RequestBody Film film) {
         Film updatedFilm = filmService.update(film);
         return ResponseEntity.ok(updatedFilm);
