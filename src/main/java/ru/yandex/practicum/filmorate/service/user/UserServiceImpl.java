@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.user;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +12,13 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private final UserStorage userStorage;
 
-    public void addFriend(Long userId, Long userFriendId) {
+@Override
+public void addFriend(Long userId, Long userFriendId) {
         if (Objects.equals(userId, userFriendId)) {
             throw new ValidationException("Id пользователей не могут быть равны");
         }
@@ -27,6 +28,7 @@ public class UserService {
         userFriend.getFriends().add(user.getId());
     }
 
+    @Override
     public void deleteFriend(Long userId, Long userFriendId) {
         if (Objects.equals(userId, userFriendId)) {
             throw new ValidationException("Id пользователей не могут быть равны");
@@ -37,6 +39,7 @@ public class UserService {
         userFriend.getFriends().remove(user.getId());
     }
 
+    @Override
     public Collection<User> getFriends(Long userId) {
         User user = userStorage.getUserById(userId);
         return user.getFriends()
@@ -45,6 +48,7 @@ public class UserService {
                 .toList();
     }
 
+    @Override
     public Collection<User> getListOfMutualFriends(Long userId, Long userFriendId) {
         if (Objects.equals(userId, userFriendId)) {
             throw new ValidationException("Id пользователей не могут быть равны");
@@ -56,5 +60,30 @@ public class UserService {
                 .filter(friendUser2::contains)
                 .map(userStorage::getUserById)
                 .toList();
+    }
+
+    @Override
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    @Override
+    public User update(User updateUser) {
+        return userStorage.update(updateUser);
+    }
+
+    @Override
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userStorage.getUserById(id);
+    }
+
+    @Override
+    public void deleteAllUser(User user) {
+        userStorage.deleteAllUser(user);
     }
 }

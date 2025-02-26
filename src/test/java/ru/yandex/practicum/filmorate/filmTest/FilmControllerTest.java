@@ -14,9 +14,10 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
+
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -27,24 +28,16 @@ import java.util.Optional;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {FilmController.class, UserController.class, FilmService.class, UserService.class, InMemoryFilmStorage.class, InMemoryUserStorage.class})
+@SpringBootTest
 class FilmControllerTest {
 
 	private static Validator validator;
-
 	@Autowired
 	private FilmController filmController;
-
 	@Autowired
 	private UserController userController;
-
-	@Autowired
-	private FilmStorage filmStorage;
-
-	@Autowired
-	private UserStorage userStorage;
-	private User user;
-	private Film film;
+	User user;
+	Film film;
 	private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
 	@BeforeEach
@@ -65,8 +58,8 @@ class FilmControllerTest {
 
 	@AfterEach
 	void setDown() {
-		filmStorage.deleteAllFilms(film);
-		userStorage.deleteAllUser(user);
+		filmController.deleteAllFilm(film);
+		userController.deleteAllUser(user);
 	}
 
 	@Test
@@ -86,6 +79,7 @@ class FilmControllerTest {
 		film2.setDescription("Test Description_2");
 		film2.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film2.setDuration(120);
+
 
 		Collection<Film> films = filmController.findAll();
 		assertEquals(1, films.size(), "Контроллер не создал фильм");
@@ -123,7 +117,7 @@ class FilmControllerTest {
 
 	@Test
 	void filmValidatesNegativeDuration() {
-		film.setDuration(-1);
+		film.setDuration(-1);;
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на отрицательную продолжительность");
 	}

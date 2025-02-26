@@ -55,6 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (updateFilm.getId() == null) {
             throw new ValidationException("Id фильма должен быть указан!");
         }
+
         validate(updateFilm);
         if (films.containsKey(updateFilm.getId())) {
             Film oldFilmInformation = films.get(updateFilm.getId());
@@ -66,6 +67,15 @@ public class InMemoryFilmStorage implements FilmStorage {
             return oldFilmInformation;
         }
         throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
+    }
+
+    private long getNextId() {
+        long currentMaxId = films.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 
     private void validate(Film film) {
@@ -81,14 +91,5 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Дата релиза фильма не может быть раньше: {}", STARTED_REALISE_DATE);
             throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
-    }
-
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }

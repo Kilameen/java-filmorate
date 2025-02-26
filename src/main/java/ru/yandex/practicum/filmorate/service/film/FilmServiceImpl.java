@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.film;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +11,15 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class FilmService {
+public class FilmServiceImpl implements FilmService {
 
     @Autowired
     private final FilmStorage filmStorage;
     @Autowired
     private final UserStorage userStorage;
 
+
+    @Override
     public void addLike(Long filmId, Long userId) {
         validateUserId(userId);
         Film film = filmStorage.getFilmById(filmId);
@@ -26,12 +28,14 @@ public class FilmService {
         }
     }
 
+    @Override
     public void deleteLike(Long filmId, Long userId) {
         validateUserId(userId);
         Film film = filmStorage.getFilmById(filmId);
         film.getLikes().remove(userId);
     }
 
+    @Override
     public Collection<Film> getPopularFilms(Long count) {
         if (count < 1) {
             throw new ValidationException("Значение переданного параметра количество записей должен быть больше 0");
@@ -41,6 +45,31 @@ public class FilmService {
                 .sorted(Collections.reverseOrder(Comparator.comparing(film -> film.getLikes().size())))
                 .limit(count)
                 .toList();
+    }
+
+    @Override
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    @Override
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    @Override
+    public Collection<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    @Override
+    public Film getFilmById(Long id) {
+        return filmStorage.getFilmById(id);
+    }
+
+    @Override
+    public void deleteAllFilms(Film film) {
+        filmStorage.deleteAllFilms(film);
     }
 
     private void validateUserId(Long id) {

@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.Collection;
 
@@ -25,9 +25,6 @@ public class FilmController {
     @Autowired
     private final FilmService filmService;
 
-    @Autowired
-    private final FilmStorage filmStorage;
-
     //Storage
 
     @GetMapping
@@ -35,18 +32,17 @@ public class FilmController {
     public Collection<Film> findAll() {
         log.info("Запрос на получение фильмов");
 
-        Collection<Film> filmCollection = filmStorage.findAll();
+        Collection<Film> filmCollection = filmService.findAll();
 
         log.debug("Список фильмов: {}", filmCollection);
 
         return filmCollection;
     }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Film getFilmById(@RequestBody Long id) {
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
         log.info("Запрос на получение фильма по id");
-        return filmStorage.getFilmById(id);
+        return filmService.getFilmById(id);
     }
 
     @PostMapping
@@ -54,7 +50,7 @@ public class FilmController {
     @Validated(Marker.OnCreate.class)
     public Film create(@Valid @RequestBody Film film) {
         log.info("Добавление фильма {}", film);
-        Film createFilm = filmStorage.create(film);
+        Film createFilm = filmService.create(film);
         log.info("Фильм {} добавлен", film);
         return createFilm;
     }
@@ -70,13 +66,20 @@ public class FilmController {
             throw new ValidationException("Id фильма должен быть указан!");
         }
         try {
-            Film filmUpdate = filmStorage.update(updateFilm);
+            Film filmUpdate = filmService.update(updateFilm);
             log.info("Информация о фильме {} обновлена!", updateFilm);
             return filmUpdate;
         } catch (NotFoundException e) {
             log.error("Фильма с Id = {} не найдено.", updateFilm.getId());
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
         }
+    }
+
+    @DeleteMapping
+    public void deleteAllFilm(Film film){
+        log.info("Запрос на удаление всех фильмов");
+        filmService.deleteAllFilms(film);
+        log.info("Все фильмы удалены");
     }
 
     //Service

@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest(classes = {UserController.class, UserService.class, InMemoryUserStorage.class})
+@SpringBootTest
 public class UserControllerTest {
 
     private static Validator validator;
@@ -30,9 +30,7 @@ public class UserControllerTest {
     @Autowired
     private UserController userController;
 
-    @Autowired
-    private UserStorage userStorage;
-    private User user;
+    User user;
 
     @BeforeEach
     void setUp() {
@@ -46,7 +44,7 @@ public class UserControllerTest {
 
     @AfterEach
     void setDown() {
-        userStorage.deleteAllUser(user);
+        userController.deleteAllUser(user);
     }
 
     @Test
