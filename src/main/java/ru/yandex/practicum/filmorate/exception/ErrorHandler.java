@@ -26,10 +26,4 @@ public class ErrorHandler {
     public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
         return new ErrorResponse("Ошибка валидации: " + e.getBindingResult().getFieldError().getDefaultMessage());
     }
-
-    @ExceptionHandler(Throwable.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerThrowable(Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
-    }
 }
