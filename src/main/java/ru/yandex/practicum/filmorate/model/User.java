@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Data
 public class User implements Marker {
     Long id;

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Data
 public class Film implements Marker {
     Long id;
