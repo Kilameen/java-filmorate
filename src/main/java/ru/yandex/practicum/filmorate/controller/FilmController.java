@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -40,20 +41,16 @@ public class FilmController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Validated(Marker.OnCreate.class)
-    public Film create(@Valid @RequestBody Film film) {
-        log.info("Добавление фильма {}", film);
-        Film createFilm = filmService.create(film);
-        log.info("Фильм {} добавлен", film);
-        return createFilm;
+    public ResponseEntity<Film> create(@Valid @RequestBody Film film) {
+        Film createdFilm = filmService.create(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
     }
 
+    // Обновление информации о фильме
     @PutMapping
-    @Validated(Marker.OnUpdate.class)
-    public Film update(@Valid @RequestBody Film updateFilm) {
-        log.info("Запрос на обновление информации о фильме {}", updateFilm);
-        return filmService.update(updateFilm);
+    public ResponseEntity<Film> update(@Valid @RequestBody Film film) {
+        Film updatedFilm = filmService.update(film);
+        return ResponseEntity.ok(updatedFilm);
     }
 
     @DeleteMapping
