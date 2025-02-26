@@ -55,7 +55,6 @@ public class FilmController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     @Validated(Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
         log.info("Запрос на обновление информации о фильме {}", updateFilm);
@@ -65,9 +64,8 @@ public class FilmController {
             throw new ValidationException("Id фильма должен быть указан!");
         }
         try {
-            Film filmUpdate = filmService.update(updateFilm);
             log.info("Информация о фильме {} обновлена!", updateFilm);
-            return filmUpdate;
+            return filmService.update(updateFilm);
         } catch (NotFoundException e) {
             log.error("Фильма с Id = {} не найдено.", updateFilm.getId());
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
