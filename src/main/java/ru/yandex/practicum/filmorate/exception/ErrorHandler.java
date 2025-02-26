@@ -30,12 +30,6 @@ public class ErrorHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerValidationException(Throwable e) {
-        return new ErrorResponse("Ошибка валидации");
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerException(Exception ex) {
         return new ErrorResponse("Произошла непредвиденная ошибка");
     }
 }
