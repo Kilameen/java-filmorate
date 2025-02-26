@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping
-    @Validated(Marker.OnCreate.class) // Валидация для создания
+    @Validated(Marker.OnCreate.class)
     public User create(@Valid @RequestBody User user) {
         log.info("Создаем пользователя {}", user);
         User createUser = userService.create(user);
