@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -58,10 +58,6 @@ public class UserController {
     public User update(@Valid @RequestBody User updateUser) {
         log.info("Запрос на обновление информации о пользователе {}", updateUser);
 
-        if (updateUser.getId() == null) {
-            log.error("Id фильма не указан!");
-            throw new ValidationException("Id фильма должен быть указан!");
-        }
         try {
             log.info("Информация о пользователе {} обновлена!", updateUser);
             return userService.update(updateUser);
