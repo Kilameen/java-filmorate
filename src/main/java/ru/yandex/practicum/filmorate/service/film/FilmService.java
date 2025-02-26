@@ -12,9 +12,9 @@ public interface FilmService {
 
     Collection<Film> getPopularFilms(Long count);
 
-    Film create(@Valid Film film);
+    Film create(Film film);
 
-    Film update(@Valid Film film);
+    Film update(Film film);
 
     Collection<Film> findAll();
 

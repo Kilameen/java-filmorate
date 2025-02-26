@@ -50,12 +50,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
 
-    public Film create(@Valid Film film) {
+    public Film create(Film film) {
         return filmStorage.create(film);
     }
 
     @Override
-    public Film update(@Valid Film film) {
+    public Film update(Film film) {
         return filmStorage.update(film);
     }
 

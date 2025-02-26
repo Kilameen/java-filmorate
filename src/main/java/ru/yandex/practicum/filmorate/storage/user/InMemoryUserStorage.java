@@ -76,11 +76,11 @@ public class InMemoryUserStorage implements UserStorage {
             throw new DuplicatedDataException("Этот логин уже используется");
         }
 
-        if (user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может содержать пробелы");
+        if (user.getLogin() == null || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может содержать пробелы или быть пустым");
         }
-        if (user.getEmail().contains(" ")) {
-            throw new ValidationException("Email не может содержать пробелы");
+        if (user.getEmail() == null || user.getEmail().contains(" ")) {
+            throw new ValidationException("Email не может содержать пробелы или быть пустым");
         }
     }
 

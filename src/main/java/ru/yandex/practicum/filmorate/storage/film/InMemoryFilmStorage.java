@@ -81,5 +81,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
             throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
+
+        if (film.getName() == null || film.getName().isBlank()) {
+            throw new ValidationException("Название фильма не может быть пустым");
+        }
+
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            throw new ValidationException("Длина описания фильма не должна превышать 200 символов");
+        }
+
+        if (film.getDuration() <= 0) {
+            throw new ValidationException("Продолжительность фильма должна быть положительной");
+        }
     }
 }
