@@ -34,7 +34,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
-        return film;
+        return films.get(film.getId());
     }
 
     @Override
@@ -49,14 +49,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film updateFilm) {
-
-        if (updateFilm.getId() == null) {
+        Film oldFilmInformation = films.get(updateFilm.getId());
+        if (oldFilmInformation == null) {
             throw new ValidationException("Id фильма должен быть указан!");
         }
 
         validate(updateFilm);
         if (films.containsKey(updateFilm.getId())) {
-            Film oldFilmInformation = films.get(updateFilm.getId());
             oldFilmInformation.setName(updateFilm.getName());
             oldFilmInformation.setDescription(updateFilm.getDescription());
             oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
