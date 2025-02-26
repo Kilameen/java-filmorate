@@ -46,9 +46,9 @@ public class UserController {
 
     @DeleteMapping
     public void deleteAllUser(User user) {
-        log.info("Запрос на удаление всех фильмов");
+        log.info("Запрос на удаление всех пользователей");
         userService.deleteAllUser(user);
-        log.info("Все фильмы удалены");
+        log.info("Все пользователи удалены");
     }
 
     @PutMapping
