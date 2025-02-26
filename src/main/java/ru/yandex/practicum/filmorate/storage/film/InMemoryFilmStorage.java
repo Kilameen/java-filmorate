@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
