@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -57,14 +55,7 @@ public class UserController {
     @Validated(Marker.OnUpdate.class) // Валидация для обновления
     public User update(@Valid @RequestBody User updateUser) {
         log.info("Запрос на обновление информации о пользователе {}", updateUser);
-
-        try {
-            log.info("Информация о пользователе {} обновлена!", updateUser);
-            return userService.update(updateUser);
-        } catch (NotFoundException e) {
-            log.error("Пользователя с Id = {} не найдено.", updateUser.getId());
-            throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
-        }
+        return userService.update(updateUser);
     }
 
     //Service

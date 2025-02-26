@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
@@ -58,14 +56,7 @@ public class FilmController {
     @Validated(Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
         log.info("Запрос на обновление информации о фильме {}", updateFilm);
-
-        try {
-            log.info("Информация о фильме {} обновлена!", updateFilm);
-            return filmService.update(updateFilm);
-        } catch (NotFoundException e) {
-            log.error("Фильма с Id = {} не найдено.", updateFilm.getId());
-            throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
-        }
+        return filmService.update(updateFilm);
     }
 
     @DeleteMapping
