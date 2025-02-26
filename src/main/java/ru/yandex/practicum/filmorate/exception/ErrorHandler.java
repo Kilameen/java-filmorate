@@ -27,9 +27,15 @@ public class ErrorHandler {
         return new ErrorResponse("Ошибка валидации: " + e.getBindingResult().getFieldError().getDefaultMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerValidationException(final Throwable e) {
+    public ErrorResponse handlerValidationException(Throwable e) {
+        return new ErrorResponse("Ошибка валидации");
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlerValidationException(Exception ex ) {
         return new ErrorResponse("Произошла непредвиденная ошибка");
     }
 }
