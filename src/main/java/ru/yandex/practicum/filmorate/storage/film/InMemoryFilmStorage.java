@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -30,11 +31,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film film) {
+    public Film create(@Valid Film film) {
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
-        return films.get(film.getId());
+        return film;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film updateFilm) {
+    public Film update(@Valid Film updateFilm) {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
@@ -80,18 +81,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
             throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
-        }
-
-        if (film.getName() == null || film.getName().isBlank()) {
-            throw new ValidationException("Название фильма не может быть пустым");
-        }
-
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throw new ValidationException("Длина описания фильма не должна превышать 200 символов");
-        }
-
-        if (film.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность фильма должна быть положительной");
         }
     }
 }
