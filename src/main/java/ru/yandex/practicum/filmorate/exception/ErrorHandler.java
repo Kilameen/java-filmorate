@@ -10,12 +10,12 @@ public class ErrorHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleValidationException(ValidationException ex) {
-        return new ResponseEntity<>("Ошибка валидации", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
-        return new ResponseEntity<>("Искомый объект не найден", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Ошибка валидации", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
