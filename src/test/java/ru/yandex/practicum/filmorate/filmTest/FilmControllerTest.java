@@ -111,7 +111,6 @@ class FilmControllerTest {
 	@Test
 	void filmValidatesNegativeDuration() {
 		film.setDuration(-1);
-		;
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на отрицательную продолжительность");
 	}

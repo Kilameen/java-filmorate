@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Marker;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    @Validated(Marker.OnCreate.class)
     public Film create(Film film) {
         validate(film);
         film.setId(getNextId());
@@ -48,6 +52,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    @Validated(Marker.OnUpdate.class)
     public Film update(Film updateFilm) {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
