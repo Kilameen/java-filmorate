@@ -8,24 +8,26 @@ import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.experimental.FieldDefaults;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 public class Film implements Marker {
-    private Long id;
+    Long id;
 
     @NotBlank(message = "Название не может быть пустым",
             groups = Marker.OnCreate.class)
-    private String name;
+    String name;
 
     @Size(max = 200, message = "Длина названия не должна превышать 200 символов", groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
-    private String description;
+    String description;
 
     @NotNull(message = "Дата релиза не может быть пустой", groups = Marker.OnCreate.class)
-    private LocalDate releaseDate;
+    LocalDate releaseDate;
 
     @Positive(message = "Длительность не может быть отрицательной",
             groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
-    private Integer duration;
+    Integer duration;
 
-    private Set<Long> likes = new HashSet<>();
+    Set<Long> likes = new HashSet<>();
 }

@@ -26,4 +26,10 @@ public class ErrorHandler {
     public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
         return new ErrorResponse("Ошибка валидации: " + e.getBindingResult().getFieldError().getDefaultMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlerValidationException(final Throwable e) {
+        return new ErrorResponse("Произошла непредвиденная ошибка");
+    }
 }
