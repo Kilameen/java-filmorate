@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
@@ -71,23 +69,19 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.values()
                 .stream()
                 .anyMatch(u -> u.getEmail().equals(user.getEmail()) && !Objects.equals(u.getId(), user.getId()))) {
-            log.error("Email {} уже используется", user.getEmail());
             throw new DuplicatedDataException("Этот email уже используется");
         }
 
         if (users.values()
                 .stream()
                 .anyMatch(u -> u.getLogin().equals(user.getLogin()) && !Objects.equals(u.getId(), user.getId()))) {
-            log.error("Логин {} уже используется", user.getLogin());
             throw new DuplicatedDataException("Этот логин уже используется");
         }
 
         if (user.getLogin().contains(" ")) {
-            log.error("Логин {} содержит пробелы", user.getLogin());
             throw new ValidationException("Логин не может содержать пробелы");
         }
         if (user.getEmail().contains(" ")) {
-            log.error("Email {} содержит пробелы", user.getEmail());
             throw new ValidationException("Email не может содержать пробелы");
         }
     }

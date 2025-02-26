@@ -19,4 +19,10 @@ public class ErrorHandler {
     public ErrorResponse handlerValidationException(final ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlerThrowable(final Throwable e) {
+        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    }
 }

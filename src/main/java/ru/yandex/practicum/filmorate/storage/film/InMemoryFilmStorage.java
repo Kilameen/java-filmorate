@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -12,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
@@ -84,11 +82,9 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .anyMatch(f -> f.getName().equals(film.getName())
                         && f.getReleaseDate().equals(film.getReleaseDate())
                         && !Objects.equals(f.getId(), film.getId()))) {
-            log.error("Фильм с названием {} и датой релиза {} уже существует", film.getName(), film.getReleaseDate());
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует");
         }
         if (STARTED_REALISE_DATE.isAfter(film.getReleaseDate())) {
-            log.error("Дата релиза фильма не может быть раньше: {}", STARTED_REALISE_DATE);
             throw new ValidationException("Дата релиза фильма раньше: " + STARTED_REALISE_DATE);
         }
     }

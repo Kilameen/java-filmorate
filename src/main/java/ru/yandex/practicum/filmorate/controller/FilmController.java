@@ -28,11 +28,8 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findAll() {
         log.info("Запрос на получение фильмов");
-
         Collection<Film> filmCollection = filmService.findAll();
-
         log.debug("Список фильмов: {}", filmCollection);
-
         return filmCollection;
     }
 
