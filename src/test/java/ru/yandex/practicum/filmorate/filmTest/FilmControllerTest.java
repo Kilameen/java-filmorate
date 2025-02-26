@@ -14,14 +14,7 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
-
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
@@ -117,7 +110,8 @@ class FilmControllerTest {
 
 	@Test
 	void filmValidatesNegativeDuration() {
-		film.setDuration(-1);;
+		film.setDuration(-1);
+		;
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на отрицательную продолжительность");
 	}

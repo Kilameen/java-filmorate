@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.Collection;
 
 @Slf4j
@@ -76,7 +75,7 @@ public class FilmController {
     }
 
     @DeleteMapping
-    public void deleteAllFilm(Film film){
+    public void deleteAllFilm(Film film) {
         log.info("Запрос на удаление всех фильмов");
         filmService.deleteAllFilms(film);
         log.info("Все фильмы удалены");

@@ -17,8 +17,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private final UserStorage userStorage;
 
-@Override
-public void addFriend(Long userId, Long userFriendId) {
+    @Override
+    public void addFriend(Long userId, Long userFriendId) {
         if (Objects.equals(userId, userFriendId)) {
             throw new ValidationException("Id пользователей не могут быть равны");
         }
