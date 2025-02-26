@@ -31,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(@Valid Film film) {
+    public Film create(Film film) {
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(@Valid Film updateFilm) {
+    public Film update(Film updateFilm) {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
