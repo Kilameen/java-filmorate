@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
@@ -33,8 +34,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    @Validated(Marker.OnCreate.class)
-    public Film create(Film film) {
+    public Film create(@Valid Film film) {
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
@@ -52,7 +52,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    @Validated(Marker.OnUpdate.class)
     public Film update(Film updateFilm) {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
