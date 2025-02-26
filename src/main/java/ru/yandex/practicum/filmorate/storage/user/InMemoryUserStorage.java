@@ -50,19 +50,17 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(User updateUser) {
-        if (updateUser.getId() == null) {
-            throw new ValidationException("Id пользователя должен быть указан!");
+        User oldUserInformation = users.get(updateUser.getId());
+        if (oldUserInformation == null) {
+            throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
         }
         validate(updateUser);
-        if (users.containsKey(updateUser.getId())) {
-            User oldUserInformation = users.get(updateUser.getId());
-            oldUserInformation.setName(updateUser.getName());
-            oldUserInformation.setLogin(updateUser.getLogin());
-            oldUserInformation.setEmail(updateUser.getEmail());
-            oldUserInformation.setBirthday(updateUser.getBirthday());
-            return oldUserInformation;
-        }
-        throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
+        oldUserInformation = users.get(updateUser.getId());
+        oldUserInformation.setName(updateUser.getName());
+        oldUserInformation.setLogin(updateUser.getLogin());
+        oldUserInformation.setEmail(updateUser.getEmail());
+        oldUserInformation.setBirthday(updateUser.getBirthday());
+        return oldUserInformation;
     }
 
     private void validate(User user) throws DuplicatedDataException {

@@ -51,19 +51,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film update(Film updateFilm) {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
-            throw new ValidationException("Id фильма должен быть указан!");
+            throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
         }
-
         validate(updateFilm);
-        if (films.containsKey(updateFilm.getId())) {
-            oldFilmInformation.setName(updateFilm.getName());
-            oldFilmInformation.setDescription(updateFilm.getDescription());
-            oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
-            oldFilmInformation.setDuration(updateFilm.getDuration());
-
-            return oldFilmInformation;
-        }
-        throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
+        oldFilmInformation.setName(updateFilm.getName());
+        oldFilmInformation.setDescription(updateFilm.getDescription());
+        oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
+        oldFilmInformation.setDuration(updateFilm.getDuration());
+        return oldFilmInformation;
     }
 
     private long getNextId() {
