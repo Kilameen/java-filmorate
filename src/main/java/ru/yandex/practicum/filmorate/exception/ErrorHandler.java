@@ -30,12 +30,12 @@ public class ErrorHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerValidationException(Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка");
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(DuplicatedDataException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDuplicatedDataException(DuplicatedDataException e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка");
+        return new ErrorResponse(e.getMessage());
     }
 }

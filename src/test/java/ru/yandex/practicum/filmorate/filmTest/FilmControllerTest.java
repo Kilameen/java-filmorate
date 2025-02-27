@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
@@ -57,7 +56,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void filmControllerCreatesCorrectFilm() throws MethodArgumentNotValidException {
+	void filmControllerCreatesCorrectFilm() {
 		filmController.create(film);
 		Collection<Film> films = filmController.findAll();
 		assertEquals(1, films.size(), "Контроллер не создал фильм");
@@ -65,7 +64,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void filmControllerRejectsDuplicateFilms() throws MethodArgumentNotValidException {
+	void filmControllerRejectsDuplicateFilms() {
 		filmController.create(film);
 
 		Film film2 = new Film();
@@ -123,7 +122,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void userLikesTheFilm() throws MethodArgumentNotValidException {
+	void userLikesTheFilm() {
 		filmController.create(film);
 		userController.create(user);
 		filmController.addLike(film.getId(), user.getId());
@@ -132,7 +131,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void userDeleteLikesTheFilm() throws MethodArgumentNotValidException {
+	void userDeleteLikesTheFilm() {
 		filmController.create(film);
 		userController.create(user);
 		filmController.addLike(film.getId(), user.getId());
@@ -142,7 +141,7 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void testPopularFilm() throws MethodArgumentNotValidException {
+	void testPopularFilm() {
 		filmController.create(film);
 
 		Film film1 = new Film();

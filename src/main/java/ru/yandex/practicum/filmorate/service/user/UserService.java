@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.util.Collection;
 
 public interface UserService {
@@ -14,9 +12,9 @@ public interface UserService {
 
     Collection<User> getListOfMutualFriends(Long userId, Long userFriendId);
 
-    User create(User user) throws MethodArgumentNotValidException;
+    User create(User user);
 
-    User update(User updateUser) throws MethodArgumentNotValidException;
+    User update(User updateUser);
 
     Collection<User> findAll();
 

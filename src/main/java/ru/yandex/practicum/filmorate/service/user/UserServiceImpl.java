@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -62,12 +61,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) throws MethodArgumentNotValidException {
+    public User create(User user) {
         return userStorage.create(user);
     }
 
     @Override
-    public User update(User updateUser) throws MethodArgumentNotValidException {
+    public User update(User updateUser) {
         return userStorage.update(updateUser);
     }
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -46,7 +45,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateCorrectUser() throws MethodArgumentNotValidException {
+    void testCreateCorrectUser() {
         userController.create(user);
         Collection<User> users = userController.findAll();
         assertEquals(1, users.size(), "Контроллер не создал пользователя");
@@ -54,7 +53,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testUpdateUser() throws MethodArgumentNotValidException {
+    void testUpdateUser() {
         User createdUser = userController.create(user);
         createdUser.setName("NewName");
         User updatedUser = userController.update(createdUser);
@@ -62,7 +61,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testFindAllUsers() throws MethodArgumentNotValidException {
+    void testFindAllUsers() {
         userController.create(user);
         User user1 = new User();
         user1.setName("TestName2");
@@ -82,7 +81,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserWithDuplicateEmail() throws MethodArgumentNotValidException {
+    void testCreateUserWithDuplicateEmail() {
         userController.create(user);
         User userWithSameEmail = new User();
         userWithSameEmail.setEmail("test@yandex.ru");
@@ -98,7 +97,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserWithDuplicateLogin() throws MethodArgumentNotValidException {
+    void testCreateUserWithDuplicateLogin() {
         userController.create(user);
         User userWithSameLogin = new User();
         userWithSameLogin.setEmail("another@yandex.ru");
@@ -113,7 +112,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testCreateUserNameIsEmpty() throws MethodArgumentNotValidException {
+    void testCreateUserNameIsEmpty() {
         user.setName("");
         userController.create(user);
         assertEquals("TestLogin", user.getName(), "Пустое имя пользователя не было заменено на логин");
@@ -134,7 +133,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testUserAddFriend() throws MethodArgumentNotValidException {
+    void testUserAddFriend() {
         userController.create(user);
 
         User user1 = new User();
@@ -152,7 +151,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testUserDeleteFriend() throws MethodArgumentNotValidException {
+    void testUserDeleteFriend() {
         userController.create(user);
 
         User user1 = new User();
@@ -176,7 +175,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testListOfMutualFriends() throws MethodArgumentNotValidException {
+    void testListOfMutualFriends() {
         userController.create(user);
 
         User user1 = new User();
