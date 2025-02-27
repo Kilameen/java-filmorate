@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
@@ -35,7 +36,7 @@ public class UserController {
 
     @PostMapping
     @Validated(Marker.OnCreate.class)
-    public User create(@Valid @RequestBody User user) {
+    public User create(@Valid @RequestBody User user) throws MethodArgumentNotValidException {
         log.info("Создаем пользователя {}", user);
         User createUser = userService.create(user);
         log.info("Пользователь {} создан", user);
@@ -51,7 +52,7 @@ public class UserController {
 
     @PutMapping
     @Validated(Marker.OnUpdate.class) // Валидация для обновления
-    public User update(@Valid @RequestBody User updateUser) {
+    public User update(@Valid @RequestBody User updateUser) throws MethodArgumentNotValidException {
         log.info("Запрос на обновление информации о пользователе {}", updateUser);
         return userService.update(updateUser);
     }
