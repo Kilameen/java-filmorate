@@ -30,7 +30,14 @@ public class ErrorHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerValidationException(Throwable e) {
-        return new ErrorResponse(e.getMessage());
+        String errorMessage = "Произошла внутренняя ошибка сервера: ";
+        errorMessage += "Тип исключения - " + e.getClass().getSimpleName() + ". ";
+        if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+            errorMessage += "Сообщение: " + e.getMessage();
+        } else {
+            errorMessage += "Сообщение отсутствует.";
+        }
+        return new ErrorResponse(errorMessage);
     }
 
     @ExceptionHandler(DuplicatedDataException.class)
