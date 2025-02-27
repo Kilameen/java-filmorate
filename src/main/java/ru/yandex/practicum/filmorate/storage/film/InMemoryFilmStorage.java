@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film updateFilm) throws MethodArgumentNotValidException  {
+    public Film update(Film updateFilm) throws MethodArgumentNotValidException {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
