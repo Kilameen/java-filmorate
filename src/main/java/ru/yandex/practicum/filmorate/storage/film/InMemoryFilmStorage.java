@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -30,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film film) {
+    public Film create(Film film) throws MethodArgumentNotValidException {
         validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
@@ -48,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film updateFilm) {
+    public Film update(Film updateFilm) throws MethodArgumentNotValidException  {
         Film oldFilmInformation = films.get(updateFilm.getId());
         if (oldFilmInformation == null) {
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");

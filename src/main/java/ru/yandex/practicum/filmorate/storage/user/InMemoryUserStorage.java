@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -28,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User create(User user) {
+    public User create(User user) throws MethodArgumentNotValidException{
         validate(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -49,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User updateUser) {
+    public User update(User updateUser) throws MethodArgumentNotValidException {
         User oldUserInformation = users.get(updateUser.getId());
         if (oldUserInformation == null) {
             throw new NotFoundException("Пользователя с Id = " + updateUser.getId() + " не найдено.");
