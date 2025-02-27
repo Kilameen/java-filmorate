@@ -54,10 +54,19 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильма с Id = " + updateFilm.getId() + " не найдено.");
         }
         validate(updateFilm);
-        oldFilmInformation.setName(updateFilm.getName());
-        oldFilmInformation.setDescription(updateFilm.getDescription());
-        oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
-        oldFilmInformation.setDuration(updateFilm.getDuration());
+
+        if (updateFilm.getName() != null) {
+            oldFilmInformation.setName(updateFilm.getName());
+        }
+        if (updateFilm.getDescription() != null) {
+            oldFilmInformation.setDescription(updateFilm.getDescription());
+        }
+        if (updateFilm.getReleaseDate() != null) {
+            oldFilmInformation.setReleaseDate(updateFilm.getReleaseDate());
+        }
+        if (updateFilm.getDuration() != null) {
+            oldFilmInformation.setDuration(updateFilm.getDuration());
+        }
         return oldFilmInformation;
     }
 

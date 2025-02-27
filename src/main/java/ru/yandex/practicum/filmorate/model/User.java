@@ -12,7 +12,7 @@ import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-public class User implements Marker {
+public class User {
     Long id;
 
     @Email

@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-public class Film implements Marker {
+public class Film {
     Long id;
 
     @NotBlank(message = "Название не может быть пустым",
