@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -40,14 +41,14 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Validated(Marker.OnCreate.class)
-    public Film create(@Valid @RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) throws MethodArgumentNotValidException {
         log.info("Добавление фильма {}", film);
         return filmService.create(film);
     }
 
     @PutMapping
     @Validated(Marker.OnUpdate.class)
-    public Film update(@Valid @RequestBody Film updateFilm) {
+    public Film update(@Valid @RequestBody Film updateFilm) throws MethodArgumentNotValidException {
         log.info("Запрос на обновление информации о фильме {}", updateFilm);
         return filmService.update(updateFilm);
     }

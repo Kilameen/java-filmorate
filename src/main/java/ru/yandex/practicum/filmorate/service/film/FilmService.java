@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 
@@ -10,9 +11,9 @@ public interface FilmService {
 
     Collection<Film> getPopularFilms(Long count);
 
-    Film create(Film film);
+    Film create(Film film) throws MethodArgumentNotValidException;
 
-    Film update(Film film);
+    Film update(Film film) throws MethodArgumentNotValidException;
 
     Collection<Film> findAll();
 

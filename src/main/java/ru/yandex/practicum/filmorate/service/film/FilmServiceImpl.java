@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -38,12 +39,12 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film create(Film film) {
+    public Film create(Film film) throws MethodArgumentNotValidException {
         return filmStorage.create(film);
     }
 
     @Override
-    public Film update(Film film) {
+    public Film update(Film film) throws MethodArgumentNotValidException {
         return filmStorage.update(film);
     }
 
