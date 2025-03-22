@@ -1,11 +1,3 @@
-# java-filmorate
-## Схема БД
-![Diagram](diagram.png)
-
-<details>
-  <summary>Код схемы БД</summary>
-
-```
 Table users {
   id bigint [primary key, increment]
   email varchar(255) [not null]
@@ -62,26 +54,3 @@ Ref: likes.film_id > films.id
 Ref: likes.user_id > users.id
 Ref: friendships.user_id > users.id
 Ref: friendships.friend_id > users.id
-
-```
-</details>
-
-<details>
-  <summary>Описание схемы БД</summary>
-
-### Эта схема представляет собой базу данных для хранения информации о :
-+ пользователях 
-+ фильмах
-+ жанрах
-+ рейтингах
-+ лайках 
-+ дружеских связях. 
-
-### В таблицах:
-+ friendships
-+ film_genre
-+ likes 
-
-Используются ***составные первичные ключи*** для обеспечения уникальности связей между записями.
-
-</details>
