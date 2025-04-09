@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service.film.rating;
 
 import ru.yandex.practicum.filmorate.model.Rating;
-
 import java.util.Collection;
-import java.util.List;
 
 public interface RatingService {
     Collection<Rating> getAllRating();
