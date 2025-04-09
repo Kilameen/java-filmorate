@@ -142,45 +142,34 @@ public class UserControllerTest {
         user1.setEmail("tests@yandex.ru");
         user1.setBirthday(LocalDate.of(1992, 1, 25));
         userController.create(user1);
-
         userController.addFriend(user.getId(), user1.getId());
-
-        // Проверяем, что user1 есть в друзьях у user
         Collection<User> friends = userController.getFriends(user.getId());
         assertEquals(1, friends.size(), "Контроллер не добавил user1 в друзья user");
-
-        // Проверяем, что у user1 нет друзей (пока что)
         friends = userController.getFriends(user1.getId());
         assertEquals(0, friends.size(), "У user1 не должно быть друзей, пока его никто не добавил.");
+
     }
+
     @Test
     void testUserDeleteFriend() {
-        // Создаем первого пользователя
         userController.create(user);
 
-        // Создаем второго пользователя
         User user1 = new User();
         user1.setName("TestName1");
         user1.setLogin("TestLogin1");
         user1.setEmail("tests@yandex.ru");
         user1.setBirthday(LocalDate.of(1992, 1, 25));
         userController.create(user1);
-
-        // Добавляем обоих пользователей друг другу в друзья
         userController.addFriend(user.getId(), user1.getId());
         userController.addFriend(user1.getId(), user.getId());
-
-        // Проверяем, что друзья добавились
         Collection<User> friends = userController.getFriends(user.getId());
         assertEquals(1, friends.size(), "Контроллер не добавил user1 в друзья user");
         friends = userController.getFriends(user1.getId());
         assertEquals(1, friends.size(), "Контроллер не добавил user в друзья user1");
 
-        // Удаляем обоих пользователей друг у друга из друзей
         userController.deleteFriend(user.getId(), user1.getId());
         userController.deleteFriend(user1.getId(), user.getId());
 
-        // Проверяем, что друзья удалились
         friends = userController.getFriends(user.getId());
         assertEquals(0, friends.size(), "Контроллер не удалил user1 из друзей user");
         friends = userController.getFriends(user1.getId());
