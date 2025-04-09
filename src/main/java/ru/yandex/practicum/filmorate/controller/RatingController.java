@@ -20,14 +20,14 @@ public class RatingController {
     private final RatingService ratingService;
 
     @GetMapping
-    public Collection<Rating> getRatings(){
+    public Collection<Rating> getRatings() {
         log.info("Запрос на получение всех рейтингов");
         return ratingService.getAllRating();
     }
 
     @GetMapping("/{id}")
-    public Rating getRatingById(@PathVariable Long id){
-        log.info("Запрос на получение рейтинга по id {}",id);
+    public Rating getRatingById(@PathVariable Long id) {
+        log.info("Запрос на получение рейтинга по id {}", id);
         return ratingService.getRatingByID(id);
     }
 }
