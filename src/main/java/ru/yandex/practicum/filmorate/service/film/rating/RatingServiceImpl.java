@@ -7,10 +7,7 @@ import ru.yandex.practicum.filmorate.dao.RatingDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.film.rating.RatingService;
-
 import java.util.Collection;
-import java.util.List;
-
 import static java.util.Objects.isNull;
 
 @Service
