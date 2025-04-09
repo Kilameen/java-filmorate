@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 
 public interface FilmService {
+
     void addLike(Long filmId, Long userId);
 
     void deleteLike(Long filmId, Long userId);
@@ -18,5 +19,6 @@ public interface FilmService {
 
     Film getFilmById(Long id);
 
-    void deleteAllFilms(Film film);
+    void deleteFilm(Film film);
 }
+

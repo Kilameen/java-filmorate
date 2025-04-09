@@ -1,0 +1,60 @@
+package ru.yandex.practicum.filmorate.service.film.genre;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.GenreDao;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Genre;
+import java.util.Collection;
+import java.util.Map;
+import static java.util.Objects.isNull;
+
+@Service
+@Slf4j
+public class GenreServiceImpl implements GenreService {
+    private final GenreDao genreDbStorage;
+
+    @Autowired
+    public GenreServiceImpl(GenreDao genreDbStorage) {
+        this.genreDbStorage = genreDbStorage;
+    }
+
+    @Override
+    public Collection<Genre> getGenres() {
+        return genreDbStorage.getGenres();
+    }
+
+    @Override
+    public Genre getGenre(Long id) {
+        Genre genre = genreDbStorage.getGenre(id);
+        if (isNull(genre)) {
+            throw new NotFoundException("Жанра с таким id не существует");
+        }
+        return genre;
+    }
+
+    @Override
+    public void setGenre(Long idFilm, Long idGenre) {
+        genreDbStorage.setGenres(idFilm, idGenre);
+        log.info("Добавил жанр {} к фильму {}", idGenre, idFilm);
+    }
+
+    @Override
+    public Collection<Genre> getFilmGenres(Long filmId) {
+        log.info("Приступаю к поиску жанров для фильма {}", filmId);
+        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(filmId);
+        log.info("Нашел {} жанров к фильму", filmGenres.size());
+        return filmGenres;
+    }
+
+    @Override
+    public void clearFilmGenres(Long filmId) {
+        genreDbStorage.clearFilmGenres(filmId);
+    }
+
+    @Override
+    public Map<Long, Collection<Genre>> getAllFilmsGenres(Collection<Long> filmIds) {
+        return genreDbStorage.getAllFilmsGenres(filmIds);
+    }
+}

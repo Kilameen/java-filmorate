@@ -44,13 +44,6 @@ public class UserController {
         return createUser;
     }
 
-    @DeleteMapping
-    public void deleteAllUser(User user) {
-        log.info("Запрос на удаление всех пользователей");
-        userService.deleteAllUser(user);
-        log.info("Все пользователи удалены");
-    }
-
     @PutMapping
     @Validated(Marker.OnUpdate.class) // Валидация для обновления
     public User update(@Valid @RequestBody User updateUser) {
@@ -70,13 +63,13 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public Collection<User> getFriends(@PathVariable("id") Long userId) {
         log.info("Ваш список друзей");
-        return userService.getFriends(userId);
+        return userService.getAllUserFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getListOfMutualFriends(@PathVariable("id") Long userId, @PathVariable("otherId") Long userFriendId) {
         log.info("Cписок друзей, общих с пользователем {}.", userFriendId);
-        return userService.getListOfMutualFriends(userId, userFriendId);
+        return userService.getMutualFriends(userId, userFriendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

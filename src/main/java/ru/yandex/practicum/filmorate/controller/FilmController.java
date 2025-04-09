@@ -52,13 +52,6 @@ public class FilmController {
         return filmService.update(updateFilm);
     }
 
-    @DeleteMapping
-    public void deleteAllFilm(Film film) {
-        log.info("Запрос на удаление всех фильмов");
-        filmService.deleteAllFilms(film);
-        log.info("Все фильмы удалены");
-    }
-
     //Service
 
     @PutMapping("/{id}/like/{userId}")
