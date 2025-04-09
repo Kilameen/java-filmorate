@@ -11,7 +11,7 @@ import java.sql.Statement;
 
 @Repository
 @RequiredArgsConstructor
-public class LikeDbStorage implements LikeDao{
+public class LikeDbStorage implements LikeDao {
 
     private final JdbcTemplate jdbcTemplate;
     private static final String SQL_REQUEST_DIRECTORY = "src/main/resources/requests/film/like/";

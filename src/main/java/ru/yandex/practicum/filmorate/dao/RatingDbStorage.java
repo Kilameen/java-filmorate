@@ -12,7 +12,7 @@ import java.util.Collection;
 @Component
 @Repository
 @RequiredArgsConstructor
-public class RatingDbStorage implements RatingDao{
+public class RatingDbStorage implements RatingDao {
     private final JdbcTemplate jdbcTemplate;
     private static final String SQL_REQUEST_DIRECTORY = "src/main/resources/requests/rating/";
     private static final String SELECT_RATING_BY_ID_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getRatingById.sql");
