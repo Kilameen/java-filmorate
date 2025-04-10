@@ -130,8 +130,9 @@ public class FilmServiceImpl implements FilmService {
         if (film.getReleaseDate().isBefore(STARTED_REALISE_DATE)) {
             throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
         }
-        if (filmStorage.findAll().stream().anyMatch(f ->
-                f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))) {
+        if (filmStorage.findAll().stream()
+                .anyMatch(f -> f.getName().equals(film.getName()) &&
+                        f.getReleaseDate().equals(film.getReleaseDate()))) {
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
         }
     }
