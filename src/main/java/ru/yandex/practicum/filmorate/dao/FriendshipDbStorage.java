@@ -30,8 +30,8 @@ public class FriendshipDbStorage implements FriendshipDao {
         // Сначала проверяем, есть ли уже запрос на дружбу от userIdTwo к userIdOne.
         if (isFriend(userIdTwo, userIdOne)) {
             // Если запрос есть, обновляем статус дружбы в обеих записях.
-            jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdOne, userIdTwo);
-            jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdTwo, userIdOne);
+            jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdOne, userIdTwo, true);
+            jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdTwo, userIdOne, true);
         } else {
             // Если запроса нет, создаем новый запрос на дружбу только для userIdOne -> userIdTwo
             KeyHolder keyHolderOne = new GeneratedKeyHolder();

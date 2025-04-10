@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
     public void addFriend(Long userId, Long userFriendId) {
         try {
             friendshipDao.addFriend(userId, userFriendId);
+
         } catch (Exception ex) {
             throw new NotFoundException("Ошибка поиска пользователя");
         }
