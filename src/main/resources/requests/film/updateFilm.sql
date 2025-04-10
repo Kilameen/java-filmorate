@@ -4,4 +4,4 @@ SET film_name = ?,
     release_date = ?,
     duration = ?,
     mpa_id = ?
-WHERE film_id = ?
+WHERE film_id = ?;

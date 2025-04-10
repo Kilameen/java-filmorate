@@ -1,3 +1,3 @@
 DELETE
 FROM film_genres
-WHERE film_id = ?
+WHERE film_id = ?;

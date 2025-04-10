@@ -1,3 +1,3 @@
 SELECT *
 FROM genres
-ORDER BY genre_id
+ORDER BY genre_id;

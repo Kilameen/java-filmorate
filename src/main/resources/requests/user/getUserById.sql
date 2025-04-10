@@ -1,3 +1,3 @@
 SELECT *
 FROM users
-WHERE user_id = ?
+WHERE user_id = ?;

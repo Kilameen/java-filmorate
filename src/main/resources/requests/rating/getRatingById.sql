@@ -1,3 +1,3 @@
 SELECT *
 FROM rating
-WHERE rating_id = ?
+WHERE rating_id = ?;

@@ -1,3 +1,3 @@
 SELECT *
 FROM genres
-WHERE genre_id = ?
+WHERE genre_id = ?;
