@@ -40,7 +40,7 @@ class FilmDbStorageTest {
     @BeforeEach
     void beforeEach() {
         jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
-        jdbcTemplate.update(Reader.readString("src/main/resources/requests/schema.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
         jdbcTemplate.update(Reader.readString("src/test/resources/dataSource.sql"));
     }
 

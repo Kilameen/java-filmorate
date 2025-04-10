@@ -1,6 +1,6 @@
-SELECT films.*, rating.*, COUNT(film_likes.user_id) AS rate
-FROM films
-LEFT JOIN rating ON films.mpa_id = rating.rating_id
-LEFT JOIN film_likes ON films.film_id = film_likes.film_id
-GROUP BY films.film_id
-ORDER BY films.film_id;
+SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate
+FROM films AS f
+LEFT JOIN rating AS r ON f.mpa_id = r.rating_id
+LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id
+GROUP BY f.film_id, r.rating_id
+ORDER BY f.film_id;

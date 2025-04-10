@@ -46,10 +46,10 @@ public class UserDbStorage implements UserStorage {
             user.setId(userId);
             return user;
         } catch (Exception e) {
-            if (e.getMessage().contains("EMAIL")) {
-                throw new UserExistException("EMAIL", user.getEmail());
-            } else if (e.getMessage().contains("LOGIN")) {
-                throw new UserExistException("LOGIN", user.getLogin());
+            if (e.getMessage().contains("email")) {
+                throw new UserExistException("email", user.getEmail());
+            } else if (e.getMessage().contains("login")) {
+                throw new UserExistException("login", user.getLogin());
             } else {
                 throw new UnsupportedOperationException(e.getMessage());
             }

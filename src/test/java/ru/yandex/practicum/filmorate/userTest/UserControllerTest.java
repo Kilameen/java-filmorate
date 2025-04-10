@@ -36,7 +36,7 @@ public class UserControllerTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
-        jdbcTemplate.update(Reader.readString("src/main/resources/requests/schema.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         user = new User();
         user.setName("TestName");

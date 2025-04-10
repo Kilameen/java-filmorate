@@ -21,8 +21,8 @@ public class GenreControllerTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
-        jdbcTemplate.update(Reader.readString("src/main/resources/requests/schema.sql"));
-        jdbcTemplate.update(Reader.readString("src/main/resources/requests/data.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/data.sql"));
     }
 
     @Autowired
