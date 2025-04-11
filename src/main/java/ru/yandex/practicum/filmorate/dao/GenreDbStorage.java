@@ -26,7 +26,7 @@ public class GenreDbStorage implements GenreDao {
     private static final String SELECT_GENRES_ALL_FILMS_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getGenresAllFilms.sql");
 
     @Override
-    public List<Genre> getFilmGenres(Long filmId) {
+    public Collection<Genre> getFilmGenres(Long filmId) {
         return jdbcTemplate.query(SELECT_FILM_GENRE_SQL_REQUEST, new GenreMapper(), filmId);
     }
 
