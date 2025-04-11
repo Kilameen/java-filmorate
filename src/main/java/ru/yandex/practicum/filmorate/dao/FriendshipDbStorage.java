@@ -60,6 +60,7 @@ public class FriendshipDbStorage implements FriendshipDao {
                 .stream().anyMatch(Objects::nonNull);
     }
 
+    @Override
     public Collection<User> getAllUserFriends(Long userId) {
         return jdbcTemplate.query(SELECT_ALL_USER_FRIENDS_SQL_REQUEST, new UserMapper(), userId);
     }

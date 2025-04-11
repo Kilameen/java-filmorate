@@ -57,39 +57,38 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
-        validate(film);
+        validate(film); // Проверяем основные параметры фильма
 
-        try {
-            Film addFilm = filmStorage.create(film);
-            Collection<Genre> genres1 = film.getGenres();
-            if (nonNull(genres1)) {
-                Set<Genre> genres = new HashSet<>(genres1);
-                for (Genre genre : genres) {
-                    genreService.setGenre(addFilm.getId(), genre.getId());
-                }
-                addFilm.setGenres(genreService.getFilmGenres(addFilm.getId()));
+        Film addFilm = filmStorage.create(film);
+        if (nonNull(film.getGenres())) {
+            // Используем Set для исключения дубликатов genreId
+            Set<Genre> genres = new HashSet<>(film.getGenres());
+            for (Genre genre : genres) {
+                genreService.setGenre(addFilm.getId(), genre.getId());
             }
-            return addFilm;
-        } catch (Exception ex) {
-            throw new NotFoundException(ex.getMessage());
+            addFilm.setGenres(genreService.getFilmGenres(addFilm.getId()));
         }
+        return addFilm;
     }
 
     @Override
     public Film update(Film film) {
-        validate(film);
-        Film updateFilm = filmStorage.update(film);
-        if (isNull(updateFilm)) {
+        validate(film); // Проверяем, что данные фильма корректны
+
+        Film updatedFilm = filmStorage.update(film); // Обновляем информацию о фильме
+        if (isNull(updatedFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
-        genreService.clearFilmGenres(film.getId());
-        Collection<Genre> genres = film.getGenres();
-        if (nonNull(genres)) {
+
+        genreService.clearFilmGenres(film.getId()); // Очищаем текущие жанры фильма
+
+        Set<Genre> genres = new HashSet<>(film.getGenres()); // Преобразуем список в HashSet, чтобы исключить дубликаты
+        if (nonNull(genres) && !genres.isEmpty()) { // Проверяем, что жанры не null и не пусты
             for (Genre genre : genres) {
-                genreService.setGenre(film.getId(), genre.getId());
+                genreService.setGenre(film.getId(), genre.getId()); // Устанавливаем жанр для фильма
             }
         }
-        return updateFilm;
+        return updatedFilm;
     }
 
     @Override
@@ -130,9 +129,8 @@ public class FilmServiceImpl implements FilmService {
         if (film.getReleaseDate().isBefore(STARTED_REALISE_DATE)) {
             throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
         }
-        if (filmStorage.findAll().stream()
-                .anyMatch(f -> f.getName().equals(film.getName()) &&
-                        f.getReleaseDate().equals(film.getReleaseDate()))) {
+        if (filmStorage.findAll().stream().anyMatch(f ->
+                f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))) {
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
         }
     }
