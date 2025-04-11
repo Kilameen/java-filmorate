@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.service.film.genre.GenreService;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.service.film.rating.RatingService;
-
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,13 +74,12 @@ public class FilmServiceImpl implements FilmService {
         return addFilm;
     }
 
-
     @Override
     public Film update(Film film) {
-      validateGenreAndRating(film);
-      validate(film);
+        validateGenreAndRating(film);
+        validate(film);
 
-      Film updatedFilm = filmStorage.update(film);
+        Film updatedFilm = filmStorage.update(film);
         if (isNull(updatedFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
@@ -139,7 +137,8 @@ public class FilmServiceImpl implements FilmService {
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
         }
     }
-    private void validateGenreAndRating(Film film){
+
+    private void validateGenreAndRating(Film film) {
         if (isNull(film.getMpa()) || isNull(ratingService.getRatingByID(film.getMpa().getId()))) {
             throw new ValidationException("Рейтинг с таким id не существует");
         }
