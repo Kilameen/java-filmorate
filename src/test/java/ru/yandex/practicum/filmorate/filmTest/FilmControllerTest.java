@@ -51,7 +51,7 @@ class FilmControllerTest {
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
-		;
+
 		Rating rating = new Rating(1L, "G");
 		film.setMpa(rating);
 
@@ -81,7 +81,8 @@ class FilmControllerTest {
 		film2.setDescription("Test Description");
 		film2.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film2.setDuration(120);
-
+		Rating rating = new Rating(2L, "PG");
+		film2.setMpa(rating);
 
 		Collection<Film> films = filmController.findAll();
 		assertEquals(1, films.size(), "Контроллер не создал фильм");
