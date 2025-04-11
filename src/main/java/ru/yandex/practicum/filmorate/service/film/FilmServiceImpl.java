@@ -73,7 +73,10 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film update(Film film) {
-        validate(film); // Проверяем, что данные фильма корректны
+
+        if (film.getReleaseDate().isBefore(STARTED_REALISE_DATE)) {
+            throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
+        }
 
         Film updatedFilm = filmStorage.update(film); // Обновляем информацию о фильме
         if (isNull(updatedFilm)) {
