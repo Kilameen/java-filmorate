@@ -59,16 +59,6 @@ public class FilmServiceImpl implements FilmService {
     public Film create(Film film) {
         validate(film);
 
-        try {
-            filmStorage.findAll().stream()
-                    .filter(f -> f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))
-                    .findAny().ifPresent(f -> {
-                        throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
-                    });
-        } catch (DuplicatedDataException e) {
-            throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
-        }
-
         Film addFilm = filmStorage.create(film);
         if (nonNull(film.getGenres())) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
@@ -79,6 +69,7 @@ public class FilmServiceImpl implements FilmService {
         }
         return addFilm;
     }
+
 
     @Override
     public Film update(Film film) {
