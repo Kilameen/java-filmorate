@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.film.genre.GenreService;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.service.film.rating.RatingService;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,17 +27,19 @@ public class FilmServiceImpl implements FilmService {
     private final UserStorage userStorage;
     private final LikeDbStorage likeDbStorage;
     private final GenreService genreService;
+    private final RatingService ratingService;
     private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
     public FilmServiceImpl(@Qualifier("H2FilmDb") FilmStorage filmStorage,
                            @Qualifier("H2UserDb") UserStorage userStorage,
-                           LikeDbStorage likeDbStorage, GenreService genreService) {
+                           LikeDbStorage likeDbStorage, GenreService genreService, RatingService ratingService) {
 
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likeDbStorage = likeDbStorage;
         this.genreService = genreService;
+        this.ratingService = ratingService;
     }
 
     @Override
@@ -57,6 +61,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
+        validateGenreAndRating(film);
         validate(film);
 
         Film addFilm = filmStorage.create(film);
@@ -73,19 +78,15 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film update(Film film) {
+      validateGenreAndRating(film);
+      validate(film);
 
-        if (film.getReleaseDate().isBefore(STARTED_REALISE_DATE)) {
-            throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
-        }
-
-        Film updatedFilm = filmStorage.update(film);
+      Film updatedFilm = filmStorage.update(film);
         if (isNull(updatedFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
-
         genreService.clearFilmGenres(film.getId());
-
-        Set<Genre> genres = new HashSet<>(film.getGenres());
+        Set<Genre> genres = film.getGenres() == null ? new HashSet<>() : new HashSet<>(film.getGenres()); // Создаем пустой сет, если genres == null
         if (nonNull(genres) && !genres.isEmpty()) {
             for (Genre genre : genres) {
                 genreService.setGenre(film.getId(), genre.getId());
@@ -93,6 +94,7 @@ public class FilmServiceImpl implements FilmService {
         }
         return updatedFilm;
     }
+
 
     @Override
     public Collection<Film> findAll() {
@@ -135,6 +137,22 @@ public class FilmServiceImpl implements FilmService {
         if (filmStorage.findAll().stream().anyMatch(f ->
                 f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))) {
             throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
+        }
+    }
+    private void validateGenreAndRating(Film film){
+        if (isNull(film.getMpa()) || isNull(ratingService.getRatingByID(film.getMpa().getId()))) {
+            throw new ValidationException("Рейтинг с таким id не существует");
+        }
+
+        // Проверяем, существуют ли жанры
+        if (nonNull(film.getGenres())) {
+            for (Genre genre : film.getGenres()) {
+                try {
+                    genreService.getGenre(genre.getId());
+                } catch (NotFoundException e) {
+                    throw new NotFoundException("Жанра с id " + genre.getId() + " не существует");
+                }
+            }
         }
     }
 }

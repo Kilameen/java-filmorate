@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.utils.Reader;
 import java.util.*;
@@ -55,7 +56,7 @@ public class GenreDbStorage implements GenreDao {
 
     @Override
     public Collection<Genre> getGenres() {
-        return new ArrayList<>(jdbcTemplate.query(SELECT_ALL_GENRE_SQL_REQUEST, new GenreMapper()));
+        return jdbcTemplate.query(SELECT_ALL_GENRE_SQL_REQUEST, new GenreMapper());
     }
 
     @Override

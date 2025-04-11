@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
@@ -43,13 +41,8 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     @Validated(Marker.OnCreate.class)
     public Film create(@Valid @RequestBody Film film) {
-        try {
-            log.info("Добавление фильма {}", film);
-            return filmService.create(film);
-        } catch (DuplicatedDataException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "Фильм с таким названием и датой релиза уже существует.", e);
-        }
+        log.info("Добавление фильма {}", film);
+        return filmService.create(film);
     }
 
     @PutMapping
