@@ -46,6 +46,7 @@ class FilmControllerTest {
 		jdbcTemplate.update(Reader.readString("src/main/resources/data.sql"));
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 		film = new Film();
+		film.setId(1L);
 		film.setName("Test Film");
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
@@ -55,6 +56,7 @@ class FilmControllerTest {
 		film.setMpa(rating);
 
 		user = new User();
+		user.setId(1L);
 		user.setName("TestName");
 		user.setLogin("TestLogin");
 		user.setEmail("test@yandex.ru");
@@ -154,6 +156,7 @@ class FilmControllerTest {
 		filmController.create(film);
 		Rating rating1 = new Rating(2L, "PG");
 		Film film1 = new Film();
+		film1.setId(2L);
 		film1.setName("Test Film1");
 		film1.setDescription("Test Description1");
 		film1.setReleaseDate(LocalDate.of(2024, 1, 1));
@@ -163,6 +166,7 @@ class FilmControllerTest {
 
 		Film film2 = new Film();
 		Rating rating2 = new Rating(3L, "PG-13");
+		film2.setId(3L);
 		film2.setName("Test Film2");
 		film2.setDescription("Test Description2");
 		film2.setReleaseDate(LocalDate.of(2023, 1, 1));
@@ -171,7 +175,9 @@ class FilmControllerTest {
 		filmController.create(film2);
 
 		userController.create(user);
+
 		User user1 = new User();
+		user1.setId(2L);
 		user1.setName("TestName1");
 		user1.setLogin("TestLogin1");
 		user1.setEmail("tests@yandex.ru");
@@ -179,6 +185,7 @@ class FilmControllerTest {
 		userController.create(user1);
 
 		User user2 = new User();
+		user2.setId(3L);
 		user2.setName("TestName2");
 		user2.setLogin("TestLogin2");
 		user2.setEmail("testy@yandex.ru");

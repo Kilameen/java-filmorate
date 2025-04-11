@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Objects;
 
 @Component(value = "H2FilmDb")
 @Repository
@@ -41,11 +42,7 @@ public class FilmDbStorage implements FilmStorage {
             preparedStatement.setLong(5, film.getMpa().getId());
             return preparedStatement;
         }, keyHolder);
-        Long filmId = keyHolder.getKey().longValue();
-        // Устанавливаем ID в объект Film
-        film.setId(filmId);
-        // Возвращаем фильм с установленным ID
-        return film;
+        return getFilm(Objects.requireNonNull(keyHolder.getKey()).longValue());
     }
 
     @Override
