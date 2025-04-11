@@ -57,11 +57,20 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
-        validate(film); // Проверяем основные параметры фильма
+        validate(film);
+
+        try {
+            filmStorage.findAll().stream()
+                    .filter(f -> f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))
+                    .findAny().ifPresent(f -> {
+                        throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
+                    });
+        } catch (DuplicatedDataException e) {
+            throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
+        }
 
         Film addFilm = filmStorage.create(film);
         if (nonNull(film.getGenres())) {
-            // Используем Set для исключения дубликатов genreId
             Set<Genre> genres = new HashSet<>(film.getGenres());
             for (Genre genre : genres) {
                 genreService.setGenre(addFilm.getId(), genre.getId());
@@ -78,17 +87,17 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
         }
 
-        Film updatedFilm = filmStorage.update(film); // Обновляем информацию о фильме
+        Film updatedFilm = filmStorage.update(film);
         if (isNull(updatedFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
 
-        genreService.clearFilmGenres(film.getId()); // Очищаем текущие жанры фильма
+        genreService.clearFilmGenres(film.getId());
 
-        Set<Genre> genres = new HashSet<>(film.getGenres()); // Преобразуем список в HashSet, чтобы исключить дубликаты
-        if (nonNull(genres) && !genres.isEmpty()) { // Проверяем, что жанры не null и не пусты
+        Set<Genre> genres = new HashSet<>(film.getGenres());
+        if (nonNull(genres) && !genres.isEmpty()) {
             for (Genre genre : genres) {
-                genreService.setGenre(film.getId(), genre.getId()); // Устанавливаем жанр для фильма
+                genreService.setGenre(film.getId(), genre.getId());
             }
         }
         return updatedFilm;
