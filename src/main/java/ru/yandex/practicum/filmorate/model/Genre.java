@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Data
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class Genre {
     Long id;
 

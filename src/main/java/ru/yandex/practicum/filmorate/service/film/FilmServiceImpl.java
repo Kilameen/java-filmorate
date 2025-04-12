@@ -77,7 +77,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film update(Film film) {
         validateGenreAndRating(film);
-        validate(film);
 
         Film updatedFilm = filmStorage.update(film);
         if (isNull(updatedFilm)) {
