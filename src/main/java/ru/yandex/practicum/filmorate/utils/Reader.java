@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 
 public final class Reader {
     public Reader() {
-        throw new RuntimeException("Attempt to create a final class");
+        throw new RuntimeException("Попытка создать окончательный класс");
     }
 
     public static String readString(String filePath) throws NoSuchElementException {

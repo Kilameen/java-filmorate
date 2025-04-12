@@ -27,13 +27,11 @@ public class FriendshipDbStorage implements FriendshipDao {
 
     @Override
     public void addFriend(Long userIdOne, Long userIdTwo) {
-        // Сначала проверяем, есть ли уже запрос на дружбу от userIdTwo к userIdOne.
+
         if (isFriend(userIdTwo, userIdOne)) {
-            // Если запрос есть, обновляем статус дружбы в обеих записях.
             jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdOne, userIdTwo, true);
             jdbcTemplate.update(INSERT_USER_FRIEND_SQL_REQUEST, userIdTwo, userIdOne, true);
         } else {
-            // Если запроса нет, создаем новый запрос на дружбу только для userIdOne -> userIdTwo
             KeyHolder keyHolderOne = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement preparedStatement = connection
@@ -41,7 +39,7 @@ public class FriendshipDbStorage implements FriendshipDao {
                                 Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setLong(1, userIdOne);
                 preparedStatement.setLong(2, userIdTwo);
-                preparedStatement.setBoolean(3, false); // Изначально статус - "не подтверждено".
+                preparedStatement.setBoolean(3, false);
                 return preparedStatement;
             }, keyHolderOne);
         }
@@ -50,7 +48,6 @@ public class FriendshipDbStorage implements FriendshipDao {
     @Override
     public void deleteFriend(Long userIdOne, Long userIdTwo) {
         jdbcTemplate.update(DELETE_USER_FRIEND_SQL_REQUEST, userIdOne, userIdTwo);
-        jdbcTemplate.update(DELETE_USER_FRIEND_SQL_REQUEST, userIdTwo, userIdOne);
     }
 
     @Override

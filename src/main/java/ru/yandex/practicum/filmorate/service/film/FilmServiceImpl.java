@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.LikeDbStorage;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -78,12 +77,16 @@ public class FilmServiceImpl implements FilmService {
     public Film update(Film film) {
         validateGenreAndRating(film);
 
-        Film updatedFilm = filmStorage.update(film);
-        if (isNull(updatedFilm)) {
+        //Валидация для обновления(проверка на существование фильма с таким ID)
+        Film existingFilm = filmStorage.getFilm(film.getId());
+        if (isNull(existingFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
+
+        Film updatedFilm = filmStorage.update(film);
+
         genreService.clearFilmGenres(film.getId());
-        Set<Genre> genres = film.getGenres() == null ? new HashSet<>() : new HashSet<>(film.getGenres()); // Создаем пустой сет, если genres == null
+        Set<Genre> genres = film.getGenres() == null ? new HashSet<>() : new HashSet<>(film.getGenres());
         if (nonNull(genres) && !genres.isEmpty()) {
             for (Genre genre : genres) {
                 genreService.setGenre(film.getId(), genre.getId());
@@ -130,10 +133,6 @@ public class FilmServiceImpl implements FilmService {
         if (film.getReleaseDate().isBefore(STARTED_REALISE_DATE)) {
             throw new ValidationException("Дата релиза фильма не может быть раньше: " + STARTED_REALISE_DATE);
         }
-        if (filmStorage.findAll().stream().anyMatch(f ->
-                f.getName().equals(film.getName()) && f.getReleaseDate().equals(film.getReleaseDate()))) {
-            throw new DuplicatedDataException("Фильм с таким названием и датой релиза уже существует.");
-        }
     }
 
     private void validateGenreAndRating(Film film) {
@@ -141,7 +140,6 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("Рейтинг с таким id не существует");
         }
 
-        // Проверяем, существуют ли жанры
         if (nonNull(film.getGenres())) {
             for (Genre genre : film.getGenres()) {
                 try {

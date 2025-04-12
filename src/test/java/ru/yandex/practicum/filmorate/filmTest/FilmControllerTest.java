@@ -73,28 +73,6 @@ class FilmControllerTest {
 	}
 
 	@Test
-	void filmControllerRejectsDuplicateFilms() {
-		filmController.create(film);
-
-		Film film2 = new Film();
-		film2.setName("Test Film");
-		film2.setDescription("Test Description");
-		film2.setReleaseDate(LocalDate.of(2025, 1, 1));
-		film2.setDuration(120);
-		Rating rating = new Rating(2L, "PG");
-		film2.setMpa(rating);
-
-		Collection<Film> films = filmController.findAll();
-		assertEquals(1, films.size(), "Контроллер не создал фильм");
-		DuplicatedDataException thrown = assertThrows(
-				DuplicatedDataException.class,
-				() -> filmController.create(film2),
-				"Контроллер не выкинул исключение о дубликате фильма"
-		);
-		assertTrue(thrown.getMessage().contains("Фильм с таким названием и датой релиза уже существует"));
-	}
-
-	@Test
 	void filmValidatesBlankName() {
 		film.setName("");
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
