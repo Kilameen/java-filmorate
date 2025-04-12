@@ -92,7 +92,6 @@ public class FilmServiceImpl implements FilmService {
         return updatedFilm;
     }
 
-
     @Override
     public Collection<Film> findAll() {
         Collection<Film> allFilms = filmStorage.findAll();
