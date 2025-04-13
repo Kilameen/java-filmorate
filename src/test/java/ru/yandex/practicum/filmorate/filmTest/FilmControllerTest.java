@@ -78,12 +78,14 @@ class FilmControllerTest {
 		assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
 	}
 
+
 	@Test
 	void filmValidatesNullName() {
 		Film film = new Film();
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
+		film.setMpa(new Rating(1L, "G")); // необходимо установить mpa, чтобы валидация прошла успешно
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на null название");
 	}

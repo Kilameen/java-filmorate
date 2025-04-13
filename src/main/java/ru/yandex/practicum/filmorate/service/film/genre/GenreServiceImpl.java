@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import static java.util.Objects.isNull;
 
@@ -35,7 +36,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public void setGenre(Long idFilm, Long idGenre) {
+    public void setGenre(Long idFilm, List<Long> idGenre) {
         genreDbStorage.setGenres(idFilm, idGenre);
         log.info("Добавил жанр {} к фильму {}", idGenre, idFilm);
     }

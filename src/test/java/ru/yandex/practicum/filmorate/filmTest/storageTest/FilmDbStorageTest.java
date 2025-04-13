@@ -5,14 +5,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.utils.Reader;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,11 +22,11 @@ import java.util.stream.Collectors;
 
 @JdbcTest
 @AutoConfigureTestDatabase
-@Import(FilmDbStorage.class)
+@Import({FilmDbStorage.class, FilmMapper.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmDbStorageTest {
 
-    private final FilmStorage filmStorage;
+    private final FilmDbStorage filmStorage;
     private final JdbcTemplate jdbcTemplate;
 
     Film testFilm = new Film(null,

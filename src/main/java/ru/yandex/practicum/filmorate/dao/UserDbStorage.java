@@ -5,27 +5,33 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserExistException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.utils.Reader;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
 
 @Component(value = "H2UserDb")
-@Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String SQL_REQUEST_DIRECTORY = "src/main/resources/requests/user/";
-    private static final String INSERT_USER_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "addNewUser.sql");
-    private static final String UPDATE_USER_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "updateUser.sql");
-    private static final String SELECT_ALL_USERS_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getAllUsers.sql");
-    private static final String SELECT_USER_BY_ID_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getUserById.sql");
+    private final UserMapper userMapper;
+    private static final String INSERT_USER_SQL_REQUEST = "INSERT INTO users (email, login, user_name, birthday) VALUES (?, ?, ?, ?);";
+    private static final String UPDATE_USER_SQL_REQUEST = "UPDATE users\n" +
+            "SET email = ?,\n" +
+            "    login = ?,\n" +
+            "    user_name = ?,\n" +
+            "    birthday = ?\n" +
+            "WHERE user_id = ?;";
+    private static final String SELECT_ALL_USERS_SQL_REQUEST = "SELECT *\n" +
+            "FROM users;";
+    private static final String SELECT_USER_BY_ID_SQL_REQUEST = "SELECT *\n" +
+            "FROM users\n" +
+            "WHERE user_id = ?;";
 
     @Override
     public User create(User user) {
@@ -69,12 +75,15 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findAll() {
-        return jdbcTemplate.query(SELECT_ALL_USERS_SQL_REQUEST, new UserMapper());
+        return jdbcTemplate.query(SELECT_ALL_USERS_SQL_REQUEST, userMapper);
     }
 
     @Override
     public User getUserById(Long id) {
-        return jdbcTemplate.query(SELECT_USER_BY_ID_SQL_REQUEST, new UserMapper(), id).stream().findAny().orElse(null);
+        return jdbcTemplate.query(SELECT_USER_BY_ID_SQL_REQUEST, userMapper, id)
+                .stream()
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
     }
 
     @Override

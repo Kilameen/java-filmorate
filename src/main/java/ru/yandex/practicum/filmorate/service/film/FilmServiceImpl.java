@@ -3,20 +3,15 @@ package ru.yandex.practicum.filmorate.service.film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.LikeDbStorage;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.film.genre.GenreService;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.service.film.rating.RatingService;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @Service
 public class FilmServiceImpl implements FilmService {
@@ -24,20 +19,20 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeDbStorage likeDbStorage;
-    private final GenreService genreService;
-    private final RatingService ratingService;
+    private final GenreDbStorage genreDbStorage;
+    private final RatingDbStorage ratingDbStorage;
     private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
     public FilmServiceImpl(@Qualifier("H2FilmDb") FilmStorage filmStorage,
                            @Qualifier("H2UserDb") UserStorage userStorage,
-                           LikeDbStorage likeDbStorage, GenreService genreService, RatingService ratingService) {
+                           @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage, @Qualifier("H2GenreDb") GenreDbStorage genreDbStorage, @Qualifier("H2RatingDb") RatingDbStorage ratingDbStorage) {
 
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likeDbStorage = likeDbStorage;
-        this.genreService = genreService;
-        this.ratingService = ratingService;
+        this.genreDbStorage = genreDbStorage;
+        this.ratingDbStorage = ratingDbStorage;
     }
 
     @Override
@@ -54,30 +49,42 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Collection<Film> getPopularFilms(Long count) {
-        return filmStorage.getPopularFilms(count);
+        Collection<Film> popularFilms = filmStorage.getPopularFilms(count);
+        Collection<Long> filmIds = popularFilms.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+        for (Film film : popularFilms) {
+            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
+        }
+        return popularFilms;
     }
+
 
     @Override
     public Film create(Film film) {
-        validateGenreAndRating(film);
+        validateRating(film);
         validate(film);
 
         Film addFilm = filmStorage.create(film);
-        if (nonNull(film.getGenres())) {
+
+        if (film.getGenres() != null) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
-            for (Genre genre : genres) {
-                genreService.setGenre(addFilm.getId(), genre.getId());
-            }
-            addFilm.setGenres(genreService.getFilmGenres(addFilm.getId()));
+            List<Long> genreIds = genres.stream()
+                    .map(Genre::getId)
+                    .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
+                    .collect(Collectors.toList());
+
+            genreDbStorage.setGenres(addFilm.getId(), genreIds);
+            addFilm.setGenres(genreDbStorage.getFilmGenres(addFilm.getId()));
         }
         return addFilm;
     }
 
     @Override
     public Film update(Film film) {
-        validateGenreAndRating(film);
+        validateRating(film);
 
-        //Валидация для обновления(проверка на существование фильма с таким ID)
         Film existingFilm = filmStorage.getFilm(film.getId());
         if (isNull(existingFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
@@ -85,12 +92,14 @@ public class FilmServiceImpl implements FilmService {
 
         Film updatedFilm = filmStorage.update(film);
 
-        genreService.clearFilmGenres(film.getId());
-        Set<Genre> genres = film.getGenres() == null ? new HashSet<>() : new HashSet<>(film.getGenres());
-        if (nonNull(genres) && !genres.isEmpty()) {
-            for (Genre genre : genres) {
-                genreService.setGenre(film.getId(), genre.getId());
-            }
+        genreDbStorage.clearFilmGenres(film.getId());
+        Set<Genre> genres = new HashSet<>(film.getGenres());
+        if (!genres.isEmpty()) {
+            List<Long> genreIds = genres.stream()
+                    .map(Genre::getId)
+                    .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
+                    .collect(Collectors.toList());
+            genreDbStorage.setGenres(film.getId(), genreIds);
         }
         return updatedFilm;
     }
@@ -101,7 +110,7 @@ public class FilmServiceImpl implements FilmService {
         Collection<Long> filmIds = allFilms.stream()
                 .map(Film::getId)
                 .collect(Collectors.toList());
-        Map<Long, Collection<Genre>> filmsGenres = genreService.getAllFilmsGenres(filmIds);
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
         for (Film film : allFilms) {
             film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
         }
@@ -114,15 +123,9 @@ public class FilmServiceImpl implements FilmService {
         if (isNull(film)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
-        Collection<Genre> filmGenres = genreService.getFilmGenres(id);
+        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         film.setGenres(filmGenres);
         return film;
-    }
-
-    @Override
-    public void deleteFilm(Film film) {
-        filmStorage.deleteFilm(film);
-        genreService.clearFilmGenres(film.getId());
     }
 
     private void validateUserId(Long id) {
@@ -135,19 +138,9 @@ public class FilmServiceImpl implements FilmService {
         }
     }
 
-    private void validateGenreAndRating(Film film) {
-        if (isNull(film.getMpa()) || isNull(ratingService.getRatingByID(film.getMpa().getId()))) {
+    private void validateRating(Film film) {
+        if (isNull(film.getMpa()) || isNull(ratingDbStorage.getRating(film.getMpa().getId()))) {
             throw new ValidationException("Рейтинг с таким id не существует");
-        }
-
-        if (nonNull(film.getGenres())) {
-            for (Genre genre : film.getGenres()) {
-                try {
-                    genreService.getGenre(genre.getId());
-                } catch (NotFoundException e) {
-                    throw new NotFoundException("Жанра с id " + genre.getId() + " не существует");
-                }
-            }
         }
     }
 }

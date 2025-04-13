@@ -18,7 +18,4 @@ public interface FilmService {
     Collection<Film> findAll();
 
     Film getFilmById(Long id);
-
-    void deleteFilm(Film film);
 }
-

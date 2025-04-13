@@ -4,19 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.utils.Reader;
+import org.springframework.stereotype.Component;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-@Repository
+@Component(value = "H2LikeDb")
 @RequiredArgsConstructor
 public class LikeDbStorage implements LikeDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String SQL_REQUEST_DIRECTORY = "src/main/resources/requests/film/like/";
-    private static final String INSERT_LIKE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "addLikeTheFilm.sql");
-    private static final String DELETE_LIKE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "deleteLikeTheFilm.sql");
+    private static final String INSERT_LIKE_SQL_REQUEST = "INSERT INTO film_likes (film_id, user_id)\n" +
+            "VALUES (?, ?);";
+    private static final String DELETE_LIKE_SQL_REQUEST = "DELETE\n" +
+            "FROM film_likes\n" +
+            "WHERE film_id = ? AND user_id = ?;";
 
     @Override
     public void addLike(Long filmId, Long userId) {

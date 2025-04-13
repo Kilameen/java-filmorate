@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public interface GenreDao {
@@ -9,7 +10,7 @@ public interface GenreDao {
 
     Map<Long, Collection<Genre>> getAllFilmsGenres(Collection<Long> filmIds);
 
-    void setGenres(Long filmId, Long genreId);
+    void setGenres(Long filmId, List<Long> genreIds);
 
     Collection<Genre> getGenres();
 

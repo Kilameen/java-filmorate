@@ -5,29 +5,42 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.utils.Reader;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Component
-@Repository
+@Component (value = "H2GenreDb")
 @RequiredArgsConstructor
 public class GenreDbStorage implements GenreDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JdbcTemplate jdbcTemplate;
-    private static final String SQL_REQUEST_DIRECTORY = "src/main/resources/requests/genre/";
-    private static final String INSERT_GENRE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "addGenre.sql");
-    private static final String DELETE_GENRE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "deleteGenre.sql");
-    private static final String SELECT_ALL_GENRE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getAllGenre.sql");
-    private static final String SELECT_FILM_GENRE_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getFilmGenre.sql");
-    private static final String SELECT_GENRE_BY_ID_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getGenreById.sql");
-    private static final String SELECT_GENRES_ALL_FILMS_SQL_REQUEST = Reader.readString(SQL_REQUEST_DIRECTORY + "getGenresAllFilms.sql");
+    private final GenreMapper genreMapper;
+    private static final String INSERT_GENRE_SQL_REQUEST = "INSERT INTO film_genres (film_id, genre_id)\n" +
+            "VALUES (?, ?);";
+    private static final String DELETE_GENRE_SQL_REQUEST = "DELETE\n" +
+            "FROM film_genres\n" +
+            "WHERE film_id = ?;";
+    private static final String SELECT_ALL_GENRE_SQL_REQUEST = "SELECT *\n" +
+            "FROM genres\n" +
+            "ORDER BY genre_id;";
+    private static final String SELECT_FILM_GENRE_SQL_REQUEST = "SELECT genres.genre_id, genre_name\n" +
+            "FROM film_genres\n" +
+            "         LEFT JOIN genres ON film_genres.genre_id = genres.genre_id\n" +
+            "WHERE film_id = ?\n" +
+            "ORDER BY genres.genre_id;";
+    private static final String SELECT_GENRE_BY_ID_SQL_REQUEST = "SELECT *\n" +
+            "FROM genres\n" +
+            "WHERE genre_id = ?;";
+    private static final String SELECT_GENRES_ALL_FILMS_SQL_REQUEST = "SELECT fg.film_id, g.*\n" +
+            "FROM film_genres fg\n" +
+            "JOIN genres g ON fg.genre_id = g.genre_id\n" +
+            "WHERE fg.film_id IN (:filmIds);";
 
     @Override
     public Collection<Genre> getFilmGenres(Long filmId) {
-        return jdbcTemplate.query(SELECT_FILM_GENRE_SQL_REQUEST, new GenreMapper(), filmId);
+        return jdbcTemplate.query(SELECT_FILM_GENRE_SQL_REQUEST, genreMapper, filmId);
     }
 
     @Override
@@ -49,19 +62,25 @@ public class GenreDbStorage implements GenreDao {
     }
 
     @Override
-    public void setGenres(Long filmId, Long genreId) {
-        jdbcTemplate.update(INSERT_GENRE_SQL_REQUEST, filmId, genreId);
+    public void setGenres(Long filmId, List<Long> genreIds) {
+        List<Object[]> batchArgs = genreIds.stream()
+                .map(genreId -> new Object[]{filmId, genreId})
+                .collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(INSERT_GENRE_SQL_REQUEST, batchArgs);
     }
 
     @Override
     public Collection<Genre> getGenres() {
-        return jdbcTemplate.query(SELECT_ALL_GENRE_SQL_REQUEST, new GenreMapper());
+        return jdbcTemplate.query(SELECT_ALL_GENRE_SQL_REQUEST, genreMapper);
     }
 
     @Override
     public Genre getGenre(Long genreId) {
-        return jdbcTemplate.query(SELECT_GENRE_BY_ID_SQL_REQUEST, new GenreMapper(), genreId)
-                .stream().findAny().orElse(null);
+        return jdbcTemplate.query(SELECT_GENRE_BY_ID_SQL_REQUEST, genreMapper, genreId)
+                .stream()
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("Жанр с id " + genreId + " не найден"));
     }
 
     @Override

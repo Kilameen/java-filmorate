@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +16,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
-
     Long id;
 
     @NotBlank(message = "Название не может быть пустым",
@@ -33,6 +33,8 @@ public class Film {
     Integer duration;
 
     Long likes;
+
+    @NotNull(message = "Рейтинг MPA не может быть пустым", groups = Marker.OnCreate.class)
     Rating mpa;
-    Collection<Genre> genres;
+    Collection<Genre> genres = new HashSet<>();
 }

@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Reader;
 import java.time.LocalDate;
@@ -19,9 +23,8 @@ import java.util.stream.Collectors;
 
 @JdbcTest
 @AutoConfigureTestDatabase
-@Import(UserDbStorage.class)
+@Import({UserDbStorage.class, UserMapper.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-
 public class UserDbStorageTest {
     private final UserDbStorage userStorage;
     private final JdbcTemplate jdbcTemplate;

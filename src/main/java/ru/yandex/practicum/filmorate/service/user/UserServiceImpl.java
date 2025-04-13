@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final FriendshipDao friendshipDao;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage, FriendshipDao friendshipDao) {
+    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage, @Qualifier("H2FriendDb") FriendshipDao friendshipDao) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
     }

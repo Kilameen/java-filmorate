@@ -1,8 +1,8 @@
-MERGE INTO rating (rating_id, rating_name) VALUES ( 1, 'G' );
-MERGE INTO rating (rating_id, rating_name) VALUES ( 2, 'PG' );
-MERGE INTO rating (rating_id, rating_name) VALUES ( 3, 'PG-13' );
-MERGE INTO rating (rating_id, rating_name) VALUES ( 4, 'R' );
-MERGE INTO rating (rating_id, rating_name) VALUES ( 5, 'NC-17' );
+MERGE INTO mpa (rating_id, rating_name) VALUES ( 1, 'G' );
+MERGE INTO mpa (rating_id, rating_name) VALUES ( 2, 'PG' );
+MERGE INTO mpa (rating_id, rating_name) VALUES ( 3, 'PG-13' );
+MERGE INTO mpa (rating_id, rating_name) VALUES ( 4, 'R' );
+MERGE INTO mpa (rating_id, rating_name) VALUES ( 5, 'NC-17' );
 MERGE INTO genres (genre_id, genre_name) VALUES ( 1, 'Комедия' );
 MERGE INTO genres (genre_id, genre_name) VALUES ( 2, 'Драма' );
 MERGE INTO genres (genre_id, genre_name) VALUES ( 3, 'Мультфильм' );
