@@ -82,11 +82,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteAllUsers(User user) {
-        userStorage.deleteUser(user);
-    }
-
-    @Override
     public Collection<User> getAllUserFriends(Long id) {
         getUserById(id);
         return friendshipDao.getAllUserFriends(id);

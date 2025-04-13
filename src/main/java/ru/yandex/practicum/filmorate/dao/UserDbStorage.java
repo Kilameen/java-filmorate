@@ -85,8 +85,4 @@ public class UserDbStorage implements UserStorage {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
     }
-
-    @Override
-    public void deleteUser(User user) {
-    }
 }
