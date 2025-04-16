@@ -31,19 +31,19 @@ public class FilmDbStorage implements FilmStorage {
             "WHERE film_id = ?;";
     private static final String SELECT_ALL_FILM_SQL_REQUEST = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
             "FROM films AS f\n" +
-            "LEFT JOIN mpa AS r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
             "GROUP BY f.film_id, r.rating_id\n" +
             "ORDER BY f.film_id;\n";
-    private static final String SELECT_FILM_BY_ID_SQL_REQUEST = "SELECT films.*, mpa.*, COUNT(film_likes.user_id) AS rate\n" +
+    private static final String SELECT_FILM_BY_ID_SQL_REQUEST = "SELECT films.*, rating_mpa.*, COUNT(film_likes.user_id) AS rate\n" +
             "   FROM films\n" +
-            "   LEFT JOIN mpa ON films.mpa_id = mpa.rating_id\n" +
+            "   LEFT JOIN rating_mpa ON films.mpa_id = rating_mpa.rating_id\n" +
             "   LEFT JOIN film_likes ON films.film_id = film_likes.film_id\n" +
             "   WHERE films.film_id = ?\n" +
             "   GROUP BY films.film_id;\n";
     private static final String SELECT_POPULAR_FILMS_SQL_REQUEST = "SELECT f.*, r.rating_id, r.rating_name, COUNT(fl.user_id) AS rate\n" +
             "FROM films f\n" +
-            "LEFT JOIN mpa r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
             "GROUP BY f.film_id, r.rating_id, r.rating_name\n" +
             "ORDER BY rate DESC\n" +

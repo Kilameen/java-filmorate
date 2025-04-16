@@ -10,8 +10,6 @@ public interface GenreService {
 
     Genre getGenre(Long id);
 
-    void setGenre(Long idFilm, List<Long> idGenre);
-
     Collection<Genre> getFilmGenres(Long filmId);
 
     void clearFilmGenres(Long filmId);

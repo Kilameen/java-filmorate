@@ -36,12 +36,6 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public void setGenre(Long idFilm, List<Long> idGenre) {
-        genreDbStorage.setGenres(idFilm, idGenre);
-        log.info("Добавил жанр {} к фильму {}", idGenre, idFilm);
-    }
-
-    @Override
     public Collection<Genre> getFilmGenres(Long filmId) {
         log.info("Приступаю к поиску жанров для фильма {}", filmId);
         Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(filmId);

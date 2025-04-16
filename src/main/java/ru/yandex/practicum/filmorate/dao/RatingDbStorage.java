@@ -14,10 +14,10 @@ public class RatingDbStorage implements RatingDao {
     private final JdbcTemplate jdbcTemplate;
     private final RatingMapper ratingMapper;
     private static final String SELECT_RATING_BY_ID_SQL_REQUEST = "SELECT *\n" +
-            "FROM mpa\n" +
+            "FROM rating_mpa\n" +
             "WHERE rating_id = ?;";
     private static final String SELECT_ALL_RATING_SQL_REQUEST = "SELECT *\n" +
-            "FROM mpa\n" +
+            "FROM rating_mpa\n" +
             "ORDER BY rating_id;";
 
     @Override
