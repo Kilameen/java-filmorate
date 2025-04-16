@@ -1,6 +1,6 @@
 # java-filmorate
 ## Схема БД
-![Diagram](diagram.png)
+![Diagram](diagramBD.png)
 
 <details>
   <summary>Код схемы БД</summary>
@@ -8,15 +8,15 @@
 ```
 Table users {
   id bigint [primary key, increment]
-  email varchar(255) [not null]
-  login varchar(255) [not null]
-  name varchar(255)
+  email varchar(100) [not null]
+  login varchar(100) [not null]
+  name varchar(100)
   birthday date
 }
 
 Table films {
   id bigint [primary key, increment]
-  name varchar(255) [not null]
+  name varchar(100) [not null]
   description varchar(200)
   release_date date [not null]
   duration integer [not null]
@@ -35,7 +35,7 @@ Table friendships {
 
 Table genres {
   id bigint [primary key, increment]
-  name varchar(255) [not null]
+  name varchar(100) [not null]
 }
 
 Table film_genre {
@@ -46,7 +46,7 @@ Table film_genre {
 
 Table ratings {
   id bigint [primary key, increment]
-  name varchar(255) [not null]
+  name varchar(100) [not null]
 }
 
 Table likes {
@@ -70,17 +70,17 @@ Ref: friendships.friend_id > users.id
   <summary>Описание схемы БД</summary>
 
 ### Эта схема представляет собой базу данных для хранения информации о :
-+ пользователях 
++ пользователях
 + фильмах
 + жанрах
 + рейтингах
-+ лайках 
-+ дружеских связях. 
++ лайках
++ дружеских связях.
 
 ### В таблицах:
 + friendships
 + film_genre
-+ likes 
++ likes
 
 Используются ***составные первичные ключи*** для обеспечения уникальности связей между записями.
 

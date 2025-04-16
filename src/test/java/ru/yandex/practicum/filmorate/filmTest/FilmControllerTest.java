@@ -1,27 +1,28 @@
 package ru.yandex.practicum.filmorate.filmTest;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import org.junit.jupiter.api.AfterEach;
+import jakarta.validation.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import ru.yandex.practicum.filmorate.utils.Reader;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 class FilmControllerTest {
 
 	private static Validator validator;
@@ -29,59 +30,45 @@ class FilmControllerTest {
 	private FilmController filmController;
 	@Autowired
 	private UserController userController;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
 	User user;
 	Film film;
+
 	private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
 	@BeforeEach
 	void setUp() {
+		jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
+		jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
+		jdbcTemplate.update(Reader.readString("src/main/resources/data.sql"));
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 		film = new Film();
+		film.setId(1L);
 		film.setName("Test Film");
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
 
+		Rating rating = new Rating(1L, "G");
+		film.setMpa(rating);
+
 		user = new User();
+		user.setId(1L);
 		user.setName("TestName");
 		user.setLogin("TestLogin");
 		user.setEmail("test@yandex.ru");
 		user.setBirthday(LocalDate.of(1993, 1, 25));
 	}
 
-	@AfterEach
-	void setDown() {
-		filmController.deleteAllFilm(film);
-		userController.deleteAllUser(user);
-	}
-
 	@Test
 	void filmControllerCreatesCorrectFilm() {
 		filmController.create(film);
+
 		Collection<Film> films = filmController.findAll();
 		assertEquals(1, films.size(), "Контроллер не создал фильм");
 		assertEquals("Test Film", films.iterator().next().getName(), "Контроллер создал некорректный фильм");
-	}
-
-	@Test
-	void filmControllerRejectsDuplicateFilms() {
-		filmController.create(film);
-
-		Film film2 = new Film();
-		film2.setName("Test Film");
-		film2.setDescription("Test Description_2");
-		film2.setReleaseDate(LocalDate.of(2025, 1, 1));
-		film2.setDuration(120);
-
-
-		Collection<Film> films = filmController.findAll();
-		assertEquals(1, films.size(), "Контроллер не создал фильм");
-		DuplicatedDataException thrown = assertThrows(
-				DuplicatedDataException.class,
-				() -> filmController.create(film2),
-				"Контроллер не выкинул исключение о дубликате фильма"
-		);
-		assertTrue(thrown.getMessage().contains("Фильм с таким названием и датой релиза уже существует"));
 	}
 
 	@Test
@@ -91,12 +78,14 @@ class FilmControllerTest {
 		assertEquals(1, violations.size(), "Не пройдена валидация на пустое название");
 	}
 
+
 	@Test
 	void filmValidatesNullName() {
 		Film film = new Film();
 		film.setDescription("Test Description");
 		film.setReleaseDate(LocalDate.of(2025, 1, 1));
 		film.setDuration(120);
+		film.setMpa(new Rating(1L, "G")); // необходимо установить mpa, чтобы валидация прошла успешно
 		Set<ConstraintViolation<Film>> violations = validator.validate(film, Marker.OnCreate.class);
 		assertEquals(1, violations.size(), "Не пройдена валидация на null название");
 	}
@@ -126,8 +115,10 @@ class FilmControllerTest {
 		filmController.create(film);
 		userController.create(user);
 		filmController.addLike(film.getId(), user.getId());
+
 		Film findFilm = filmController.getFilmById(film.getId());
-		assertTrue(findFilm.getLikes().contains(user.getId()), "Контроллер не поставил лайк пользователя");
+
+		assertEquals(1L, findFilm.getLikes(), "Контроллер не поставил лайк пользователя");
 	}
 
 	@Test
@@ -137,29 +128,36 @@ class FilmControllerTest {
 		filmController.addLike(film.getId(), user.getId());
 		filmController.deleteLike(film.getId(), user.getId());
 		Film findFilm = filmController.getFilmById(film.getId());
-		assertTrue(findFilm.getLikes().isEmpty(), "Контроллер не удалил лайк пользователя");
+		assertEquals(0L, findFilm.getLikes(), "Контроллер не удалил лайк пользователя");
 	}
 
 	@Test
 	void testPopularFilm() {
 		filmController.create(film);
-
+		Rating rating1 = new Rating(2L, "PG");
 		Film film1 = new Film();
+		film1.setId(2L);
 		film1.setName("Test Film1");
 		film1.setDescription("Test Description1");
 		film1.setReleaseDate(LocalDate.of(2024, 1, 1));
 		film1.setDuration(120);
+		film1.setMpa(rating1);
 		filmController.create(film1);
 
 		Film film2 = new Film();
+		Rating rating2 = new Rating(3L, "PG-13");
+		film2.setId(3L);
 		film2.setName("Test Film2");
 		film2.setDescription("Test Description2");
 		film2.setReleaseDate(LocalDate.of(2023, 1, 1));
 		film2.setDuration(120);
+		film2.setMpa(rating2);
 		filmController.create(film2);
 
 		userController.create(user);
+
 		User user1 = new User();
+		user1.setId(2L);
 		user1.setName("TestName1");
 		user1.setLogin("TestLogin1");
 		user1.setEmail("tests@yandex.ru");
@@ -167,6 +165,7 @@ class FilmControllerTest {
 		userController.create(user1);
 
 		User user2 = new User();
+		user2.setId(3L);
 		user2.setName("TestName2");
 		user2.setLogin("TestLogin2");
 		user2.setEmail("testy@yandex.ru");

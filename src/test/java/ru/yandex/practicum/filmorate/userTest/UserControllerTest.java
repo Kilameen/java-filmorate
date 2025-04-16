@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.userTest;
 
 import jakarta.validation.ConstraintViolation;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import ru.yandex.practicum.filmorate.utils.Reader;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
@@ -20,28 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 public class UserControllerTest {
 
     private static Validator validator;
 
     @Autowired
     private UserController userController;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     User user;
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         user = new User();
         user.setName("TestName");
         user.setLogin("TestLogin");
         user.setEmail("test@yandex.ru");
         user.setBirthday(LocalDate.of(1993, 1, 25));
-    }
-
-    @AfterEach
-    void setDown() {
-        userController.deleteAllUser(user);
     }
 
     @Test
@@ -135,19 +136,18 @@ public class UserControllerTest {
     @Test
     void testUserAddFriend() {
         userController.create(user);
-
         User user1 = new User();
         user1.setName("TestName1");
         user1.setLogin("TestLogin1");
         user1.setEmail("tests@yandex.ru");
         user1.setBirthday(LocalDate.of(1992, 1, 25));
         userController.create(user1);
-
         userController.addFriend(user.getId(), user1.getId());
         Collection<User> friends = userController.getFriends(user.getId());
-        assertEquals(1, friends.size(), "Контроллер не добавил user в друзья user1");
-        friends = userController.getFriends(user1.getId());
         assertEquals(1, friends.size(), "Контроллер не добавил user1 в друзья user");
+        friends = userController.getFriends(user1.getId());
+        assertEquals(0, friends.size(), "У user1 не должно быть друзей, пока его никто не добавил.");
+
     }
 
     @Test
@@ -160,14 +160,16 @@ public class UserControllerTest {
         user1.setEmail("tests@yandex.ru");
         user1.setBirthday(LocalDate.of(1992, 1, 25));
         userController.create(user1);
-
         userController.addFriend(user.getId(), user1.getId());
+        userController.addFriend(user1.getId(), user.getId());
         Collection<User> friends = userController.getFriends(user.getId());
-        assertEquals(1, friends.size(), "Контроллер не добавил user в друзья user1");
-        friends = userController.getFriends(user1.getId());
         assertEquals(1, friends.size(), "Контроллер не добавил user1 в друзья user");
+        friends = userController.getFriends(user1.getId());
+        assertEquals(1, friends.size(), "Контроллер не добавил user в друзья user1");
 
         userController.deleteFriend(user.getId(), user1.getId());
+        userController.deleteFriend(user1.getId(), user.getId());
+
         friends = userController.getFriends(user.getId());
         assertEquals(0, friends.size(), "Контроллер не удалил user1 из друзей user");
         friends = userController.getFriends(user1.getId());
@@ -186,6 +188,7 @@ public class UserControllerTest {
         userController.create(user1);
 
         User user2 = new User();
+
         user2.setName("TestName2");
         user2.setLogin("TestLogin2");
         user2.setEmail("testy@yandex.ru");
