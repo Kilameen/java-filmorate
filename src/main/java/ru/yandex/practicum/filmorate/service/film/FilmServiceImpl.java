@@ -70,7 +70,6 @@ public class FilmServiceImpl implements FilmService {
 
         if (film.getGenres() != null) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
-            // Получаем список ID жанров, которые существуют в БД.
             List<Long> genreIds = genres.stream()
                     .map(Genre::getId)
                     .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
