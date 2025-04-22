@@ -4,15 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 
 @Service
@@ -21,11 +21,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
     private final FriendshipDao friendshipDao;
+    private final LikeDao likeDbStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage, @Qualifier("H2FriendDb") FriendshipDao friendshipDao) {
+    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage,
+                           @Qualifier("H2FriendDb") FriendshipDao friendshipDao,
+                           @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage,
+                           @Qualifier("H2FilmDb") FilmStorage filmStorage) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
+        this.likeDbStorage = likeDbStorage;
+        this.filmStorage = filmStorage;
     }
 
     @Override
@@ -85,6 +92,49 @@ public class UserServiceImpl implements UserService {
     public Collection<User> getAllUserFriends(Long id) {
         getUserById(id);
         return friendshipDao.getAllUserFriends(id);
+    }
+
+    @Override
+    public Collection<Film> getRecommendation(Long userId) {
+        User user = userStorage.getUserById(userId);
+        if (isNull(user)) {
+            throw new NotFoundException("Пользователя с таким id не существует");
+        }
+
+        Map<Long, Set<Long>> userWithLikes = likeDbStorage.getAllUsersWithLikes();
+        Set<Long> userLikeFilms = userWithLikes.get(userId);
+
+        if (userLikeFilms == null || userLikeFilms.isEmpty()) {
+            return Collections.emptyList();
+        }
+        userWithLikes.remove(userId);
+
+        if (userWithLikes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        long userWithHighestMatch = -1L;
+        long topMatch = 0L;
+
+        for (Long otherUserId : userWithLikes.keySet()) {
+            Set<Long> filmsLikedByOtherUser = new HashSet<>(userWithLikes.get(otherUserId));
+            filmsLikedByOtherUser.retainAll(userLikeFilms);
+            long commonLikesCount = filmsLikedByOtherUser.size();
+
+            if (commonLikesCount > topMatch) {
+                topMatch = commonLikesCount;
+                userWithHighestMatch = otherUserId;
+            }
+        }
+        if (userWithHighestMatch == -1L) {
+            return Collections.emptyList();
+        }
+        Set<Long> filmsLikedBySimilarUser = userWithLikes.get(userWithHighestMatch);
+        filmsLikedBySimilarUser.removeAll(userLikeFilms);
+
+        return filmsLikedBySimilarUser.stream()
+                .map(filmStorage::getFilm)
+                .collect(Collectors.toList());
     }
 
     private void validate(User user) {
