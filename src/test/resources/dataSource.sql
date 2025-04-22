@@ -28,3 +28,19 @@ VALUES (1, 2, TRUE), (2, 1, TRUE), (2, 3, TRUE), (3, 1, DEFAULT), (3, 2, TRUE);
 
 INSERT INTO film_genres (film_id, genre_id)
 VALUES (1, 1), (2, 2), (3, 1), (3, 4);
+
+-- БД для задачи "Добавить отзывы" --
+INSERT INTO reviews (content, is_positive, film_id, user_id, useful)
+VALUES ("Фильм мне понравился. Отличный!", TRUE, 1, 1, 2),
+       ("Нормальный фильм. Для одного раза пойдет.", TRUE, 1, 2, 1),
+       ("Мне фильм не понравился. Было скучно", FALSE, 2, 1, 2),
+       ("Неплохой фильм.", TRUE, 2, 3, 2);
+
+INSERT INTO review_likes (review_id, user_id, is_positive)
+VALUES (1,2,TRUE),
+       (1,3,TRUE),
+       (2,3,FALSE),
+       (3,2,TRUE),
+       (3,3,TRUE),
+       (4,2,FALSE),
+       (4,1,FALSE);
