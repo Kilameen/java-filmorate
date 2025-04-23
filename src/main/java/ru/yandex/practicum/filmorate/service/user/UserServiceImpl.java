@@ -115,4 +115,14 @@ public class UserServiceImpl implements UserService {
             user.setName(user.getLogin());
         }
     }
+
+    @Override
+    public void deleteUserById(Long id) {
+        userStorage.getUserById(id); // проверка, если не найдет, выкинет ошибку
+        log.info("Удаляем пользователя с id {}", id);
+
+        userStorage.deleteUserById(id);
+
+        log.info("Пользователь с id {} удален", id);
+    }
 }
