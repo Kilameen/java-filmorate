@@ -142,4 +142,10 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("Рейтинг с таким id не существует");
         }
     }
+
+    public void deleteFilmById(Long id) {
+        filmStorage.getFilm(id);
+
+        filmStorage.deleteFilm(id);
+    }
 }
