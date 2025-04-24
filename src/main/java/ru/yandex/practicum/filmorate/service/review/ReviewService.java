@@ -31,5 +31,7 @@ public interface ReviewService {
     void addDislike(Long reviewId, Long userId);
 
     //Пользователь удаляет лайк/дизлайк отзыву
-    void deleteMark(Long reviewId, Long userId);
+    void deleteLike(Long reviewId, Long userId);
+
+    void deleteDislike(Long reviewId, Long userId);
 }

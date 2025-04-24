@@ -13,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component(value = "H2ReviewDb")
 @RequiredArgsConstructor
@@ -24,13 +23,13 @@ public class ReviewDbStorage implements ReviewDao {
 
     private static final String INSERT_REVIEW_SQL_REQUEST = "INSERT INTO reviews (content, is_positive, film_id, user_id, useful)\n" +
             "VALUES (?, ?, ?, ?, 0);"; //В функциональности написано: При создании отзыва рейтинг равен нулю.
-    private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews=? content=? is_positive=? film_id=? user_id=? useful=? WHERE review_id=?;";
-    private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM review WHERE review_id=?";
-    private static final String DELETE_REVIEW_SQL_REQUEST = "DELETE FROM review WHERE review_id = ?;";
-    private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM review";
-    private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM review WHERE film_id=? ORDER BY useful DESC LIMIT ?";
-    private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT COUNT(*) FROM review WHERE review_id = ?)";
-    private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE useful=? WHERE review_id=?;";
+    private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=?, film_id=?, user_id=? WHERE review_id=?;";
+    private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE review_id=?";
+    private static final String DELETE_REVIEW_SQL_REQUEST = "DELETE FROM reviews WHERE review_id = ?;";
+    private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews";
+    private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
+    private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
+    private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";
 
     @Override
     public Review create(Review review) {
@@ -59,8 +58,7 @@ public class ReviewDbStorage implements ReviewDao {
             preparedStatement.setBoolean(2, review.isPositive());
             preparedStatement.setLong(3, review.getFilm_id());
             preparedStatement.setLong(4, review.getUser_id());
-            preparedStatement.setInt(5, review.getUseful());
-            preparedStatement.setLong(6,review.getId());
+            preparedStatement.setLong(5, review.getId());
             return preparedStatement;
         }, keyHolder);
         return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -91,7 +89,7 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Collection<Review> getReviewsByFilmId(Long id, int count) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, id,count);
+        return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, id, count);
     }
 
     @Override
@@ -101,10 +99,11 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public boolean isReviewExist(Long id) {
-        return Optional.ofNullable(
-                        jdbcTemplate.queryForObject(CHECK_REVIEW_IS_EXIST, Boolean.class, id)
-                )
-                .orElseThrow(() -> new NotFoundException("Во время поиска отзыва с id " + id + "произошла ошибка!"));
+        try {
+            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_REVIEW_IS_EXIST, Boolean.class, id));
+        } catch (Exception ex) {
+            throw new RuntimeException("Во время поиска отзыва с id " + id + "произошла ошибка!");
+        }
     }
 
     @Override
@@ -114,6 +113,7 @@ public class ReviewDbStorage implements ReviewDao {
                     .prepareStatement(UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST);
             preparedStatement.setInt(1, useful);
             preparedStatement.setLong(2, reviewId);
-            return preparedStatement;});
+            return preparedStatement;
+        });
     }
 }

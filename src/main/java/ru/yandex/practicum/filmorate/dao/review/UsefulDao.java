@@ -6,7 +6,9 @@ public interface UsefulDao {
 
     void addDislike(Long reviewId, Long userId);
 
-    void deleteMark(Long reviewId, Long userId);
+    void deleteLike(Long reviewId, Long userId);
+
+    void deleteDislike(Long reviewId, Long userId);
 
     void deleteAllMarks(Long reviewId);
 

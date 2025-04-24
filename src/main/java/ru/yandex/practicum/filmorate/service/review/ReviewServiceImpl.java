@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.service.review;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.dao.review.ReviewDao;
 import ru.yandex.practicum.filmorate.dao.review.UsefulDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
@@ -19,27 +20,33 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewDao reviewDao;
     private final UsefulDao usefulDao;
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public ReviewServiceImpl(@Qualifier("H2ReviewDb")ReviewDao reviewDao, @Qualifier("H2UsefulDb")UsefulDao usefulDao,
-                             @Qualifier("H2FilmDb")FilmStorage filmStorage) {
+                             @Qualifier("H2FilmDb")FilmStorage filmStorage, @Qualifier("H2UserDb")UserStorage userStorage) {
         this.reviewDao = reviewDao;
         this.usefulDao = usefulDao;
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     @Override
     public Review create(Review review) {
         filmStorage.getFilm(review.getFilm_id());
+        userStorage.getUserById(review.getUser_id());
+        validate(review.getContent());
         return reviewDao.create(review);
     }
 
     @Override
     public Review update(Review review) {
+        validate(review.getContent());
         //Если отзыв не найден, то выбросит исключение
         if (!reviewDao.isReviewExist(review.getId())) {
             throw new NotFoundException("Отзыв с id " + review.getId() + " не найден!");
         }
         filmStorage.getFilm(review.getFilm_id());
+        userStorage.getUserById(review.getUser_id());
         return reviewDao.update(review);
     }
 
@@ -76,7 +83,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addLike(Long reviewId, Long userId) {
-        filmStorage.getFilm(reviewId);
+        userStorage.getUserById(userId);
         usefulDao.addLike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
@@ -85,7 +92,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addDislike(Long reviewId, Long userId) {
-        filmStorage.getFilm(reviewId);
+        userStorage.getUserById(userId);
         usefulDao.addDislike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
@@ -93,11 +100,26 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteMark(Long reviewId, Long userId) {
-        filmStorage.getFilm(reviewId);
-        usefulDao.deleteMark(reviewId, userId);
+    public void deleteLike(Long reviewId, Long userId) {
+        userStorage.getUserById(userId);
+        usefulDao.deleteLike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
         reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+    }
+
+    @Override
+    public void deleteDislike(Long reviewId, Long userId) {
+        userStorage.getUserById(userId);
+        usefulDao.deleteDislike(reviewId, userId);
+        int likesCount = usefulDao.getLikesCountForReview(reviewId);
+        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
+        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+    }
+
+    private void validate(String content) {
+        if (content.length()>255) {
+            throw new ValidationException("Длина отзыва не должна превышать 200 символов");
+        }
     }
 }

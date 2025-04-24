@@ -20,12 +20,13 @@ public class UsefulDbStorage implements UsefulDao {
     private final JdbcTemplate jdbcTemplate;
     private static final String INSERT_LIKE_SQL_REQUEST = "INSERT INTO review_likes (review_id, user_id, is_positive)\n" +
             "VALUES (?, ?, TRUE);";
-    private static final String DELETE_MARK_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ?;";
+    private static final String DELETE_LIKE_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive=TRUE;";
+    private static final String DELETE_DISLIKE_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive=FALSE;";
     private static final String INSERT_DISLIKE_SQL_REQUEST = "INSERT INTO review_likes (review_id, user_id, is_positive)\n" +
             "VALUES (?, ?, FALSE);";
     private static final String DELETE_ALL_MARK_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ?;";
     private static final String GET_LIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive=TRUE;";
-    private static final String GET_DISLIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive=TRUE;";
+    private static final String GET_DISLIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive=FALSE;";
 
     @Override
     public void addLike(Long reviewId, Long userId) {
@@ -56,17 +57,31 @@ public class UsefulDbStorage implements UsefulDao {
     }
 
     @Override
-    public void deleteMark(Long reviewId, Long userId) {
+    public void deleteLike(Long reviewId, Long userId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement(DELETE_MARK_SQL_REQUEST,
+                    .prepareStatement(DELETE_LIKE_SQL_REQUEST,
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setLong(1, reviewId);
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Пользователь с id {} удалил свою оценку отзыву с id {}",userId, reviewId);
+        log.info("Пользователь с id {} удалил свой лайк отзыву с id {}",userId, reviewId);
+    }
+
+    @Override
+    public void deleteDislike(Long reviewId, Long userId) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(DELETE_DISLIKE_SQL_REQUEST,
+                            Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setLong(1, reviewId);
+            preparedStatement.setLong(2, userId);
+            return preparedStatement;
+        }, keyHolder);
+        log.info("Пользователь с id {} удалил свой дизлайк отзыву с id {}",userId, reviewId);
     }
 
     @Override
