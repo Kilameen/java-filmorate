@@ -42,7 +42,7 @@ public class UsefulDbStorage implements UsefulDao {
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Пользователь с id {} поставил лайк отзыву с id {}",userId, reviewId);
+        log.info("Пользователь с id {} поставил лайк отзыву с id {}", userId, reviewId);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UsefulDbStorage implements UsefulDao {
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Пользователь с id {} поставил дизлайк отзыву с id {}",userId, reviewId);
+        log.info("Пользователь с id {} поставил дизлайк отзыву с id {}", userId, reviewId);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UsefulDbStorage implements UsefulDao {
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Пользователь с id {} удалил свой лайк отзыву с id {}",userId, reviewId);
+        log.info("Пользователь с id {} удалил свой лайк отзыву с id {}", userId, reviewId);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class UsefulDbStorage implements UsefulDao {
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Пользователь с id {} удалил свой дизлайк отзыву с id {}",userId, reviewId);
+        log.info("Пользователь с id {} удалил свой дизлайк отзыву с id {}", userId, reviewId);
     }
 
     @Override
@@ -132,8 +132,7 @@ public class UsefulDbStorage implements UsefulDao {
         try {
             return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_DISLIKE_IS_EXIST, Boolean.class, reviewId, userId));
         } catch (Exception ex) {
-            throw new RuntimeException("Пользователь " + userId + " не ставил дизлайк отзыву " + reviewId);        }
+            throw new RuntimeException("Пользователь " + userId + " не ставил дизлайк отзыву " + reviewId);
+        }
     }
-
-
 }
