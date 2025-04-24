@@ -48,6 +48,8 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, r.rating_id, r.rating_name\n" +
             "ORDER BY rate DESC\n" +
             "LIMIT ?;\n";
+    private static final String DELETE_FILM_SQL_REQUEST = "DELETE FROM films\n" +
+            "WHERE film_id = ?;";
 
     @Override
     public Film create(Film film) {
@@ -94,5 +96,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> getPopularFilms(Long count) {
         return jdbcTemplate.query(SELECT_POPULAR_FILMS_SQL_REQUEST, filmMapper, count);
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        getFilm(id);
+
+        jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
     }
 }
