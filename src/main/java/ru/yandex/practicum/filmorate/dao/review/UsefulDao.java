@@ -15,4 +15,8 @@ public interface UsefulDao {
     int getLikesCountForReview(Long reviewId);
 
     int getDislikesCountForReview(Long reviewId);
+
+    boolean isLikeExist(Long reviewId, Long userId);
+
+    boolean isDislikeExist(Long reviewId, Long userId);
 }

@@ -16,7 +16,7 @@ public interface ReviewDao {
 
     Review getReviewById(Long id);
 
-    Collection<Review> getReviewsByFilmId (Long id, int count);
+    Collection<Review> getReviewsByFilmId(Long id, int count);
 
     Collection<Review> getAllReviews();
 

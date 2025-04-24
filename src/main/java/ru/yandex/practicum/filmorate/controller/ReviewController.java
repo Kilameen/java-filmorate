@@ -61,7 +61,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "10") int count) {
 
         //Если фильм не указан, то все
-        if(filmId==null||filmId==-1){
+        if (filmId == null || filmId == -1) {
             log.info("Запрос на получение всех отзывов");
             return reviewService.getAllReviews();
         }
@@ -73,25 +73,26 @@ public class ReviewController {
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Пользователь с id {} пытается поставить лайк отзыву с id {}", userId, reviewId);
-        reviewService.addLike(reviewId,userId);
+        reviewService.addLike(reviewId, userId);
     }
+
     //Пользователь ставит дизлайк отзыву
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Пользователь с id {} пытается поставить дизлайк отзыву с id {}", userId, reviewId);
-        reviewService.addDislike(reviewId,userId);
+        reviewService.addDislike(reviewId, userId);
     }
 
     //Пользователь удаляет лайк/дизлайк отзыву
     @DeleteMapping({"/{id}/dislike/{userId}"})
     public void deleteLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Пользователь с id {} пытается убрать лайк у отзыва с id {}", userId, reviewId);
-        reviewService.deleteLike(reviewId,userId);
+        reviewService.deleteLike(reviewId, userId);
     }
 
     @DeleteMapping({"/{id}/like/{userId}"})
     public void deleteDislike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Пользователь с id {} пытается убрать дизлайк у отзыва с id {}", userId, reviewId);
-        reviewService.deleteDislike(reviewId,userId);
+        reviewService.deleteDislike(reviewId, userId);
     }
 }

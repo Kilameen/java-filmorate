@@ -1,16 +1,19 @@
 package ru.yandex.practicum.filmorate.reviewTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.yandex.practicum.filmorate.utils.Reader;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -21,6 +24,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ReviewControllerMarkTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void beforeEach() {
+        jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
+        jdbcTemplate.update(Reader.readString("src/test/resources/dataSource.sql"));
+    }
 
     @Test
     @DisplayName("Добавить лайк. Успешно")
@@ -31,6 +43,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isOk()); // Проверяем статус ответа
     }
+
     @Test
     @DisplayName("Добавить лайк. Отзыв не найден")
     void testAddLike_ReviewNotFound() throws Exception {
@@ -40,6 +53,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Добавить лайк. Пользователь не найден")
     void testAddLike_UserNotFound() throws Exception {
@@ -59,6 +73,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(put("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isOk());
     }
+
     @Test
     @DisplayName("Добавить дизлайк. Отзыв не найден")
     void testAddDislike_ReviewNotFound() throws Exception {
@@ -68,6 +83,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(put("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Добавить дизлайк. Пользователь не найден")
     void testAddDislike_UserNotFound() throws Exception {
@@ -87,6 +103,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isOk()); // Проверяем статус ответа
     }
+
     @Test
     @DisplayName("Удалить лайк. Отзыв не найден")
     void testDeleteLike_ReviewNotFound() throws Exception {
@@ -96,6 +113,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Удалить лайк. Пользователь не найден")
     void testDeleteLike_UserNotFound() throws Exception {
@@ -105,6 +123,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Удалить лайк. Лайк не найден")
     void testDeleteLike_LikeNotFound() throws Exception {
@@ -124,6 +143,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isOk()); // Проверяем статус ответа
     }
+
     @Test
     @DisplayName("Удалить дизлайк. Отзыв не найден")
     void testDeleteDislike_ReviewNotFound() throws Exception {
@@ -133,6 +153,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Удалить дизлайк. Пользователь не найден")
     void testDeleteDislike_UserNotFound() throws Exception {
@@ -142,6 +163,7 @@ public class ReviewControllerMarkTest {
         mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     @DisplayName("Удалить дизлайк. Дизлайк не найден")
     void testDeleteDislike_DislikeNotFound() throws Exception {

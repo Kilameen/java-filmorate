@@ -7,13 +7,13 @@ import java.util.List;
 public interface ReviewService {
 
     //Добавление нового отзыва
-    Review create (Review review);
+    Review create(Review review);
 
     //Редактирование уже имеющегося отзыва
-    Review update (Review review);
+    Review update(Review review);
 
     //Удаление уже имеющегося отзыва
-    void delete (Long id);
+    void delete(Long id);
 
     //Получение отзыва по идентификатору
     Review getReview(Long id);
@@ -21,6 +21,7 @@ public interface ReviewService {
     //Получение всех отзывов по идентификатору фильма
     //Если фильм не указан, то все
     List<Review> getAllReviews();
+
     //Если кол-во не указано, то 10
     List<Review> getReviewsByFilmId(Long filmId, int count);
 

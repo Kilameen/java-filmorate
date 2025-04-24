@@ -27,6 +27,9 @@ public class UsefulDbStorage implements UsefulDao {
     private static final String DELETE_ALL_MARK_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ?;";
     private static final String GET_LIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive=TRUE;";
     private static final String GET_DISLIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive=FALSE;";
+    private static final String CHECK_LIKE_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive=TRUE)";
+    private static final String CHECK_DISLIKE_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive=FALSE)";
+
 
     @Override
     public void addLike(Long reviewId, Long userId) {
@@ -114,4 +117,23 @@ public class UsefulDbStorage implements UsefulDao {
                 )
                 .orElseThrow(() -> new NotFoundException("Отзыв не найден!"));
     }
+
+    @Override
+    public boolean isLikeExist(Long reviewId, Long userId) {
+        try {
+            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_LIKE_IS_EXIST, Boolean.class, reviewId, userId));
+        } catch (Exception ex) {
+            throw new RuntimeException("Пользователь " + userId + " не ставил лайк отзыву " + reviewId);
+        }
+    }
+
+    @Override
+    public boolean isDislikeExist(Long reviewId, Long userId) {
+        try {
+            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_DISLIKE_IS_EXIST, Boolean.class, reviewId, userId));
+        } catch (Exception ex) {
+            throw new RuntimeException("Пользователь " + userId + " не ставил дизлайк отзыву " + reviewId);        }
+    }
+
+
 }

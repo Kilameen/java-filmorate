@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.dao.review.UsefulDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -22,8 +24,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    public ReviewServiceImpl(@Qualifier("H2ReviewDb")ReviewDao reviewDao, @Qualifier("H2UsefulDb")UsefulDao usefulDao,
-                             @Qualifier("H2FilmDb")FilmStorage filmStorage, @Qualifier("H2UserDb")UserStorage userStorage) {
+    public ReviewServiceImpl(@Qualifier("H2ReviewDb") ReviewDao reviewDao, @Qualifier("H2UsefulDb") UsefulDao usefulDao,
+                             @Qualifier("H2FilmDb") FilmStorage filmStorage, @Qualifier("H2UserDb") UserStorage userStorage) {
         this.reviewDao = reviewDao;
         this.usefulDao = usefulDao;
         this.filmStorage = filmStorage;
@@ -83,6 +85,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addLike(Long reviewId, Long userId) {
+        if (!reviewDao.isReviewExist(reviewId)) {
+            throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
+        }
+        Collection<User> users = userStorage.findAll();
         userStorage.getUserById(userId);
         usefulDao.addLike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
@@ -92,6 +98,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addDislike(Long reviewId, Long userId) {
+        if (!reviewDao.isReviewExist(reviewId)) {
+            throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
+        }
         userStorage.getUserById(userId);
         usefulDao.addDislike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
@@ -101,6 +110,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void deleteLike(Long reviewId, Long userId) {
+        if (!usefulDao.isLikeExist(reviewId, reviewId)) {
+            throw new NotFoundException("Такой лайк не найден");
+        }
         userStorage.getUserById(userId);
         usefulDao.deleteLike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
@@ -110,6 +122,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void deleteDislike(Long reviewId, Long userId) {
+        if (!usefulDao.isDislikeExist(reviewId, reviewId)) {
+            throw new NotFoundException("Такой дизлайк не найден");
+        }
         userStorage.getUserById(userId);
         usefulDao.deleteDislike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
@@ -118,7 +133,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private void validate(String content) {
-        if (content.length()>255) {
+        if (content.length() > 255) {
             throw new ValidationException("Длина отзыва не должна превышать 200 символов");
         }
     }
