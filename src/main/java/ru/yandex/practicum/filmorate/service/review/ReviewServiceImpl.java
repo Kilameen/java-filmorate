@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.review;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.review.ReviewDao;
@@ -13,12 +14,18 @@ import java.util.List;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewDao reviewDao;
     private final UsefulDao usefulDao;
     private final FilmStorage filmStorage;
+
+    public ReviewServiceImpl(@Qualifier("H2ReviewDb")ReviewDao reviewDao, @Qualifier("H2UsefulDb")UsefulDao usefulDao,
+                             @Qualifier("H2FilmDb")FilmStorage filmStorage) {
+        this.reviewDao = reviewDao;
+        this.usefulDao = usefulDao;
+        this.filmStorage = filmStorage;
+    }
 
     @Override
     public Review create(Review review) {
