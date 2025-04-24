@@ -1,34 +1,36 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.review;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.User;
 
-@Service
-@Slf4j
-@AllArgsConstructor
-public class ReviewService {
+import java.util.List;
 
-    //private final ReviewStorage reviewStorage;
-    //private final ReviewLikeStorage reviewLikeStorage;
+public interface ReviewService {
 
     //Добавление нового отзыва
+    Review create (Review review);
 
     //Редактирование уже имеющегося отзыва
+    Review update (Review review);
 
     //Удаление уже имеющегося отзыва
+    void delete (Long id);
 
     //Получение отзыва по идентификатору
+    Review getReview(Long id);
 
     //Получение всех отзывов по идентификатору фильма
     //Если фильм не указан, то все
+    List<Review> getAllReviews();
     //Если кол-во не указано, то 10
+    List<Review> getReviewsByFilmId(Long filmId, int count);
 
     //Пользователь ставит лайк отзыву
+    void addLike(Long reviewId, Long userId);
 
     //Пользователь ставит дизлайк отзыву
+    void addDislike(Long reviewId, Long userId);
 
     //Пользователь удаляет лайк/дизлайк отзыву
-
-    //Пользователь удаляет дизлайк отзыву.
+    void deleteMark(Long reviewId, Long userId);
 }
