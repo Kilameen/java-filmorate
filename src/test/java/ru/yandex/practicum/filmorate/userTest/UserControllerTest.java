@@ -258,7 +258,30 @@ public class UserControllerTest {
     }
 
     @Test
-    void testGetRecommendation_userNotFound() {
+    void testGetRecommendationUserNotFound() {
         assertThrows(NotFoundException.class, () -> userController.getRecommendation(999L));
+    }
+
+    @Test
+    void testGetRecommendationsWithNoRecommendations() {
+        User user1 = new User();
+        user1.setName("TestUser1");
+        user1.setLogin("TestLogin1");
+        user1.setEmail("test1@example.com");
+        user1.setBirthday(LocalDate.of(1990, 1, 1));
+        userController.create(user1);
+
+        Rating rating1 = new Rating(2L, "PG");
+        Film film1 = new Film();
+        film1.setId(1L);
+        film1.setName("Test Film1");
+        film1.setDescription("Test Description1");
+        film1.setReleaseDate(LocalDate.of(2024, 1, 1));
+        film1.setDuration(120);
+        film1.setMpa(rating1);
+        filmController.create(film1);
+
+        Collection<Film> recommendations = userController.getRecommendation(user1.getId());
+        assertEquals(0, recommendations.size(), "Рекомендаций быть не должно");
     }
 }

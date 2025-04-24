@@ -21,17 +21,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
     private final FriendshipDao friendshipDao;
-    private final LikeDao likeDbStorage;
+    private final LikeDao likeDao;
     private final FilmStorage filmStorage;
 
     @Autowired
     public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage,
                            @Qualifier("H2FriendDb") FriendshipDao friendshipDao,
-                           @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage,
+                           @Qualifier("H2LikeDb") LikeDao likeDao,
                            @Qualifier("H2FilmDb") FilmStorage filmStorage) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
-        this.likeDbStorage = likeDbStorage;
+        this.likeDao = likeDao;
         this.filmStorage = filmStorage;
     }
 
@@ -97,44 +97,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<Film> getRecommendation(Long userId) {
         User user = userStorage.getUserById(userId);
-        if (isNull(user)) {
+        if (user == null) {
             throw new NotFoundException("Пользователя с таким id не существует");
         }
 
-        Map<Long, Set<Long>> userWithLikes = likeDbStorage.getAllUsersWithLikes();
-        Set<Long> userLikeFilms = userWithLikes.get(userId);
+        Map<Long, Set<Long>> userWithLikes = likeDao.getAllUsersWithLikes();
+        Set<Long> userLikeFilms = userWithLikes.getOrDefault(userId, Collections.emptySet());
 
-        if (userLikeFilms == null || userLikeFilms.isEmpty()) {
+        if (userLikeFilms.isEmpty()) {
             return Collections.emptyList();
         }
+
         userWithLikes.remove(userId);
 
         if (userWithLikes.isEmpty()) {
             return Collections.emptyList();
         }
 
-        long userWithHighestMatch = -1L;
-        long topMatch = 0L;
+        Optional<Map.Entry<Long, Set<Long>>> mostSimilarUser = userWithLikes.entrySet().stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .max(Comparator.comparingLong(entry -> intersectionSize(userLikeFilms, entry.getValue())));
 
-        for (Long otherUserId : userWithLikes.keySet()) {
-            Set<Long> filmsLikedByOtherUser = new HashSet<>(userWithLikes.get(otherUserId));
-            filmsLikedByOtherUser.retainAll(userLikeFilms);
-            long commonLikesCount = filmsLikedByOtherUser.size();
-
-            if (commonLikesCount > topMatch) {
-                topMatch = commonLikesCount;
-                userWithHighestMatch = otherUserId;
-            }
-        }
-        if (userWithHighestMatch == -1L) {
+        if (mostSimilarUser.isEmpty()) {
             return Collections.emptyList();
         }
-        Set<Long> filmsLikedBySimilarUser = userWithLikes.get(userWithHighestMatch);
-        filmsLikedBySimilarUser.removeAll(userLikeFilms);
 
-        return filmsLikedBySimilarUser.stream()
+        Set<Long> similarUserLikes = mostSimilarUser.get().getValue();
+        similarUserLikes.removeAll(userLikeFilms);
+
+        return similarUserLikes.stream()
                 .map(filmStorage::getFilm)
                 .collect(Collectors.toList());
+    }
+
+    private long intersectionSize(Set<Long> set1, Set<Long> set2) {
+        return set1.stream().filter(set2::contains).count();
     }
 
     private void validate(User user) {
