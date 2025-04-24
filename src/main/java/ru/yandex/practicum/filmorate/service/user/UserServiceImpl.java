@@ -122,6 +122,10 @@ public class UserServiceImpl implements UserService {
             return Collections.emptyList();
         }
 
+        if (intersectionSize(userLikeFilms, mostSimilarUser.get().getValue()) == 0) {
+            return Collections.emptyList();
+        }
+
         Set<Long> similarUserLikes = mostSimilarUser.get().getValue();
         similarUserLikes.removeAll(userLikeFilms);
 

@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
@@ -20,8 +19,6 @@ public class LikeDbStorage implements LikeDao {
     private static final String DELETE_LIKE_SQL_REQUEST = "DELETE\n" +
             "FROM film_likes\n" +
             "WHERE film_id = ? AND user_id = ?;";
-    private static final String SELECT_FILM_LIKES = " SELECT *\n" +
-            "FROM film_likes\n WHERE film_id = ?;";
     private static final String SELECT_ALL_USERS_AND_LIKES =
             "SELECT user_id, film_id FROM film_likes";
 
@@ -49,11 +46,6 @@ public class LikeDbStorage implements LikeDao {
             preparedStatement.setLong(2, userId);
             return preparedStatement;
         }, keyHolder);
-    }
-
-    @Override
-    public Collection<Long> getFilmLikes(Film film) {
-        return jdbcTemplate.query(SELECT_FILM_LIKES, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
     }
 
     @Override
