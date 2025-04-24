@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import java.util.Collection;
+import java.util.Set;
 
 @Slf4j
 @Validated
@@ -52,7 +53,6 @@ public class FilmController {
         return filmService.update(updateFilm);
     }
 
-    //Service
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
@@ -75,5 +75,13 @@ public class FilmController {
         log.info("Пользователь {} хочет удалить лайк фильму {}.", userId, filmId);
         filmService.deleteLike(filmId, userId);
         log.info("Лайк удален");
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId,@RequestParam String sortBy){
+        if (!sortBy.equals("year") && !sortBy.equals("likes")) {
+            throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
+        }
+        return filmService.getDirectorFilms(directorId, sortBy);
     }
 }
