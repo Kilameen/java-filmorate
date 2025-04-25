@@ -33,6 +33,9 @@ public class UserDbStorage implements UserStorage {
             "FROM users\n" +
             "WHERE user_id = ?;";
     private static final String DELETE_USER_BY_ID_SQL_REQUEST = "DELETE FROM users WHERE user_id = ?;";
+    private static final String DELETE_USER_FRIENDSHIPS_SQL =
+            "DELETE FROM friendship WHERE user_id = ? OR friend_id = ?;";
+
 
     @Override
     public User create(User user) {
@@ -90,6 +93,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void deleteUserById(Long id) {
         getUserById(id);
+
+        jdbcTemplate.update(DELETE_USER_FRIENDSHIPS_SQL, id, id);
+
         jdbcTemplate.update(DELETE_USER_BY_ID_SQL_REQUEST, id);
     }
 }

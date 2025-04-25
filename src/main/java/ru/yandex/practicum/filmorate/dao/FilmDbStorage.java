@@ -50,6 +50,8 @@ public class FilmDbStorage implements FilmStorage {
             "LIMIT ?;\n";
     private static final String DELETE_FILM_SQL_REQUEST = "DELETE FROM films\n" +
             "WHERE film_id = ?;";
+    private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
+    private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
 
     @Override
     public Film create(Film film) {
@@ -102,6 +104,8 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilm(Long id) {
         getFilm(id);
 
+        jdbcTemplate.update(DELETE_FILM_LIKES, id);
+        jdbcTemplate.update(DELETE_FILM_GENRES, id);
         jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
     }
 }
