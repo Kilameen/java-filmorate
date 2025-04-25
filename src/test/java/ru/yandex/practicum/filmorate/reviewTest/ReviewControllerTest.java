@@ -84,7 +84,7 @@ public class ReviewControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(review)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.reviewId").value(1))
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Обновленный отзыв"))
@@ -126,7 +126,7 @@ public class ReviewControllerTest {
     void testGetReview_Success() throws Exception {
         mockMvc.perform(get("/reviews/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.reviewId").value(1))
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Фильм мне понравился. Отличный!"))
