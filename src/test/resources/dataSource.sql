@@ -35,11 +35,9 @@ VALUES ('Фильм мне понравился. Отличный!', TRUE, 1, 1,
        ('Мне фильм не понравился. Было скучно', FALSE, 2, 1, 2),
        ('Неплохой фильм.', TRUE, 2, 3, 0);
 
-INSERT INTO review_likes (review_id, user_id)
-VALUES (1,2),
-       (1,3),
-       (3,2),
-       (3,3);
-
-INSERT INTO review_dislikes (review_id, user_id)
-VALUES (2,3);
+INSERT INTO review_likes (review_id, user_id, is_positive)
+VALUES (1,2,TRUE),
+       (1,3,TRUE),
+       (2,3,FALSE),
+       (3,2,TRUE),
+       (3,3,TRUE);

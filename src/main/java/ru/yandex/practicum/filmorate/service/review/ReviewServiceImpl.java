@@ -66,8 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
         }
-        usefulDao.deleteDislikes(id);
-        usefulDao.deleteLikes(id);
+        usefulDao.deleteAllMarks(id);
         reviewDao.delete(id);
         log.info("Фильм с id {} удален", id);
     }
@@ -98,7 +97,14 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
         }
         userStorage.getUserById(userId);
-        usefulDao.addLike(reviewId, userId);
+        //проверяем, есть ли дизлайк у такого пользователя и отзыва
+        if (usefulDao.isDislikeExist(reviewId, userId)) {
+            //если есть, то изменяем дизлайк на лайк
+            usefulDao.changeDislikeToLike(reviewId, userId);
+        } else {
+            //если нет, то ставим лайк
+            usefulDao.addLike(reviewId, userId);
+        }
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
         reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
@@ -110,7 +116,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
         }
         userStorage.getUserById(userId);
-        usefulDao.addDislike(reviewId, userId);
+        if (usefulDao.isLikeExist(reviewId, userId)) {
+            //если есть, то изменяем дизлайк на лайк
+            usefulDao.changeLikeToDislike(reviewId, userId);
+        } else {
+            //если нет, то ставим лайк
+            usefulDao.addDislike(reviewId, userId);
+        }
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
         reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);

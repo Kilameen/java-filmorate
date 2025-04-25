@@ -4,15 +4,17 @@ public interface UsefulDao {
 
     void addLike(Long reviewId, Long userId);
 
+    void changeDislikeToLike(Long reviewId, Long userId);
+
     void addDislike(Long reviewId, Long userId);
+
+    void changeLikeToDislike(Long reviewId, Long userId);
 
     void deleteLike(Long reviewId, Long userId);
 
     void deleteDislike(Long reviewId, Long userId);
 
-    void deleteLikes(Long reviewId);
-
-    void deleteDislikes(Long reviewId);
+    void deleteAllMarks(Long reviewId);
 
     int getLikesCountForReview(Long reviewId);
 
