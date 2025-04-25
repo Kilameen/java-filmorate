@@ -12,8 +12,6 @@ public interface ReviewDao {
 
     void delete(Long id);
 
-    Collection<Review> findAll();
-
     Review getReviewById(Long id);
 
     Long getReviewIdByFilmIdAndUserId(Long userId, Long filmId);

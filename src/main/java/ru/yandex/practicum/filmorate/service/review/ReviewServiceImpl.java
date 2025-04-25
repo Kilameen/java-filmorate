@@ -33,8 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review create(Review review) {
-        filmStorage.getFilm(review.getFilmId());
-        userStorage.getUserById(review.getUserId());
+        checkFilmAndUserExist(review.getFilmId(), review.getUserId());
         validateContent(review.getContent());
         try {
             reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId());
@@ -55,8 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
                 throw new NotFoundException("Отзыв с id " + review.getReviewId() + " не найден!");
             }
         }
-        filmStorage.getFilm(review.getFilmId());
-        userStorage.getUserById(review.getUserId());
+        checkFilmAndUserExist(review.getFilmId(), review.getUserId());
         return reviewDao.update(review);
     }
 
@@ -68,7 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
         usefulDao.deleteAllMarks(id);
         reviewDao.delete(id);
-        log.info("Фильм с id {} удален", id);
+        log.info("Отзыв с id {} удален", id);
     }
 
     @Override
@@ -105,9 +103,7 @@ public class ReviewServiceImpl implements ReviewService {
             //если нет, то ставим лайк
             usefulDao.addLike(reviewId, userId);
         }
-        int likesCount = usefulDao.getLikesCountForReview(reviewId);
-        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
-        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+        updateUseful(reviewId);
     }
 
     @Override
@@ -123,9 +119,7 @@ public class ReviewServiceImpl implements ReviewService {
             //если нет, то ставим лайк
             usefulDao.addDislike(reviewId, userId);
         }
-        int likesCount = usefulDao.getLikesCountForReview(reviewId);
-        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
-        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+        updateUseful(reviewId);
     }
 
     @Override
@@ -158,5 +152,10 @@ public class ReviewServiceImpl implements ReviewService {
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
         reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+    }
+
+    private void checkFilmAndUserExist(Long filmId, Long userId) {
+        filmStorage.getFilm(filmId);
+        userStorage.getUserById(userId);
     }
 }

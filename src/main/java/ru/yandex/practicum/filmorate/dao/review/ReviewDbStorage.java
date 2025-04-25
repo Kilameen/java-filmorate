@@ -77,11 +77,6 @@ public class ReviewDbStorage implements ReviewDao {
     }
 
     @Override
-    public Collection<Review> findAll() {
-        return jdbcTemplate.query(SELECT_ALL_REVIEWS_SQL_REQUEST, reviewMapper);
-    }
-
-    @Override
     public Review getReviewById(Long id) {
         return jdbcTemplate.query(SELECT_REVIEW_BY_ID_SQL_REQUEST, reviewMapper, id)
                 .stream()
