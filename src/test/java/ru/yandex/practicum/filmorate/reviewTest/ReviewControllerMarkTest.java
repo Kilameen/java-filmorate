@@ -45,6 +45,16 @@ public class ReviewControllerMarkTest {
     }
 
     @Test
+    @DisplayName("Поставить лайк вместо дизлайка. Успешно")
+    void testChangeDislikeToLike_Success() throws Exception {
+        Long reviewId = 2L;
+        Long userId = 3L;
+
+        mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
+                .andExpect(status().isOk()); // Проверяем статус ответа
+    }
+
+    @Test
     @DisplayName("Добавить лайк. Отзыв не найден")
     void testAddLike_ReviewNotFound() throws Exception {
         Long reviewId = 999L;
