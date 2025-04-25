@@ -10,9 +10,7 @@ import ru.yandex.practicum.filmorate.dao.review.UsefulDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -88,7 +86,6 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewDao.isReviewExist(reviewId)) {
             throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
         }
-        Collection<User> users = userStorage.findAll();
         userStorage.getUserById(userId);
         usefulDao.addLike(reviewId, userId);
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
@@ -134,7 +131,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void updateUseful(Long reviewId){
+    private void updateUseful(Long reviewId) {
         int likesCount = usefulDao.getLikesCountForReview(reviewId);
         int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
         reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);

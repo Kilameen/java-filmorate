@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.dao.review;
 
-import java.util.Collection;
-
 public interface UsefulDao {
 
     void addLike(Long reviewId, Long userId);
