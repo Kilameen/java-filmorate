@@ -55,7 +55,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleTypeMismatch() {
         return new ErrorResponse("Ошибка преобразования строки в число. ID должен быть числом.");
     }

@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
-    Long id;
+    Long reviewId;
     @NotNull(message = "Укажите id пользователя, оставившего отзыв")
     Long userId;
     @NotNull(message = "Укажите id фильма, которому оставляете отзыв")

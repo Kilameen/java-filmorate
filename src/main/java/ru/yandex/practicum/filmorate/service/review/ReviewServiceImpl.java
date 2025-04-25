@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.dao.review.ReviewDao;
 import ru.yandex.practicum.filmorate.dao.review.UsefulDao;
+import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -35,15 +36,24 @@ public class ReviewServiceImpl implements ReviewService {
         filmStorage.getFilm(review.getFilmId());
         userStorage.getUserById(review.getUserId());
         validateContent(review.getContent());
-        return reviewDao.create(review);
+        try {
+            reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId());
+            throw new DuplicatedDataException("Отзыв пользователя " + review.getUserId() + " на фильм " + review.getFilmId() + " уже существует");
+        } catch (Exception ex) {
+            return reviewDao.create(review);
+        }
     }
 
     @Override
     public Review update(Review review) {
         validateContent(review.getContent());
-        //Если отзыв не найден по id, то выбросит исключение
-        if (!reviewDao.isReviewExist(review.getId())) {
-            throw new NotFoundException("Отзыв с id " + review.getId() + " не найден!");
+        //Если отзыв не найден, то выбросит исключение
+        if (!reviewDao.isReviewExist(review.getReviewId())) {
+            try {
+                review.setReviewId(reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId()));
+            } catch (Exception ex) {
+                throw new NotFoundException("Отзыв с id " + review.getReviewId() + " не найден!");
+            }
         }
         filmStorage.getFilm(review.getFilmId());
         userStorage.getUserById(review.getUserId());

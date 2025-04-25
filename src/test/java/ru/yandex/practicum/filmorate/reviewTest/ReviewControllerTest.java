@@ -78,7 +78,7 @@ public class ReviewControllerTest {
     @Test
     @DisplayName("Обновить отзыв. Успешно")
     void testUpdateReview_Success() throws Exception {
-        review.setId(1L);
+        review.setReviewId(1L);
         review.setContent("Обновленный отзыв");
         mockMvc.perform(put("/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,8 +96,9 @@ public class ReviewControllerTest {
     @Test
     @DisplayName("Обновить отзыв. Отзыв не найден")
     void testUpdateReview_NotFound() throws Exception {
-        review.setId(10L);
-
+        review.setReviewId(10L);
+        review.setUserId(10L);
+        review.setFilmId(10L);
         mockMvc.perform(put("/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(review)))

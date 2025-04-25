@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.review;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -30,6 +31,7 @@ public class ReviewDbStorage implements ReviewDao {
     private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
     private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
     private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";
+    private static final String GET_REVIEW_ID_BY_FILM_AND_USER_SQL_REQUEST = "SELECT review_id FROM reviews WHERE film_id=? AND user_id=?;";
 
     @Override
     public Review create(Review review) {
@@ -58,7 +60,7 @@ public class ReviewDbStorage implements ReviewDao {
             preparedStatement.setBoolean(2, review.getIsPositive());
             preparedStatement.setLong(3, review.getFilmId());
             preparedStatement.setLong(4, review.getUserId());
-            preparedStatement.setLong(5, review.getId());
+            preparedStatement.setLong(5, review.getReviewId());
             return preparedStatement;
         }, keyHolder);
         return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -85,6 +87,20 @@ public class ReviewDbStorage implements ReviewDao {
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Отзыв с id " + id + " не найден"));
+    }
+
+    @Override
+    public Long getReviewIdByFilmIdAndUserId(Long userId, Long filmId) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    GET_REVIEW_ID_BY_FILM_AND_USER_SQL_REQUEST,
+                    Long.class,
+                    filmId,
+                    userId
+            );
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Отзыв не найден");
+        }
     }
 
     @Override
