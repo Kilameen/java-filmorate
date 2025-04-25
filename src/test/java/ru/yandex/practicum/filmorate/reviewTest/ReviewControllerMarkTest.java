@@ -78,7 +78,7 @@ public class ReviewControllerMarkTest {
     @DisplayName("Добавить дизлайк. Отзыв не найден")
     void testAddDislike_ReviewNotFound() throws Exception {
         Long reviewId = 999L;
-        Long userId = 12L;
+        Long userId = 2L;
 
         mockMvc.perform(put("/reviews/{id}/dislike/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());

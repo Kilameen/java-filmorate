@@ -34,8 +34,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review create(Review review) {
-        filmStorage.getFilm(review.getFilm_id());
-        userStorage.getUserById(review.getUser_id());
+        filmStorage.getFilm(review.getFilmId());
+        userStorage.getUserById(review.getUserId());
         validate(review.getContent());
         return reviewDao.create(review);
     }
@@ -47,8 +47,8 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewDao.isReviewExist(review.getId())) {
             throw new NotFoundException("Отзыв с id " + review.getId() + " не найден!");
         }
-        filmStorage.getFilm(review.getFilm_id());
-        userStorage.getUserById(review.getUser_id());
+        filmStorage.getFilm(review.getFilmId());
+        userStorage.getUserById(review.getUserId());
         return reviewDao.update(review);
     }
 
@@ -110,31 +110,33 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void deleteLike(Long reviewId, Long userId) {
-        if (!usefulDao.isLikeExist(reviewId, reviewId)) {
+        if (!usefulDao.isLikeExist(reviewId, userId)) {
             throw new NotFoundException("Такой лайк не найден");
         }
         userStorage.getUserById(userId);
         usefulDao.deleteLike(reviewId, userId);
-        int likesCount = usefulDao.getLikesCountForReview(reviewId);
-        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
-        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+        updateUseful(reviewId);
     }
 
     @Override
     public void deleteDislike(Long reviewId, Long userId) {
-        if (!usefulDao.isDislikeExist(reviewId, reviewId)) {
+        if (!usefulDao.isDislikeExist(reviewId, userId)) {
             throw new NotFoundException("Такой дизлайк не найден");
         }
         userStorage.getUserById(userId);
         usefulDao.deleteDislike(reviewId, userId);
-        int likesCount = usefulDao.getLikesCountForReview(reviewId);
-        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
-        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
+        updateUseful(reviewId);
     }
 
     private void validate(String content) {
         if (content.length() > 255) {
             throw new ValidationException("Длина отзыва не должна превышать 200 символов");
         }
+    }
+
+    private void updateUseful(Long reviewId){
+        int likesCount = usefulDao.getLikesCountForReview(reviewId);
+        int dislikesCount = usefulDao.getDislikesCountForReview(reviewId);
+        reviewDao.updateUsefulToReview(reviewId, likesCount - dislikesCount);
     }
 }

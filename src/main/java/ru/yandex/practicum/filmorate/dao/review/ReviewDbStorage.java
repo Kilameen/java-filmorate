@@ -40,8 +40,8 @@ public class ReviewDbStorage implements ReviewDao {
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, review.getContent());
             preparedStatement.setBoolean(2, review.isPositive());
-            preparedStatement.setLong(3, review.getFilm_id());
-            preparedStatement.setLong(4, review.getUser_id());
+            preparedStatement.setLong(3, review.getFilmId());
+            preparedStatement.setLong(4, review.getUserId());
             return preparedStatement;
         }, keyHolder);
         return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -56,8 +56,8 @@ public class ReviewDbStorage implements ReviewDao {
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, review.getContent());
             preparedStatement.setBoolean(2, review.isPositive());
-            preparedStatement.setLong(3, review.getFilm_id());
-            preparedStatement.setLong(4, review.getUser_id());
+            preparedStatement.setLong(3, review.getFilmId());
+            preparedStatement.setLong(4, review.getUserId());
             preparedStatement.setLong(5, review.getId());
             return preparedStatement;
         }, keyHolder);

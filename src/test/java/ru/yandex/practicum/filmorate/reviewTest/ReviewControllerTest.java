@@ -12,12 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.utils.Reader;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -43,8 +43,8 @@ public class ReviewControllerTest {
         jdbcTemplate.update(Reader.readString("src/test/resources/dataSource.sql"));
 
         review = new Review();
-        review.setUser_id(1L);
-        review.setFilm_id(1L);
+        review.setUserId(1L);
+        review.setFilmId(1L);
         review.setContent("Отличный фильм!");
         review.setPositive(true);
         review.setUseful(5);
@@ -57,8 +57,8 @@ public class ReviewControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(review)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.user_id").value(1))
-                .andExpect(jsonPath("$.film_id").value(1))
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Отличный фильм!"))
                 .andExpect(jsonPath("$.positive").value(true))
                 .andExpect(jsonPath("$.useful").value(0));
@@ -85,8 +85,8 @@ public class ReviewControllerTest {
                         .content(objectMapper.writeValueAsString(review)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.user_id").value(1))
-                .andExpect(jsonPath("$.film_id").value(1))
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Обновленный отзыв"))
                 .andExpect(jsonPath("$.positive").value(true))
                 .andExpect(jsonPath("$.useful").value(2));
@@ -115,7 +115,7 @@ public class ReviewControllerTest {
     @Test
     @DisplayName("Удалить отзыв. Отзыв не найден")
     void testDeleteReview_NotFound() throws Exception {
-        mockMvc.perform(delete("/reviews/{id}",10L))
+        mockMvc.perform(delete("/reviews/{id}", 10L))
                 .andExpect(status().isNotFound());
     }
 
@@ -126,8 +126,8 @@ public class ReviewControllerTest {
         mockMvc.perform(get("/reviews/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.user_id").value(1))
-                .andExpect(jsonPath("$.film_id").value(1))
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Фильм мне понравился. Отличный!"))
                 .andExpect(jsonPath("$.positive").value(true))
                 .andExpect(jsonPath("$.useful").value(2));
@@ -143,7 +143,7 @@ public class ReviewControllerTest {
 
     @Test
     @DisplayName("Получить все отзывы. Нет параметров. Успешно")
-    void testGetAllReviews_NoParams_Success() throws Exception{
+    void testGetAllReviews_NoParams_Success() throws Exception {
         mockMvc.perform(get("/reviews"))
                 .andExpect(status().isOk()) // Проверяем статус ответа
                 .andExpect(jsonPath("$.length()").value(4));
@@ -191,4 +191,5 @@ public class ReviewControllerTest {
                         .param("filmId", String.valueOf(filmId))) // Передаем filmId=999
                 .andExpect(status().isNotFound());
     }
+
 }

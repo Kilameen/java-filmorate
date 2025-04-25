@@ -13,9 +13,9 @@ import lombok.experimental.FieldDefaults;
 public class Review {
     Long id;
     @NotNull(message = "Укажите id пользователя, оставившего отзыв")
-    Long user_id;
+    Long userId;
     @NotNull(message = "Укажите id фильма, которому оставляете отзыв")
-    Long film_id;
+    Long filmId;
     boolean isPositive;
     @Size(max = 255, message = "Длина отзыва не должна превышать 200 символов",
             groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
