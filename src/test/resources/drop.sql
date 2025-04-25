@@ -6,3 +6,4 @@ DROP TABLE IF EXISTS friendship CASCADE;
 -- БД для задачи "Добавить отзывы" --
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS review_likes CASCADE;
+DROP TABLE IF EXISTS dislikes_likes CASCADE;

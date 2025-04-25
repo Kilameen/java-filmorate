@@ -66,7 +66,14 @@ CREATE TABLE IF NOT EXISTS reviews (
 CREATE TABLE IF NOT EXISTS review_likes (
        review_id BIGINT,
        user_id BIGINT,
-       is_positive BOOLEAN DEFAULT TRUE,
+       FOREIGN KEY (review_id) REFERENCES reviews (review_id),
+       FOREIGN KEY (user_id) REFERENCES users (user_id),
+       PRIMARY KEY (review_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS review_dislikes (
+       review_id BIGINT,
+       user_id BIGINT,
        FOREIGN KEY (review_id) REFERENCES reviews (review_id),
        FOREIGN KEY (user_id) REFERENCES users (user_id),
        PRIMARY KEY (review_id, user_id)

@@ -66,7 +66,8 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
         }
-        usefulDao.deleteAllMarks(id);
+        usefulDao.deleteDislikes(id);
+        usefulDao.deleteLikes(id);
         reviewDao.delete(id);
         log.info("Фильм с id {} удален", id);
     }

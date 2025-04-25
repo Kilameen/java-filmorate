@@ -10,7 +10,9 @@ public interface UsefulDao {
 
     void deleteDislike(Long reviewId, Long userId);
 
-    void deleteAllMarks(Long reviewId);
+    void deleteLikes(Long reviewId);
+
+    void deleteDislikes(Long reviewId);
 
     int getLikesCountForReview(Long reviewId);
 

@@ -18,17 +18,21 @@ import java.util.Optional;
 public class UsefulDbStorage implements UsefulDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String INSERT_LIKE_SQL_REQUEST = "INSERT INTO review_likes (review_id, user_id, is_positive)\n" +
-            "VALUES (?, ?, TRUE);";
-    private static final String INSERT_DISLIKE_SQL_REQUEST = "INSERT INTO review_likes (review_id, user_id, is_positive)\n" +
-            "VALUES (?, ?, FALSE);";
-    private static final String DELETE_LIKE_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive = TRUE;";
-    private static final String DELETE_DISLIKE_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive = FALSE;";
-    private static final String DELETE_ALL_MARK_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ?;";
-    private static final String GET_LIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive = TRUE;";
-    private static final String GET_DISLIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ? AND is_positive = FALSE;";
-    private static final String CHECK_LIKE_IS_EXIST = "SELECT EXISTS (SELECT 1 FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive = TRUE);";
-    private static final String CHECK_DISLIKE_IS_EXIST = "SELECT EXISTS (SELECT 1 FROM review_likes WHERE review_id = ? AND user_id = ? AND is_positive = FALSE);";
+    private static final String INSERT_LIKE_SQL_REQUEST = "INSERT INTO review_likes (review_id, user_id)\n" +
+            "VALUES (?, ?);";
+    private static final String INSERT_DISLIKE_SQL_REQUEST = "INSERT INTO review_dislikes (review_id, user_id)\n" +
+            "VALUES (?, ?);";
+    private static final String DELETE_LIKE_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ?;";
+    private static final String DELETE_DISLIKE_SQL_REQUEST = "DELETE FROM review_dislikes WHERE review_id = ? AND user_id = ?;";
+
+    private static final String DELETE_LIKES_SQL_REQUEST = "DELETE FROM review_likes WHERE review_id = ?;";
+    private static final String DELETE_DISLIKES_SQL_REQUEST = "DELETE FROM review_dislikes WHERE review_id = ?;";
+
+    private static final String GET_LIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_likes WHERE review_id = ?;";
+    private static final String GET_DISLIKES_COUNT_SQL_REQUEST = "SELECT COUNT(*) FROM review_dislikes WHERE review_id = ?;";
+
+    private static final String CHECK_LIKE_IS_EXIST = "SELECT EXISTS (SELECT 1 FROM review_likes WHERE review_id = ? AND user_id = ?);";
+    private static final String CHECK_DISLIKE_IS_EXIST = "SELECT EXISTS (SELECT 1 FROM review_dislikes WHERE review_id = ? AND user_id = ?);";
 
 
     @Override
@@ -88,16 +92,29 @@ public class UsefulDbStorage implements UsefulDao {
     }
 
     @Override
-    public void deleteAllMarks(Long reviewId) {
+    public void deleteLikes(Long reviewId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement(DELETE_ALL_MARK_SQL_REQUEST,
+                    .prepareStatement(DELETE_LIKES_SQL_REQUEST,
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setLong(1, reviewId);
             return preparedStatement;
         }, keyHolder);
-        log.info("Удалены все оценки отзыву с id {}", reviewId);
+        log.info("Удалены все лайки отзыву с id {}", reviewId);
+    }
+
+    @Override
+    public void deleteDislikes(Long reviewId) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement(DELETE_DISLIKES_SQL_REQUEST,
+                            Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setLong(1, reviewId);
+            return preparedStatement;
+        }, keyHolder);
+        log.info("Удалены все дизлайки отзыву с id {}", reviewId);
     }
 
     @Override
