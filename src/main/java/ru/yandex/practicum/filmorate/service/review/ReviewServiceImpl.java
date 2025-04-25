@@ -34,14 +34,14 @@ public class ReviewServiceImpl implements ReviewService {
     public Review create(Review review) {
         filmStorage.getFilm(review.getFilmId());
         userStorage.getUserById(review.getUserId());
-        validate(review.getContent());
+        validateContent(review.getContent());
         return reviewDao.create(review);
     }
 
     @Override
     public Review update(Review review) {
-        validate(review.getContent());
-        //Если отзыв не найден, то выбросит исключение
+        validateContent(review.getContent());
+        //Если отзыв не найден по id, то выбросит исключение
         if (!reviewDao.isReviewExist(review.getId())) {
             throw new NotFoundException("Отзыв с id " + review.getId() + " не найден!");
         }
@@ -125,7 +125,7 @@ public class ReviewServiceImpl implements ReviewService {
         updateUseful(reviewId);
     }
 
-    private void validate(String content) {
+    private void validateContent(String content) {
         if (content.length() > 255) {
             throw new ValidationException("Длина отзыва не должна превышать 200 символов");
         }

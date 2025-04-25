@@ -16,7 +16,8 @@ public class Review {
     Long userId;
     @NotNull(message = "Укажите id фильма, которому оставляете отзыв")
     Long filmId;
-    boolean isPositive;
+    @NotNull(message = "Тип отзыва обязателен")
+    Boolean isPositive;
     @Size(max = 255, message = "Длина отзыва не должна превышать 200 символов",
             groups = {Marker.OnCreate.class, Marker.OnUpdate.class})
     String content;
