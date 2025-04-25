@@ -46,7 +46,7 @@ public class ReviewControllerTest {
         review.setUserId(1L);
         review.setFilmId(1L);
         review.setContent("Отличный фильм!");
-        review.setPositive(true);
+        review.setIsPositive(true);
         review.setUseful(5);
     }
 
@@ -60,7 +60,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Отличный фильм!"))
-                .andExpect(jsonPath("$.positive").value(true))
+                .andExpect(jsonPath("$.isPositive").value(true))
                 .andExpect(jsonPath("$.useful").value(0));
     }
 
@@ -88,7 +88,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Обновленный отзыв"))
-                .andExpect(jsonPath("$.positive").value(true))
+                .andExpect(jsonPath("$.isPositive").value(true))
                 .andExpect(jsonPath("$.useful").value(2));
 
     }
@@ -129,7 +129,7 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.filmId").value(1))
                 .andExpect(jsonPath("$.content").value("Фильм мне понравился. Отличный!"))
-                .andExpect(jsonPath("$.positive").value(true))
+                .andExpect(jsonPath("$.isPositive").value(true))
                 .andExpect(jsonPath("$.useful").value(2));
     }
 
