@@ -69,8 +69,8 @@ public class FilmServiceImpl implements FilmService {
         validate(film);
 
         Film addFilm = filmStorage.create(film);
-        if(!film.getDirector().isEmpty()){
-            for(Director director : film.getDirector()){
+        if(!film.getDirectors().isEmpty()){
+            for(Director director : film.getDirectors()){
                 Director filmDirector = directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:"+director.getId()+" не найден"));
             }
         }
@@ -90,6 +90,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film update(Film film) {
         validateRating(film);
+        System.out.println(film.getDirectors()+"2");
 
         Film existingFilm = filmStorage.getFilm(film.getId());
         if (isNull(existingFilm)) {
@@ -146,7 +147,7 @@ public class FilmServiceImpl implements FilmService {
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }
         return directorFilms.stream()
-                .sorted(Comparator.comparing(Film::getReleaseDate).reversed()) // Сортируем по убыванию года
+                .sorted(Comparator.comparing(Film::getReleaseDate)) // Сортируем по убыванию года
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

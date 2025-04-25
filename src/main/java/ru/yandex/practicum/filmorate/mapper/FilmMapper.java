@@ -17,7 +17,7 @@ public class FilmMapper implements RowMapper<Film> {
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Set<Director> directors = new HashSet<>();
         directors.add(new Director(rs.getLong("director_id"),rs.getString("name")));
-        System.out.println(directors);
+        System.out.println(directors+"mapper");
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("film_name"))
@@ -26,7 +26,7 @@ public class FilmMapper implements RowMapper<Film> {
                 .duration(rs.getInt("duration"))
                 .mpa(new Rating(rs.getLong("rating_id"), rs.getString("rating_name")))
                 .likes(rs.getLong("rate"))
-                .director(directors)
+                .directors(directors)
                 .build();
     }
 }

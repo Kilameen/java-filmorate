@@ -93,9 +93,10 @@ public class FilmDbStorage implements FilmStorage {
 
         Long filmId = keyHolder.getKeyAs(Long.class);
         film.setId(filmId);
-        saveFilmDirectors(filmId, film.getDirector().stream().collect(Collectors.toSet()));
+        System.out.println((film.getDirectors()));
+        saveFilmDirectors(filmId, film.getDirectors().stream().collect(Collectors.toSet()));
         List<Director> filmDirectors = directorStorage.getFilmDirectors(film.getId());
-        film.setDirector(filmDirectors.stream().collect(Collectors.toSet()));
+        film.setDirectors(filmDirectors.stream().collect(Collectors.toSet()));
 
         return film;
     }
@@ -123,8 +124,24 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
+        updateDirector(film.getId(),film.getDirectors());
+        System.out.println(directorStorage.getFilmDirectors(film.getId())+"sa");
         return getFilm(film.getId());
     }
+    private void updateDirector(Long filmId, Set<Director> directors) {
+        if (directors == null || directors.isEmpty()) {
+            deleteAllDirectorsForFilm(filmId);
+            return;
+        }
+        deleteAllDirectorsForFilm(filmId);
+        saveFilmDirectors(filmId, directors);
+    }
+
+    private void deleteAllDirectorsForFilm(Long filmId) {
+        String sql = "DELETE FROM films_directors WHERE film_id = ?";
+        jdbcTemplate.update(sql, filmId);
+    }
+
 
     @Override
     public Collection<Film> findAll() {

@@ -41,5 +41,5 @@ public class Film {
     Collection<Genre> genres = new HashSet<>();
 
     @NotNull
-    Set<Director> director = new HashSet<>();
+    Set<Director> directors = new HashSet<>();
 }

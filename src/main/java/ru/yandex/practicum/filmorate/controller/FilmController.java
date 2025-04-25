@@ -50,6 +50,7 @@ public class FilmController {
     @Validated(Marker.OnUpdate.class)
     public Film update(@Valid @RequestBody Film updateFilm) {
         log.info("Запрос на обновление информации о фильме {}", updateFilm);
+        System.out.println(updateFilm.getDirectors());
         return filmService.update(updateFilm);
     }
 
@@ -78,7 +79,7 @@ public class FilmController {
     }
 
     @GetMapping("/director/{directorId}")
-    public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId,@RequestParam String sortBy){
+    public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId,@RequestParam(defaultValue = "year") String sortBy){
         if (!sortBy.equals("year") && !sortBy.equals("likes")) {
             throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
         }
