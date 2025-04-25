@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.review.ReviewService;
@@ -42,6 +43,9 @@ public class ReviewController {
     @DeleteMapping("/{id}")
     @Validated(Marker.OnCreate.class)
     public void delete(@PathVariable Long id) {
+        if (id == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Запрос на удаление отзыва с id {}", id);
         reviewService.delete(id);
     }
@@ -50,6 +54,9 @@ public class ReviewController {
     @GetMapping("/{id}")
     @Validated(Marker.OnCreate.class)
     public Review getReview(@PathVariable Long id) {
+        if (id == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Запрос на получение отзыва с id {}", id);
         return reviewService.getReview(id);
     }
@@ -72,6 +79,9 @@ public class ReviewController {
     //Пользователь ставит лайк отзыву
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
+        if (reviewId == null || userId == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Пользователь с id {} пытается поставить лайк отзыву с id {}", userId, reviewId);
         reviewService.addLike(reviewId, userId);
     }
@@ -79,6 +89,9 @@ public class ReviewController {
     //Пользователь ставит дизлайк отзыву
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
+        if (reviewId == null || userId == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Пользователь с id {} пытается поставить дизлайк отзыву с id {}", userId, reviewId);
         reviewService.addDislike(reviewId, userId);
     }
@@ -86,6 +99,9 @@ public class ReviewController {
     //Пользователь удаляет лайк отзыву
     @DeleteMapping({"/{id}/like/{userId}"})
     public void deleteLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
+        if (reviewId == null || userId == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Пользователь с id {} пытается убрать лайк у отзыва с id {}", userId, reviewId);
         reviewService.deleteLike(reviewId, userId);
     }
@@ -93,6 +109,9 @@ public class ReviewController {
     //Пользователь удаляет дизлайк отзыву
     @DeleteMapping({"/{id}/dislike/{userId}"})
     public void deleteDislike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
+        if (reviewId == null || userId == null) {
+            throw new NotFoundException("ID не может быть пустым");
+        }
         log.info("Пользователь с id {} пытается убрать дизлайк у отзыва с id {}", userId, reviewId);
         reviewService.deleteDislike(reviewId, userId);
     }
