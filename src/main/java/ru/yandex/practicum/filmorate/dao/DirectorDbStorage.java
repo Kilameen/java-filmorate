@@ -31,14 +31,15 @@ public class DirectorDbStorage implements DirectorStorage {
                     "FROM directors AS d " +
                     "JOIN films_directors AS fd ON d.director_id = fd.director_id " +
                     "WHERE film_id = ?";
+
     @Override
     public List<Director> getDirectors() {
-        return jdbcTemplate.query(GET_ALL_DIRECTORS,mapper);
+        return jdbcTemplate.query(GET_ALL_DIRECTORS, mapper);
     }
 
     @Override
     public Optional<Director> getDirectorById(Long directorId) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(GET_DIRECTOR_BY_ID,mapper,directorId));
+        return Optional.ofNullable(jdbcTemplate.queryForObject(GET_DIRECTOR_BY_ID, mapper, directorId));
     }
 
     @Override
@@ -69,14 +70,13 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public void deleteDirector(Long directorId) {
-        jdbcTemplate.update(DELETE_QUERY,directorId);
+        jdbcTemplate.update(DELETE_QUERY, directorId);
     }
 
     @Override
     public List<Director> getFilmDirectors(Long filmId) {
-       return jdbcTemplate.query(GET_FILM_DIRECTOR_BY_ID,mapper,filmId);
+        return jdbcTemplate.query(GET_FILM_DIRECTOR_BY_ID, mapper, filmId);
     }
-
 
 
 }

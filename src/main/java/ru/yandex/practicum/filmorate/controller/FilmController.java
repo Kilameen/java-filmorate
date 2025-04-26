@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -22,7 +23,6 @@ public class FilmController {
 
     private final FilmService filmService;
 
-    //Storage
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -79,10 +79,11 @@ public class FilmController {
     }
 
     @GetMapping("/director/{directorId}")
-    public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId,@RequestParam(defaultValue = "year") String sortBy){
+    public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId, @RequestParam(defaultValue = "year") String sortBy) {
         if (!sortBy.equals("year") && !sortBy.equals("likes")) {
             throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
         }
+        log.info("Запрос на получение фильмов режиссера с id:" + directorId);
         return filmService.getDirectorFilms(directorId, sortBy);
     }
 }

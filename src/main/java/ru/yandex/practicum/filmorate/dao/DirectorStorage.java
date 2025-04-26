@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.dao;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public interface DirectorStorage {
 
     List<Director> getDirectors();

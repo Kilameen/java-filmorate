@@ -9,19 +9,24 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.dao.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.RatingDbStorage;
+import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.mapper.RatingMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.utils.Reader;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @JdbcTest
 @AutoConfigureTestDatabase
-@Import({FilmDbStorage.class, FilmMapper.class})
+@Import({FilmDbStorage.class, FilmMapper.class, DirectorDbStorage.class, DirectorMapper.class, RatingDbStorage.class, RatingMapper.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmDbStorageTest {
 
@@ -35,7 +40,7 @@ class FilmDbStorageTest {
             220,
             0L,
             new Rating(1L, "G"),
-            null,null);
+            null,new HashSet<>());
 
     @BeforeEach
     void beforeEach() {
@@ -63,7 +68,7 @@ class FilmDbStorageTest {
                 100,
                 1L,
                 new Rating(3L, "PG-13"),
-                null,null);
+                null,new HashSet<>());
         Assertions.assertEquals(film, filmStorage.getFilm(1L));
     }
 

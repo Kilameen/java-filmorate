@@ -9,9 +9,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Service
@@ -69,9 +71,9 @@ public class FilmServiceImpl implements FilmService {
         validate(film);
 
         Film addFilm = filmStorage.create(film);
-        if(!film.getDirectors().isEmpty()){
-            for(Director director : film.getDirectors()){
-                Director filmDirector = directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:"+director.getId()+" не найден"));
+        if (!film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
+                Director filmDirector = directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
             }
         }
 
@@ -90,7 +92,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film update(Film film) {
         validateRating(film);
-        System.out.println(film.getDirectors()+"2");
 
         Film existingFilm = filmStorage.getFilm(film.getId());
         if (isNull(existingFilm)) {

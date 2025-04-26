@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DirectorServiceImpl implements DirectorService{
+public class DirectorServiceImpl implements DirectorService {
 
     private final DirectorStorage directorStorage;
 
@@ -21,7 +21,7 @@ public class DirectorServiceImpl implements DirectorService{
 
     @Override
     public Director getDirectorById(Long directorId) {
-        return directorStorage.getDirectorById(directorId).orElseThrow(()-> new NotFoundException("Режиссер с id:"+directorId+" не найден"));
+        return directorStorage.getDirectorById(directorId).orElseThrow(() -> new NotFoundException("Режиссер с id:" + directorId + " не найден"));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DirectorServiceImpl implements DirectorService{
 
     @Override
     public Director updateDirector(Director newDirector) {
-        Director director = directorStorage.getDirectorById(newDirector.getId()).orElseThrow(()-> new NotFoundException("Режиссер с id:"+newDirector.getId()+" не найден"));
+        Director director = directorStorage.getDirectorById(newDirector.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + newDirector.getId() + " не найден"));
         director = directorStorage.updateDirector(newDirector);
         director.setName(newDirector.getName());
         return director;

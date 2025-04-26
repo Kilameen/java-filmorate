@@ -30,7 +30,7 @@ public class ErrorHandler {
         return new ErrorResponse("Ошибка валидации: " + e.getBindingResult().getFieldError().getDefaultMessage());
     }
 
-/*    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerValidationException(Throwable e) {
         String errorMessage = "Произошла внутренняя ошибка сервера: ";
@@ -41,7 +41,7 @@ public class ErrorHandler {
             errorMessage += "Сообщение отсутствует.";
         }
         return new ErrorResponse(errorMessage);
-    }*/
+    }
 
     @ExceptionHandler(DuplicatedDataException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -57,13 +57,13 @@ public class ErrorHandler {
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleWithDuplicateDirector(DuplicateKeyException ex){
+    public ErrorResponse handleWithDuplicateDirector(DuplicateKeyException ex) {
         return new ErrorResponse("Такая сущность уже существует!");
     }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleWithDuplicateDirector(EmptyResultDataAccessException ex){
+    public ErrorResponse handleWithDuplicateDirector(EmptyResultDataAccessException ex) {
         return new ErrorResponse("Объект не найден!");
     }
 }
