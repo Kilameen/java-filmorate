@@ -35,6 +35,7 @@ class DirectorDbStorageTest {
         jdbcTemplate.execute("DELETE FROM directors");
     }
 
+
     @Test
     void createDirector_ShouldInsertAndReturnDirector() {
         // Arrange
