@@ -7,9 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Rating;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +26,9 @@ class DirectorDbStorageTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private FilmDbStorage filmStorage;
 
     @BeforeEach
     void setUp() {
@@ -96,9 +104,18 @@ class DirectorDbStorageTest {
     void getFilmDirectors_ShouldReturnListOfDirectors_WhenFilmHasDirectors() {
         Director director1 = directorDbStorage.createDirector(new Director(null, "Director 1"));
         Director director2 = directorDbStorage.createDirector(new Director(null, "Director 2"));
-        jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)", 1L, director1.getId());
-        jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)", 1L, director2.getId());
-        List<Director> directors = directorDbStorage.getFilmDirectors(1L);
+        Film testFilm = new Film(null,
+                "Test Film",
+                "Test Description",
+                LocalDate.of(1993, 1, 25),
+                220,
+                0L,
+                new Rating(1L, "G"),
+                null,new HashSet<>());
+        testFilm = filmStorage.create(testFilm);
+        jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)", testFilm.getId(), director1.getId());
+        jdbcTemplate.update("INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)", testFilm.getId(), director2.getId());
+        List<Director> directors = directorDbStorage.getFilmDirectors(testFilm.getId());
 
         // Assert
         assertEquals(2, directors.size());
