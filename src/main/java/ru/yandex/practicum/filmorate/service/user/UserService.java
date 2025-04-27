@@ -21,5 +21,7 @@ public interface UserService {
 
     Collection<User> getAllUserFriends(Long id);
 
+    void deleteUserById(Long id);
+
     Collection<Film> getRecommendation(Long id);
 }

@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        log.info("Запрос на получение фильма по id");
+        log.info("Запрос на получение пользователя по id");
         return userService.getUserById(id);
     }
 
@@ -50,6 +50,14 @@ public class UserController {
     public User update(@Valid @RequestBody User updateUser) {
         log.info("Запрос на обновление информации о пользователе {}", updateUser);
         return userService.update(updateUser);
+    }
+
+    @DeleteMapping("{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long userId) {
+        log.info("Запрос на удаление пользователя с id {}", userId);
+        userService.deleteUserById(userId);
+        log.info("Пользователь с id {} удален", userId);
     }
 
     //Service

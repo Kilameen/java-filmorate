@@ -32,6 +32,10 @@ public class UserDbStorage implements UserStorage {
     private static final String SELECT_USER_BY_ID_SQL_REQUEST = "SELECT *\n" +
             "FROM users\n" +
             "WHERE user_id = ?;";
+    private static final String DELETE_USER_BY_ID_SQL_REQUEST = "DELETE FROM users WHERE user_id = ?;";
+    private static final String DELETE_USER_FRIENDSHIPS_SQL =
+            "DELETE FROM friendship WHERE user_id = ? OR friend_id = ?;";
+
 
     @Override
     public User create(User user) {
@@ -84,5 +88,12 @@ public class UserDbStorage implements UserStorage {
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не найден"));
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        jdbcTemplate.update(DELETE_USER_FRIENDSHIPS_SQL, id, id);
+
+        jdbcTemplate.update(DELETE_USER_BY_ID_SQL_REQUEST, id);
     }
 }
