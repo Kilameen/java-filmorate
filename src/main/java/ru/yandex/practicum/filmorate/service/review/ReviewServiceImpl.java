@@ -144,7 +144,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private void validateContent(String content) {
         if (content.length() > 255) {
-            throw new ValidationException("Длина отзыва не должна превышать 200 символов");
+            throw new ValidationException("Длина отзыва не должна превышать 255 символов");
         }
     }
 
