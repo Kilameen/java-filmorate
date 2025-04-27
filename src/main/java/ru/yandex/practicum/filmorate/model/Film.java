@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
@@ -37,4 +39,7 @@ public class Film {
     @NotNull(message = "Рейтинг MPA не может быть пустым", groups = Marker.OnCreate.class)
     Rating mpa;
     Collection<Genre> genres = new HashSet<>();
+
+    @NotNull
+    Set<Director> directors = new HashSet<>();
 }

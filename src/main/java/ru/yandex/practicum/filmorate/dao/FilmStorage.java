@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
     Film create(Film film);
@@ -13,6 +14,8 @@ public interface FilmStorage {
     Film getFilm(Long id);
 
     Collection<Film> getPopularFilms(Long count);
+
+    List<Film> getDirectorFilms(Long directorId);
 
     boolean deleteFilm(Long id);
 }

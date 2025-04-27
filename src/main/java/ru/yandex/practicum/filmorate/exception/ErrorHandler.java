@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +54,18 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
         return new ErrorResponse("Ошибка валидации: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleWithDuplicateDirector(DuplicateKeyException ex) {
+        return new ErrorResponse("Такая сущность уже существует!");
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleWithDuplicateDirector(EmptyResultDataAccessException ex) {
+        return new ErrorResponse("Объект не найден!");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

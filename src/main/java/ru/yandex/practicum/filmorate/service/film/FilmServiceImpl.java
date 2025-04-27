@@ -6,16 +6,20 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Service
 public class FilmServiceImpl implements FilmService {
 
+    private final DirectorStorage directorStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeDbStorage likeDbStorage;
@@ -24,10 +28,10 @@ public class FilmServiceImpl implements FilmService {
     private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
-    public FilmServiceImpl(@Qualifier("H2FilmDb") FilmStorage filmStorage,
+    public FilmServiceImpl(DirectorStorage directorStorage, @Qualifier("H2FilmDb") FilmStorage filmStorage,
                            @Qualifier("H2UserDb") UserStorage userStorage,
                            @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage, @Qualifier("H2GenreDb") GenreDbStorage genreDbStorage, @Qualifier("H2RatingDb") RatingDbStorage ratingDbStorage) {
-
+        this.directorStorage = directorStorage;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likeDbStorage = likeDbStorage;
@@ -66,6 +70,11 @@ public class FilmServiceImpl implements FilmService {
         validate(film);
 
         Film addFilm = filmStorage.create(film);
+        if (!film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
+                Director filmDirector = directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
+            }
+        }
 
         if (film.getGenres() != null) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
@@ -124,6 +133,22 @@ public class FilmServiceImpl implements FilmService {
         Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         film.setGenres(filmGenres);
         return film;
+    }
+
+    @Override
+    public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
+        List<Film> directorFilms = filmStorage.getDirectorFilms(directorId);
+        if (directorFilms.isEmpty()) {
+            return Collections.emptySet();
+        }
+        if (sortBy.equals("likes")) {
+            return directorFilms.stream()
+                    .sorted(Comparator.comparing(Film::getLikes).reversed()) // Сортируем по убыванию лайков
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+        return directorFilms.stream()
+                .sorted(Comparator.comparing(Film::getReleaseDate)) // Сортируем по убыванию года
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private void validateUserId(Long id) {
