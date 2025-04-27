@@ -13,9 +13,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -113,7 +111,7 @@ public class FilmController {
         if (by.trim().isEmpty()) {
             throw new InternalServerException("Параметр byList не может быть пустым или отсутствовать");
         }
-        log.info("Поиск фильма, содержащего \"{}\" в {}", query,by);
-        return filmService.getFilmByNameOrDirector(query,by);
+        log.info("Поиск фильма, содержащего \"{}\" в {}", query, by);
+        return filmService.getFilmByNameOrDirector(query, by);
     }
 }
