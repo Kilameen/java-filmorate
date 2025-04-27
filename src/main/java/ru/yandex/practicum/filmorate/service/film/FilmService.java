@@ -23,4 +23,6 @@ public interface FilmService {
     Set<Film> getDirectorFilms(Long directorId, String sortBy);
 
     void deleteFilmById(Long id);
+
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
 }

@@ -94,4 +94,9 @@ public class FilmController {
         filmService.deleteFilmById(filmId);
         log.info("Фильм с id {} успешно удалён", filmId);
     }
+
+    @GetMapping("/films/common")
+    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }

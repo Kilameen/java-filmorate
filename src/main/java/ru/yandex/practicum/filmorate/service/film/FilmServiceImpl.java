@@ -172,4 +172,8 @@ public class FilmServiceImpl implements FilmService {
 
         filmStorage.deleteFilm(id);
     }
+
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 }

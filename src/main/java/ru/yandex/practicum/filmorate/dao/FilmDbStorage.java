@@ -58,6 +58,14 @@ public class FilmDbStorage implements FilmStorage {
             "WHERE film_id = ?;";
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
+    private static final String SELECT_COMMON_FILMS_SQL =
+            "SELECT f.name, f.rate\n" +
+                    "FROM films AS f\n" +
+                    "JOIN likes AS l ON f.film_id = l.film_id\n" +
+                    "WHERE l.user_id IN (:userId, :friendId)\n" +
+                    "GROUP BY f.film_id, f.name, f.rate\n" +
+                    "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
+                    "ORDER BY f.rate DESC;\n";
 
     @Override
     public Film create(Film film) {
@@ -166,5 +174,10 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(DELETE_FILM_GENRES, id);
         int rowsAffected = jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
         return rowsAffected > 0;
+    }
+
+    @Override
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
     }
 }
