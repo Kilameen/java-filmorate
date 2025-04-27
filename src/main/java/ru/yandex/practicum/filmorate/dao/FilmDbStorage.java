@@ -101,11 +101,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Long id) {
-        getFilm(id);
-
+    public boolean deleteFilm(Long id) {
         jdbcTemplate.update(DELETE_FILM_LIKES, id);
         jdbcTemplate.update(DELETE_FILM_GENRES, id);
-        jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
+        int rowsAffected = jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
+        return rowsAffected > 0;
     }
 }

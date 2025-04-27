@@ -82,5 +82,6 @@ public class FilmController {
     public void deleteFilm(@PathVariable Long filmId) {
         log.info("Удаление фильма с id {}", filmId);
         filmService.deleteFilmById(filmId);
+        log.info("Фильм с id {} успешно удалён", filmId);
     }
 }
