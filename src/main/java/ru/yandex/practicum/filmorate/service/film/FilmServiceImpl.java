@@ -60,7 +60,6 @@ public class FilmServiceImpl implements FilmService {
         return popularFilms;
     }
 
-
     @Override
     public Film create(Film film) {
         validateRating(film);

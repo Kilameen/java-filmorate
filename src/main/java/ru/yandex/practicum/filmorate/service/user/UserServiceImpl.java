@@ -4,15 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 
 @Service
@@ -21,11 +21,18 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
     private final FriendshipDao friendshipDao;
+    private final LikeDao likeDao;
+    private final FilmStorage filmStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage, @Qualifier("H2FriendDb") FriendshipDao friendshipDao) {
+    public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage,
+                           @Qualifier("H2FriendDb") FriendshipDao friendshipDao,
+                           @Qualifier("H2LikeDb") LikeDao likeDao,
+                           @Qualifier("H2FilmDb") FilmStorage filmStorage) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
+        this.likeDao = likeDao;
+        this.filmStorage = filmStorage;
     }
 
     @Override
@@ -85,6 +92,50 @@ public class UserServiceImpl implements UserService {
     public Collection<User> getAllUserFriends(Long id) {
         getUserById(id);
         return friendshipDao.getAllUserFriends(id);
+    }
+
+    @Override
+    public Collection<Film> getRecommendation(Long userId) {
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Пользователя с таким id не существует");
+        }
+
+        Map<Long, Set<Long>> userWithLikes = likeDao.getAllUsersWithLikes();
+        Set<Long> userLikeFilms = userWithLikes.getOrDefault(userId, Collections.emptySet());
+
+        if (userLikeFilms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        userWithLikes.remove(userId);
+
+        if (userWithLikes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Optional<Map.Entry<Long, Set<Long>>> mostSimilarUser = userWithLikes.entrySet().stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .max(Comparator.comparingLong(entry -> intersectionSize(userLikeFilms, entry.getValue())));
+
+        if (mostSimilarUser.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (intersectionSize(userLikeFilms, mostSimilarUser.get().getValue()) == 0) {
+            return Collections.emptyList();
+        }
+
+        Set<Long> similarUserLikes = mostSimilarUser.get().getValue();
+        similarUserLikes.removeAll(userLikeFilms);
+
+        return similarUserLikes.stream()
+                .map(filmStorage::getFilm)
+                .collect(Collectors.toList());
+    }
+
+    private long intersectionSize(Set<Long> set1, Set<Long> set2) {
+        return set1.stream().filter(set2::contains).count();
     }
 
     private void validate(User user) {

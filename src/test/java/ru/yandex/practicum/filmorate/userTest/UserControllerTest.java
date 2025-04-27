@@ -7,10 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -30,6 +34,8 @@ public class UserControllerTest {
     @Autowired
     private UserController userController;
     @Autowired
+    private FilmController filmController;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
     User user;
 
@@ -37,6 +43,7 @@ public class UserControllerTest {
     void setUp() {
         jdbcTemplate.update(Reader.readString("src/test/resources/drop.sql"));
         jdbcTemplate.update(Reader.readString("src/main/resources/schema.sql"));
+        jdbcTemplate.update(Reader.readString("src/main/resources/data.sql"));
         validator = Validation.buildDefaultValidatorFactory().getValidator();
         user = new User();
         user.setName("TestName");
@@ -202,5 +209,79 @@ public class UserControllerTest {
         Collection<User> friends = userController.getListOfMutualFriends(user.getId(), user1.getId());
         assertEquals(1, friends.size(), "Контроллер не нашел общих друзей");
         assertEquals("TestName2", friends.stream().findFirst().get().getName(), "Контроллер неверно нашел общих друзей");
+    }
+
+    @Test
+    void testGetRecommendations_WithRecommendations() {
+        User user1 = new User();
+        user1.setName("TestUser1");
+        user1.setLogin("TestLogin1");
+        user1.setEmail("test1@example.com");
+        user1.setBirthday(LocalDate.of(1990, 1, 1));
+        userController.create(user1);
+
+        User user2 = new User();
+        user2.setName("TestUser2");
+        user2.setLogin("TestLogin2");
+        user2.setEmail("test2@example.com");
+        user2.setBirthday(LocalDate.of(1992, 2, 2));
+        userController.create(user2);
+
+        Rating rating1 = new Rating(2L, "PG");
+        Film film1 = new Film();
+        film1.setId(1L);
+        film1.setName("Test Film1");
+        film1.setDescription("Test Description1");
+        film1.setReleaseDate(LocalDate.of(2024, 1, 1));
+        film1.setDuration(120);
+        film1.setMpa(rating1);
+        filmController.create(film1);
+
+        Film film2 = new Film();
+        Rating rating2 = new Rating(3L, "PG-13");
+        film2.setId(2L);
+        film2.setName("Test Film2");
+        film2.setDescription("Test Description2");
+        film2.setReleaseDate(LocalDate.of(2023, 1, 1));
+        film2.setDuration(120);
+        film2.setMpa(rating2);
+        filmController.create(film2);
+
+        filmController.addLike(film1.getId(), user2.getId());
+        filmController.addLike(film2.getId(), user2.getId());
+        filmController.addLike(film1.getId(), user1.getId());
+
+        Collection<Film> recommendations = userController.getRecommendation(user1.getId());
+        assertEquals(1, recommendations.size(), "Должна быть одна рекомендация");
+        Film recommendedFilm = recommendations.iterator().next();
+        assertEquals("Test Film2", recommendedFilm.getName(), "Рекомендован должен быть Test Film2");
+    }
+
+    @Test
+    void testGetRecommendationUserNotFound() {
+        assertThrows(NotFoundException.class, () -> userController.getRecommendation(999L));
+    }
+
+    @Test
+    void testGetRecommendationsWithNoRecommendations() {
+        User user1 = new User();
+        user1.setName("TestUser1");
+        user1.setLogin("TestLogin1");
+        user1.setEmail("test1@example.com");
+        user1.setBirthday(LocalDate.of(1990, 1, 1));
+        userController.create(user1);
+
+        Rating rating1 = new Rating(2L, "PG");
+        Film film1 = new Film();
+        film1.setId(1L);
+        film1.setName("Test Film1");
+        film1.setDescription("Test Description1");
+        film1.setReleaseDate(LocalDate.of(2024, 1, 1));
+        film1.setDuration(120);
+        film1.setMpa(rating1);
+        filmController.create(film1);
+
+        Collection<Film> recommendations = userController.getRecommendation(user1.getId());
+        assertEquals(0, recommendations.size(), "Рекомендаций быть не должно");
     }
 }
