@@ -26,25 +26,25 @@ public class DirectorController {
 
     @GetMapping("/directors/{id}")
     public Director getDirector(@PathVariable("id") Long id) {
-        log.info("Запрос на получение режиссера с id:" + id);
+        log.info("Запрос на получение режиссера с id:{}",id);
         return directorService.getDirectorById(id);
     }
 
     @PostMapping("/directors")
     public Director createDirector(@RequestBody Director director) {
-        log.info("Запрос на создание режиссера:" + director);
+        log.info("Запрос на создание режиссера:{}", director);
         return directorService.createDirector(director);
     }
 
     @PutMapping("/directors")
     public Director updateDirector(@RequestBody Director director) {
-        log.info("Запрос на обновление режиссера:" + director);
+        log.info("Запрос на обновление режиссера:{}", director);
         return directorService.updateDirector(director);
     }
 
     @DeleteMapping("/directors/{id}")
     public ResponseEntity<String> deleteDirector(@PathVariable Long id) {
-        log.info("Запрос на удаление режиссера с id:" + id);
+        log.info("Запрос на удаление режиссера с id:{}", id);
         directorService.deleteDirector(id);
         return new ResponseEntity<>("{\"message\":\"Удаление лайка прошло успешно\"}", HttpStatus.OK);
     }

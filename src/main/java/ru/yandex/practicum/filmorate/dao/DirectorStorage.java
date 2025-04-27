@@ -20,6 +20,4 @@ public interface DirectorStorage {
     void deleteDirector(Long directorId);
 
     List<Director> getFilmDirectors(Long filmId);
-
-
 }

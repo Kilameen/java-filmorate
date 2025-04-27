@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.dao.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.DirectorStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -22,13 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class DirectorDbStorageTest {
     @Autowired
-    private DirectorDbStorage directorDbStorage;
+    private DirectorStorage directorDbStorage;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private FilmDbStorage filmStorage;
+    private FilmStorage filmStorage;
 
     @BeforeEach
     void setUp() {
@@ -42,7 +42,6 @@ class DirectorDbStorageTest {
         jdbcTemplate.execute("DELETE FROM films_directors");
         jdbcTemplate.execute("DELETE FROM directors");
     }
-
 
     @Test
     void createDirector_ShouldInsertAndReturnDirector() {

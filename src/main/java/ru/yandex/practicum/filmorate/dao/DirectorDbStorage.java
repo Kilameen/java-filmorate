@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 
@@ -70,13 +71,14 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public void deleteDirector(Long directorId) {
-        jdbcTemplate.update(DELETE_QUERY, directorId);
+        int rowUpdated = jdbcTemplate.update(DELETE_QUERY, directorId);
+        if (rowUpdated == 0) {
+            throw new NotFoundException("Режиссер с id " + directorId + " не найден и не был удалён.");
+        }
     }
 
     @Override
     public List<Director> getFilmDirectors(Long filmId) {
         return jdbcTemplate.query(GET_FILM_DIRECTOR_BY_ID, mapper, filmId);
     }
-
-
 }

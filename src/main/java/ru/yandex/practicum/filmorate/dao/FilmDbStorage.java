@@ -23,7 +23,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmMapper filmMapper;
     private final DirectorStorage directorStorage;
-    private final RatingDbStorage ratingDbStorage;
+    private final RatingDao ratingStorage;
 
     private static final String INSERT_FILM_SQL = "INSERT INTO films (film_name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_FILM_SQL = "UPDATE films SET film_name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE film_id = ?;";
@@ -49,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
         Long filmId = keyHolder.getKeyAs(Long.class);
         film.setId(filmId);
 
-        Rating mpa = ratingDbStorage.getRating(film.getMpa().getId());
+        Rating mpa = ratingStorage.getRating(film.getMpa().getId());
         if (mpa == null) {
             throw new NotFoundException("Mpa c id:" + film.getMpa().getId() + " не найден");
         }

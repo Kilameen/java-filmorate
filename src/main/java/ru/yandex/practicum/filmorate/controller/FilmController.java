@@ -83,7 +83,7 @@ public class FilmController {
         if (!sortBy.equals("year") && !sortBy.equals("likes")) {
             throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
         }
-        log.info("Запрос на получение фильмов режиссера с id:" + directorId);
+        log.info("Запрос на получение фильмов режиссера с id:{}", directorId);
         return filmService.getDirectorFilms(directorId, sortBy);
     }
 }
