@@ -58,6 +58,27 @@ public class FilmDbStorage implements FilmStorage {
             "WHERE film_id = ?;";
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
+    private static final String SELECT_FILMS_WITH_KEY_WORD_BY_NAME_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
+            "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
+            "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
+            "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+            "WHERE LOWER(f.name) LIKE LOWER(?)\n" +
+            "GROUP BY f.film_id, r.rating_id, r.rating_name\n;";
+    private static final String SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
+            "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
+            "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
+            "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+            "WHERE LOWER(d.director_id) LIKE LOWER(?)\n" +
+            "GROUP BY f.film_id, r.rating_id, r.rating_name\n;";
+    private static final String SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_AND_NAME_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
+            "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
+            "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
+            "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+            "WHERE LOWER(d.director_id) LIKE LOWER(?) AND LOWER(d.director_id) LIKE LOWER(?)\n" +
+            "GROUP BY f.film_id, r.rating_id, r.rating_name\n;";
 
     @Override
     public Film create(Film film) {
@@ -167,4 +188,20 @@ public class FilmDbStorage implements FilmStorage {
         int rowsAffected = jdbcTemplate.update(DELETE_FILM_SQL_REQUEST, id);
         return rowsAffected > 0;
     }
+
+    @Override
+    public Collection<Film> getFilmByName(String keyWords) {
+        return jdbcTemplate.query(SELECT_FILMS_WITH_KEY_WORD_BY_NAME_SQL, filmMapper,  "%" + keyWords + "%");
+    }
+
+    @Override
+    public Collection<Film> getFilmByDirector(String keyWords) {
+        return jdbcTemplate.query(SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_SQL, filmMapper,  "%" + keyWords + "%");
+    }
+
+    @Override
+    public Collection<Film> getFilmByNameOrDirector(String keyWords) {
+        return jdbcTemplate.query(SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_AND_NAME_SQL, filmMapper,  "%" + keyWords + "%");
+    }
+
 }

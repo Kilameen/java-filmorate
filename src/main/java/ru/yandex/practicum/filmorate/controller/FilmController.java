@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -93,5 +98,22 @@ public class FilmController {
         log.info("Удаление фильма с id {}", filmId);
         filmService.deleteFilmById(filmId);
         log.info("Фильм с id {} успешно удалён", filmId);
+    }
+
+    @GetMapping("/search")
+    public Collection<Film> searchFilmByNameOrDirector(HttpServletRequest request) {
+        // Извлечение параметров
+        String query = request.getParameter("query");
+        String by = request.getParameter("by");
+
+        //trim() - удаление пробелов в начале и конце строки
+        if (query.trim().isEmpty()) {
+            throw new InternalServerException("Параметр query не может быть пустым или отсутствовать");
+        }
+        if (by.trim().isEmpty()) {
+            throw new InternalServerException("Параметр byList не может быть пустым или отсутствовать");
+        }
+        log.info("Поиск фильма, содержащего \"{}\" в {}", query,by);
+        return filmService.getFilmByNameOrDirector(query,by);
     }
 }

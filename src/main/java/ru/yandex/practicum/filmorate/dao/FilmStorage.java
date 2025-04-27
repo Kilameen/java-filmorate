@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -18,4 +19,10 @@ public interface FilmStorage {
     List<Film> getDirectorFilms(Long directorId);
 
     boolean deleteFilm(Long id);
+
+    Collection<Film> getFilmByName(String keyWords);
+
+    Collection<Film> getFilmByDirector(String keyWords);
+
+    Collection<Film> getFilmByNameOrDirector(String keyWords);
 }
