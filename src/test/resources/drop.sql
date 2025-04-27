@@ -3,3 +3,6 @@ DROP TABLE IF EXISTS films CASCADE;
 DROP TABLE IF EXISTS film_likes CASCADE;
 DROP TABLE IF EXISTS film_genres CASCADE;
 DROP TABLE IF EXISTS friendship CASCADE;
+-- БД для задачи "Добавить отзывы" --
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS review_likes CASCADE;
