@@ -174,6 +174,8 @@ public class FilmServiceImpl implements FilmService {
     }
 
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        validateUserId(userId);
+        validateUserId(friendId);
         return filmStorage.getCommonFilms(userId, friendId);
     }
 }

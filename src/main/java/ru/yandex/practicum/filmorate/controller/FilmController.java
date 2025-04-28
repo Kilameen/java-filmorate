@@ -95,8 +95,10 @@ public class FilmController {
         log.info("Фильм с id {} успешно удалён", filmId);
     }
 
-    @GetMapping("/films/common")
-    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+    @GetMapping("/common")
+    public Collection<Film> getCommonFilms(@RequestParam Long userId,
+                                           @RequestParam Long friendId) {
+        log.info("Запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }
 }

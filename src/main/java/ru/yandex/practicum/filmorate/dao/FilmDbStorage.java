@@ -59,13 +59,17 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
     private static final String SELECT_COMMON_FILMS_SQL =
-            "SELECT f.name, f.rate\n" +
+            "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name\n" +
                     "FROM films AS f\n" +
-                    "JOIN likes AS l ON f.film_id = l.film_id\n" +
-                    "WHERE l.user_id IN (:userId, :friendId)\n" +
-                    "GROUP BY f.film_id, f.name, f.rate\n" +
+                    "JOIN film_likes AS l ON f.film_id = l.film_id\n" +
+                    "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
+                    "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
+                    "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
+                    "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+                    "WHERE l.user_id IN (?, ?)\n" +
+                    "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name\n" +
                     "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
-                    "ORDER BY f.rate DESC;\n";
+                    "ORDER BY rate DESC;\n";
 
     @Override
     public Film create(Film film) {
@@ -178,6 +182,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        if (userId.equals(friendId)) {
+            throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
+        }
         return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
     }
 }
