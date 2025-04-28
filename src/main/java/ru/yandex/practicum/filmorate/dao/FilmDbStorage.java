@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.Date;
@@ -72,13 +73,18 @@ public class FilmDbStorage implements FilmStorage {
                     "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
                     "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
                     "ORDER BY rate DESC;";
+    private static final String SELECT_GENRES_FOR_FILM_SQL =
+            "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
+                    "JOIN genres g ON fg.genre_id = g.genre_id " +
+                    "WHERE fg.film_id = ?";
+
 
     @Override
     public Film create(Film film) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement(INSERT_FILM_SQL ,
+                    .prepareStatement(INSERT_FILM_SQL,
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, film.getName());
             preparedStatement.setString(2, film.getDescription());
@@ -185,14 +191,6 @@ public class FilmDbStorage implements FilmStorage {
         return rowsAffected > 0;
     }
 
-//    @Override
-//    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-//        if (userId.equals(friendId)) {
-//            throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
-//        }
-//        return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
-//    }
-
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
@@ -204,20 +202,16 @@ public class FilmDbStorage implements FilmStorage {
         for (Film film : films) {
             Long filmId = film.getId();
             // Подтягиваем жанры для фильма
-            String sql = "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
-                    "JOIN genres g ON fg.genre_id = g.genre_id " +
-                    "WHERE fg.film_id = ?";
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, filmId);
+            List<Map<String, Object>> genreRows = jdbcTemplate.queryForList(SELECT_GENRES_FOR_FILM_SQL, filmId);
 
-            Set<ru.yandex.practicum.filmorate.model.Genre> genres = new HashSet<>();
-            for (Map<String, Object> row : rows) {
+            Set<Genre> genres = new HashSet<>();
+            for (Map<String, Object> row : genreRows) {
                 Long genreId = ((Number) row.get("genre_id")).longValue();
                 String genreName = (String) row.get("genre_name");
-                genres.add(new ru.yandex.practicum.filmorate.model.Genre(genreId, genreName));
+                genres.add(new Genre(genreId, genreName));
             }
             film.setGenres(genres);
         }
-
         return films;
     }
 }
