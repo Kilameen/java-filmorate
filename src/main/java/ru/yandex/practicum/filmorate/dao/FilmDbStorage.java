@@ -78,7 +78,6 @@ public class FilmDbStorage implements FilmStorage {
                     "JOIN genres g ON fg.genre_id = g.genre_id " +
                     "WHERE fg.film_id = ?";
 
-
     @Override
     public Film create(Film film) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
