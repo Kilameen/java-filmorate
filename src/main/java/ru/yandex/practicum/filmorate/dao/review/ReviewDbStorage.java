@@ -82,6 +82,7 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Review getReviewById(Long id) {
+
         return jdbcTemplate.query(SELECT_REVIEW_BY_ID_SQL_REQUEST, reviewMapper, id)
                 .stream()
                 .findAny()
@@ -104,6 +105,9 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Collection<Review> getReviewsByFilmId(Long id, int count) {
+        if (!filmExists(id)) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
         return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, id, count);
     }
 

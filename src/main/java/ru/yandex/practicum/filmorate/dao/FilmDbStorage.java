@@ -144,6 +144,7 @@ public class FilmDbStorage implements FilmStorage {
         Film film = jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id).stream().findFirst().orElse(null);
 
         if (film != null) {
+
             List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
             film.setDirectors(new HashSet<>(filmDirectors));
         }
