@@ -5,13 +5,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.dao.event.EventDao;
 import ru.yandex.practicum.filmorate.dao.review.ReviewDao;
 import ru.yandex.practicum.filmorate.dao.review.UsefulDao;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
-
 import java.util.List;
 
 @Slf4j
@@ -22,56 +22,66 @@ public class ReviewServiceImpl implements ReviewService {
     private final UsefulDao usefulDao;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final EventDao eventDao;
 
-    public ReviewServiceImpl(@Qualifier("H2ReviewDb") ReviewDao reviewDao, @Qualifier("H2UsefulDb") UsefulDao usefulDao,
-                             @Qualifier("H2FilmDb") FilmStorage filmStorage, @Qualifier("H2UserDb") UserStorage userStorage) {
+    public ReviewServiceImpl(@Qualifier("H2ReviewDb") ReviewDao reviewDao,
+                             @Qualifier("H2UsefulDb") UsefulDao usefulDao,
+                             @Qualifier("H2FilmDb") FilmStorage filmStorage,
+                             @Qualifier("H2UserDb") UserStorage userStorage,
+                             @Qualifier("H2EventDb") EventDao eventDao) {
         this.reviewDao = reviewDao;
         this.usefulDao = usefulDao;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.eventDao = eventDao;
     }
 
     @Override
     public Review create(Review review) {
         checkFilmAndUserExist(review.getFilmId(), review.getUserId());
         validateContent(review.getContent());
+
         try {
             reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId());
             throw new DuplicatedDataException("Отзыв пользователя " + review.getUserId() + " на фильм " + review.getFilmId() + " уже существует");
-        } catch (Exception ex) {
-            return reviewDao.create(review);
+        } catch (NotFoundException ex) {
+
+            Review createdReview = reviewDao.create(review);
+            eventDao.create(createdReview.getUserId(), "REVIEW", "ADD", createdReview.getReviewId()); // Используем ID созданного отзыва
+            return createdReview;
         }
     }
 
     @Override
     public Review update(Review review) {
         validateContent(review.getContent());
-        //Если отзыв не найден, то выбросит исключение
+
         if (!reviewDao.isReviewExist(review.getReviewId())) {
-            try {
-                review.setReviewId(reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId()));
-            } catch (Exception ex) {
-                throw new NotFoundException("Отзыв с id " + review.getReviewId() + " не найден!");
-            }
+            throw new NotFoundException("Отзыв с id " + review.getReviewId() + " не найден!");
         }
         checkFilmAndUserExist(review.getFilmId(), review.getUserId());
+
+        eventDao.create(review.getUserId(), "REVIEW", "UPDATE", review.getReviewId());
         return reviewDao.update(review);
     }
 
     @Override
     public void delete(Long id) {
-        //Если отзыв не найден, то выбросит исключение
+
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
         }
+        Review review = reviewDao.getReviewById(id);
         usefulDao.deleteAllMarks(id);
         reviewDao.delete(id);
+
+        eventDao.create(review.getUserId(), "REVIEW", "REMOVE", id);
         log.info("Отзыв с id {} удален", id);
     }
 
     @Override
     public Review getReview(Long id) {
-        //Если отзыв не найден, то выбросит исключение
+
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
         }
@@ -95,12 +105,10 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException("Отзыв с id " + reviewId + " не найден!");
         }
         userStorage.getUserById(userId);
-        //проверяем, есть ли дизлайк у такого пользователя и отзыва
+
         if (usefulDao.isDislikeExist(reviewId, userId)) {
-            //если есть, то изменяем дизлайк на лайк
             usefulDao.changeDislikeToLike(reviewId, userId);
         } else {
-            //если нет, то ставим лайк
             usefulDao.addLike(reviewId, userId);
         }
         updateUseful(reviewId);
@@ -113,10 +121,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         userStorage.getUserById(userId);
         if (usefulDao.isLikeExist(reviewId, userId)) {
-            //если есть, то изменяем дизлайк на лайк
             usefulDao.changeLikeToDislike(reviewId, userId);
         } else {
-            //если нет, то ставим лайк
             usefulDao.addDislike(reviewId, userId);
         }
         updateUseful(reviewId);

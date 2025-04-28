@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
@@ -30,11 +29,16 @@ public class ReviewDbStorage implements ReviewDao {
     private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews";
     private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
     private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
+    private static final String CHECK_FILM_ID = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id = ?)";
     private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";
     private static final String GET_REVIEW_ID_BY_FILM_AND_USER_SQL_REQUEST = "SELECT review_id FROM reviews WHERE film_id=? AND user_id=?;";
 
     @Override
     public Review create(Review review) {
+
+        if (!filmExists(review.getFilmId())) {
+            throw new NotFoundException("Фильм с id " + review.getFilmId() + " не найден");
+        }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
@@ -115,6 +119,10 @@ public class ReviewDbStorage implements ReviewDao {
         } catch (Exception ex) {
             throw new RuntimeException("Во время поиска отзыва с id " + id + "произошла ошибка!");
         }
+    }
+
+    private boolean filmExists(Long filmId) {
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_FILM_ID, Boolean.class, filmId));
     }
 
     @Override
