@@ -182,7 +182,6 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
-    //@DisplayName("Получить отзыв для фильма. Не найден фильм")
     @Test
     @DisplayName("Получить отзыв для фильма. Не найден фильм")
     void testGetReviewsForFilm_FilmNotFound() throws Exception {
