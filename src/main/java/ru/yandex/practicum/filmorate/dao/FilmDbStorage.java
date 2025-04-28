@@ -59,17 +59,19 @@ public class FilmDbStorage implements FilmStorage {
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
     private static final String SELECT_COMMON_FILMS_SQL =
-            "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name\n" +
+            "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name, g.genre_id, g.genre_name\n" +
                     "FROM films AS f\n" +
                     "JOIN film_likes AS l ON f.film_id = l.film_id\n" +
                     "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
                     "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
                     "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
                     "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+                    "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id\n" +
+                    "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id\n" +
                     "WHERE l.user_id IN (?, ?)\n" +
-                    "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name\n" +
+                    "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
                     "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
-                    "ORDER BY rate DESC;\n";
+                    "ORDER BY rate DESC;";
 
     @Override
     public Film create(Film film) {
@@ -153,14 +155,17 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Long id) {
-        Film film = jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id).stream().findFirst().orElse(null);
-
-        if (film != null) {
-            List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
-            film.setDirectors(new HashSet<>(filmDirectors));
-        }
-        return film;
+        return jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id)
+                .stream()
+                .findAny()
+                .map(film -> {
+                    List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
+                    film.setDirectors(new HashSet<>(filmDirectors));
+                    return film;
+                })
+                .orElseThrow(() -> new NotFoundException("Фильм с id " + id + " не найден"));
     }
+
 
     @Override
     public Collection<Film> getPopularFilms(Long count) {
@@ -180,11 +185,39 @@ public class FilmDbStorage implements FilmStorage {
         return rowsAffected > 0;
     }
 
+//    @Override
+//    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+//        if (userId.equals(friendId)) {
+//            throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
+//        }
+//        return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
+//    }
+
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
             throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
         }
-        return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
+
+        List<Film> films = jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
+
+        for (Film film : films) {
+            Long filmId = film.getId();
+            // Подтягиваем жанры для фильма
+            String sql = "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
+                    "JOIN genres g ON fg.genre_id = g.genre_id " +
+                    "WHERE fg.film_id = ?";
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, filmId);
+
+            Set<ru.yandex.practicum.filmorate.model.Genre> genres = new HashSet<>();
+            for (Map<String, Object> row : rows) {
+                Long genreId = ((Number) row.get("genre_id")).longValue();
+                String genreName = (String) row.get("genre_name");
+                genres.add(new ru.yandex.practicum.filmorate.model.Genre(genreId, genreName));
+            }
+            film.setGenres(genres);
+        }
+
+        return films;
     }
 }
