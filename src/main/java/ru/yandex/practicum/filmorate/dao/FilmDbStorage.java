@@ -141,14 +141,16 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Long id) {
-        Film film = jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id).stream().findFirst().orElse(null);
 
-        if (film != null) {
-
-            List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
-            film.setDirectors(new HashSet<>(filmDirectors));
-        }
-        return film;
+        return jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id)
+                .stream()
+                .findAny()
+                .map(film -> {
+                    List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
+                    film.setDirectors(new HashSet<>(filmDirectors));
+                    return film;
+                })
+                .orElseThrow(() -> new NotFoundException("Фильм с id " + id + " не найден"));
     }
 
     @Override

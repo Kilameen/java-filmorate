@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
+
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
@@ -35,10 +36,6 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Review create(Review review) {
-
-        if (!filmExists(review.getFilmId())) {
-            throw new NotFoundException("Фильм с id " + review.getFilmId() + " не найден");
-        }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
@@ -105,9 +102,6 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Collection<Review> getReviewsByFilmId(Long id, int count) {
-        if (!filmExists(id)) {
-            throw new NotFoundException("Фильм с id " + id + " не найден");
-        }
         return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, id, count);
     }
 
@@ -123,10 +117,6 @@ public class ReviewDbStorage implements ReviewDao {
         } catch (Exception ex) {
             throw new RuntimeException("Во время поиска отзыва с id " + id + "произошла ошибка!");
         }
-    }
-
-    private boolean filmExists(Long filmId) {
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_FILM_ID, Boolean.class, filmId));
     }
 
     @Override

@@ -7,16 +7,13 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserExistException;
-import ru.yandex.practicum.filmorate.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.List;
 
 @Component(value = "H2UserDb")
 @RequiredArgsConstructor
@@ -24,7 +21,6 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserMapper userMapper;
-    private final EventMapper eventMapper;
     private static final String INSERT_USER_SQL_REQUEST = "INSERT INTO users (email, login, user_name, birthday) VALUES (?, ?, ?, ?);";
     private static final String UPDATE_USER_SQL_REQUEST = "UPDATE users\n" +
             "SET email = ?,\n" +
@@ -40,7 +36,6 @@ public class UserDbStorage implements UserStorage {
     private static final String DELETE_USER_BY_ID_SQL_REQUEST = "DELETE FROM users WHERE user_id = ?;";
     private static final String DELETE_USER_FRIENDSHIPS_SQL =
             "DELETE FROM friendship WHERE user_id = ? OR friend_id = ?;";
-    private static final String SELECT_EVENT_SQL_REQUEST = "SELECT * FROM events WHERE user_id = ?;";
 
     @Override
     public User create(User user) {
@@ -100,10 +95,5 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(DELETE_USER_FRIENDSHIPS_SQL, id, id);
 
         jdbcTemplate.update(DELETE_USER_BY_ID_SQL_REQUEST, id);
-    }
-
-    @Override
-    public List<Event> getUserEvents(Long userId) {
-        return jdbcTemplate.query(SELECT_EVENT_SQL_REQUEST, eventMapper, userId);
     }
 }

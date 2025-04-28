@@ -10,9 +10,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Service
@@ -133,9 +135,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film getFilmById(Long id) {
         Film film = filmStorage.getFilm(id);
-        if (isNull(film)) {
-            throw new NotFoundException("Фильма с таким id не существует");
-        }
         Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         film.setGenres(filmGenres);
         return film;

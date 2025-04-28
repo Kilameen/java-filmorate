@@ -12,9 +12,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Service
@@ -88,11 +90,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        User user = userStorage.getUserById(id);
-        if (isNull(user)) {
-            throw new NotFoundException("Пользователя с таким id не существует");
-        }
-        return user;
+        return userStorage.getUserById(id);
     }
 
     @Override
@@ -184,6 +182,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Event> getUserEvents(Long userId) {
         userStorage.getUserById(userId);
-        return userStorage.getUserEvents(userId);
+        return eventDao.getUserEvents(userId);
     }
 }
