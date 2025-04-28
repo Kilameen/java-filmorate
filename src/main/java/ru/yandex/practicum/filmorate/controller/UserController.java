@@ -6,11 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
+
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -20,8 +23,6 @@ import java.util.Collection;
 public class UserController {
 
     private final UserService userService;
-
-//Storage
 
     @GetMapping
     public Collection<User> findAll() {
@@ -60,8 +61,6 @@ public class UserController {
         log.info("Пользователь с id {} удален", userId);
     }
 
-    //Service
-
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long userFriendId) {
         log.info("Пользователь {} , хочет добавить в друзья {}.", userId, userFriendId);
@@ -92,5 +91,13 @@ public class UserController {
         log.info("Пользователь {}, хочет удалить из друзей {}", userId, userFriendId);
         userService.deleteFriend(userId, userFriendId);
         log.info("Пользователь {} удален из вашего списка друзей.", userFriendId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Event> getEvent(@PathVariable("id") Long userId) {
+        List<Event> feeds = userService.getUserEvents(userId);
+        log.info("Лента событий пользователя - {}, количество записей {}",
+                userService.getUserById(userId).getName(), feeds.size());
+        return feeds;
     }
 }

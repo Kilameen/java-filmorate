@@ -5,14 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.*;
+import ru.yandex.practicum.filmorate.dao.event.EventDao;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Service
@@ -23,16 +27,19 @@ public class UserServiceImpl implements UserService {
     private final FriendshipDao friendshipDao;
     private final LikeDao likeDao;
     private final FilmStorage filmStorage;
+    private final EventDao eventDao;
 
     @Autowired
     public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage,
                            @Qualifier("H2FriendDb") FriendshipDao friendshipDao,
                            @Qualifier("H2LikeDb") LikeDao likeDao,
-                           @Qualifier("H2FilmDb") FilmStorage filmStorage) {
+                           @Qualifier("H2FilmDb") FilmStorage filmStorage,
+                           @Qualifier("H2EventDb") EventDao eventDao) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
         this.likeDao = likeDao;
         this.filmStorage = filmStorage;
+        this.eventDao = eventDao;
     }
 
     @Override
@@ -43,6 +50,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception ex) {
             throw new NotFoundException("Ошибка поиска пользователя");
         }
+        eventDao.create(userId, "FRIEND", "ADD", userFriendId);
     }
 
     @Override
@@ -51,6 +59,7 @@ public class UserServiceImpl implements UserService {
         getUserById(userFriendId);
 
         friendshipDao.deleteFriend(userId, userFriendId);
+        eventDao.create(userId, "FRIEND", "REMOVE", userFriendId);
     }
 
     @Override
@@ -81,11 +90,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long id) {
-        User user = userStorage.getUserById(id);
-        if (isNull(user)) {
-            throw new NotFoundException("Пользователя с таким id не существует");
-        }
-        return user;
+        return userStorage.getUserById(id);
     }
 
     @Override
@@ -172,5 +177,11 @@ public class UserServiceImpl implements UserService {
         userStorage.getUserById(id); // проверка, если не найдет, выкинет ошибку
 
         userStorage.deleteUserById(id);
+    }
+
+    @Override
+    public List<Event> getUserEvents(Long userId) {
+        userStorage.getUserById(userId);
+        return eventDao.getUserEvents(userId);
     }
 }

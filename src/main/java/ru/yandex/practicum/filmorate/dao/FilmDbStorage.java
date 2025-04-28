@@ -160,6 +160,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Long id) {
+
         return jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id)
                 .stream()
                 .findAny()
@@ -170,7 +171,6 @@ public class FilmDbStorage implements FilmStorage {
                 })
                 .orElseThrow(() -> new NotFoundException("Фильм с id " + id + " не найден"));
     }
-
 
     @Override
     public Collection<Film> getPopularFilms(Long count) {
