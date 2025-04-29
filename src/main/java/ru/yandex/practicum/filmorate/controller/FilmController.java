@@ -102,11 +102,12 @@ public class FilmController {
         String by = request.getParameter("by").trim();
 
         if (query.isEmpty()) {
-            throw new InternalServerException("Параметр query не может быть пустым или отсутствовать");
+            throw new ValidationException("Параметр query не может быть пустым или отсутствовать");
         }
         if (by.isEmpty()) {
-            throw new InternalServerException("Параметр byList не может быть пустым или отсутствовать");
+            throw new ValidationException("Параметр byList не может быть пустым или отсутствовать");
         }
+
         log.info("Поиск фильма, содержащего \"{}\" в {}", query, by);
         return filmService.getFilmByNameOrDirector(query, by);
     }

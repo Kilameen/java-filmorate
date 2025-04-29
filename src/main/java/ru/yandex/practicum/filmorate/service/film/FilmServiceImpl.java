@@ -181,11 +181,12 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
         Set<String> validParameters = Set.of("director", "title", "director,title", "title,director");
-        Collection<Film> films;
-        if (!validParameters.contains(searchParameter.replace(" ", ""))) {
+        searchParameter = searchParameter.replace(" ", "");
+        if (!validParameters.contains(searchParameter)) {
             throw new NotFoundException("Поиск по указанному параметру отсутствует");
         }
 
+        Collection<Film> films;
         if (searchParameter.contains(",")) {
             films = filmStorage.getFilmByNameOrDirector(keyWords);
         } else if (searchParameter.equals("director")) {
