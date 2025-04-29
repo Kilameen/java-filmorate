@@ -25,8 +25,6 @@ public class FilmController {
 
     private final FilmService filmService;
 
-    //Storage
-
     @GetMapping
     public Collection<Film> findAll() {
         log.info("Запрос на получение фильмов");
@@ -100,15 +98,13 @@ public class FilmController {
 
     @GetMapping("/search")
     public Collection<Film> searchFilmByNameOrDirector(HttpServletRequest request) {
-        // Извлечение параметров
-        String query = request.getParameter("query");
-        String by = request.getParameter("by");
+        String query = request.getParameter("query").trim();
+        String by = request.getParameter("by").trim();
 
-        //trim() - удаление пробелов в начале и конце строки
-        if (query.trim().isEmpty()) {
+        if (query.isEmpty()) {
             throw new InternalServerException("Параметр query не может быть пустым или отсутствовать");
         }
-        if (by.trim().isEmpty()) {
+        if (by.isEmpty()) {
             throw new InternalServerException("Параметр byList не может быть пустым или отсутствовать");
         }
         log.info("Поиск фильма, содержащего \"{}\" в {}", query, by);
