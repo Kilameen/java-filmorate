@@ -72,10 +72,6 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
             "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
             "ORDER BY rate DESC;\n";
-    private static final String SELECT_GENRES_FOR_FILM_SQL =
-            "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
-                    "JOIN genres g ON fg.genre_id = g.genre_id " +
-                    "WHERE fg.film_id = ?";
 
     @Override
     public Film create(Film film) {
