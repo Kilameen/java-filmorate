@@ -59,20 +59,20 @@ public class FilmDbStorage implements FilmStorage {
             "WHERE film_id = ?;";
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
-    private static final String SELECT_COMMON_FILMS_SQL =
-            "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name, g.genre_id, g.genre_name\n" +
-                    "FROM films AS f\n" +
-                    "JOIN film_likes AS l ON f.film_id = l.film_id\n" +
-                    "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
-                    "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
-                    "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
-                    "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
-                    "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id\n" +
-                    "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id\n" +
-                    "WHERE l.user_id IN (?, ?)\n" +
-                    "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
-                    "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
-                    "ORDER BY rate DESC;";
+    private static final String SELECT_COMMON_FILMS_SQL =  "SELECT f.*, r.rating_name, r.rating_id,\n" +
+            "(SELECT COUNT(*) FROM film_likes fl WHERE fl.film_id = f.film_id) AS rate,\n" +
+            "d.director_id, d.name, g.genre_id, g.genre_name\n" +
+            "FROM films AS f\n" +
+            "JOIN film_likes AS l ON f.film_id = l.film_id\n" +
+            "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
+            "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
+            "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
+            "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id\n" +
+            "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id\n" +
+            "WHERE l.user_id IN (?, ?)\n" +
+            "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
+            "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
+            "ORDER BY rate DESC;\n";
     private static final String SELECT_GENRES_FOR_FILM_SQL =
             "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
                     "JOIN genres g ON fg.genre_id = g.genre_id " +
@@ -192,25 +192,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        if (userId.equals(friendId)) {
-            throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
-        }
-
-        List<Film> films = jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
-
-        for (Film film : films) {
-            Long filmId = film.getId();
-            // Подтягиваем жанры для фильма
-            List<Map<String, Object>> genreRows = jdbcTemplate.queryForList(SELECT_GENRES_FOR_FILM_SQL, filmId);
-
-            Set<Genre> genres = new HashSet<>();
-            for (Map<String, Object> row : genreRows) {
-                Long genreId = ((Number) row.get("genre_id")).longValue();
-                String genreName = (String) row.get("genre_name");
-                genres.add(new Genre(genreId, genreName));
-            }
-            film.setGenres(genres);
-        }
-        return films;
+        return jdbcTemplate.query(SELECT_COMMON_FILMS_SQL, filmMapper, userId, friendId);
     }
 }

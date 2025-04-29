@@ -179,8 +179,25 @@ public class FilmServiceImpl implements FilmService {
     }
 
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        if (userId.equals(friendId)) {
+            throw new IllegalArgumentException("Пользователь и друг не могут быть одним и тем же человеком.");
+        }
+
         validateUserId(userId);
         validateUserId(friendId);
-        return filmStorage.getCommonFilms(userId, friendId);
+
+        Collection<Film> films = filmStorage.getCommonFilms(userId, friendId);
+
+        Collection<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Collection<Genre>> filmGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+
+        for (Film film : films) {
+            film.setGenres(filmGenres.getOrDefault(film.getId(), Collections.emptyList()));
+        }
+
+        return films;
     }
 }
