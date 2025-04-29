@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.*;
+import ru.yandex.practicum.filmorate.dao.event.EventDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -25,30 +26,37 @@ public class FilmServiceImpl implements FilmService {
     private final LikeDbStorage likeDbStorage;
     private final GenreDbStorage genreDbStorage;
     private final RatingDbStorage ratingDbStorage;
+    private final EventDao eventDao;
     private static final LocalDate STARTED_REALISE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
     public FilmServiceImpl(DirectorStorage directorStorage, @Qualifier("H2FilmDb") FilmStorage filmStorage,
                            @Qualifier("H2UserDb") UserStorage userStorage,
-                           @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage, @Qualifier("H2GenreDb") GenreDbStorage genreDbStorage, @Qualifier("H2RatingDb") RatingDbStorage ratingDbStorage) {
+                           @Qualifier("H2LikeDb") LikeDbStorage likeDbStorage,
+                           @Qualifier("H2GenreDb") GenreDbStorage genreDbStorage,
+                           @Qualifier("H2RatingDb") RatingDbStorage ratingDbStorage,
+                           @Qualifier("H2EventDb") EventDao eventDao) {
         this.directorStorage = directorStorage;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.likeDbStorage = likeDbStorage;
         this.genreDbStorage = genreDbStorage;
         this.ratingDbStorage = ratingDbStorage;
+        this.eventDao = eventDao;
     }
 
     @Override
     public void addLike(Long filmId, Long userId) {
         validateUserId(userId);
         likeDbStorage.addLike(filmId, userId);
+        eventDao.create(userId, "LIKE", "ADD", filmId);
     }
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
         validateUserId(userId);
         likeDbStorage.deleteLike(filmId, userId);
+        eventDao.create(userId, "LIKE", "REMOVE", filmId);
     }
 
     @Override
@@ -127,9 +135,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film getFilmById(Long id) {
         Film film = filmStorage.getFilm(id);
-        if (isNull(film)) {
-            throw new NotFoundException("Фильма с таким id не существует");
-        }
         Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         film.setGenres(filmGenres);
         return film;

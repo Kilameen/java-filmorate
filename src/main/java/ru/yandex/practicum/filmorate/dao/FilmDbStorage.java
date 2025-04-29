@@ -15,7 +15,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
-import java.util.List;
 
 @Component(value = "H2FilmDb")
 @RequiredArgsConstructor
@@ -167,6 +166,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Long id) {
+
         return jdbcTemplate.query(SELECT_FILM_BY_ID_SQL, filmMapper, id)
                 .stream()
                 .findAny()
