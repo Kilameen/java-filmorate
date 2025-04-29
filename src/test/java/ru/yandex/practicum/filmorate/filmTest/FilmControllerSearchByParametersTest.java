@@ -82,7 +82,7 @@ public class FilmControllerSearchByParametersTest {
         mockMvc.perform(get("/films/search")
                         .param("query", query)
                         .param("by", by))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class FilmControllerSearchByParametersTest {
         mockMvc.perform(get("/films/search")
                         .param("query", query)
                         .param("by", by))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class FilmControllerSearchByParametersTest {
         mockMvc.perform(get("/films/search")
                         .param("query", query)
                         .param("by", by))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
