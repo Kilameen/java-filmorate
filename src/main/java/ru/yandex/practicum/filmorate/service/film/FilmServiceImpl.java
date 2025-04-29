@@ -180,7 +180,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
-        Set<String> validParameters = Set.of("director", "title", "director,title");
+        Set<String> validParameters = Set.of("director", "title", "director,title", "title,director");
         Collection<Film> films;
         if (!validParameters.contains(searchParameter.replace(" ", ""))) {
             throw new NotFoundException("Поиск по указанному параметру отсутствует");
