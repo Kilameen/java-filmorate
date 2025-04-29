@@ -58,9 +58,9 @@ public class FilmDbStorage implements FilmStorage {
             "WHERE film_id = ?;";
     private static final String DELETE_FILM_LIKES = "DELETE FROM film_likes WHERE film_id = ?";
     private static final String DELETE_FILM_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
-    private static final String SELECT_FILMS_WITH_KEY_WORD_BY_NAME_SQL =
-            "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
-                    "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+    private static final String SELECT_FILMS_WITH_KEY_WORD_BY_NAME_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
+                    "FROM films f " +
+                    "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
                     "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
                     "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
                     "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
@@ -68,7 +68,8 @@ public class FilmDbStorage implements FilmStorage {
                     "GROUP BY f.film_id, r.rating_id, r.rating_name\n" +
                     "ORDER BY rate DESC;";
     private static final String SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
-            "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+            "FROM films f " +
+            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
             "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
             "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
@@ -76,7 +77,8 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, r.rating_id, r.rating_name\n" +
             "ORDER BY rate DESC;";
     private static final String SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_AND_NAME_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
-            "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
+            "FROM films f " +
+            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
             "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
             "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +

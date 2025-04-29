@@ -194,9 +194,9 @@ public class FilmServiceImpl implements FilmService {
             films = filmStorage.getFilmByName(keyWords);
         }
 
-        if (films.isEmpty()) {
-            throw new NotFoundException("По Вашему запросу фильмы не найдены");
-        }
+//        if (films.isEmpty()) {
+//            throw new NotFoundException("По Вашему запросу фильмы не найдены");
+//        }
         return films;
     }
 }
