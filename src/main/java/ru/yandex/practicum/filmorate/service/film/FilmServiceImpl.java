@@ -194,9 +194,13 @@ public class FilmServiceImpl implements FilmService {
             films = filmStorage.getFilmByName(keyWords);
         }
 
-//        if (films.isEmpty()) {
-//            throw new NotFoundException("По Вашему запросу фильмы не найдены");
-//        }
+        Collection<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+        for (Film film : films) {
+            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
+        }
         return films;
     }
 }
