@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import ru.yandex.practicum.filmorate.model.Film;
+
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 
@@ -9,8 +12,6 @@ public interface FilmService {
     void addLike(Long filmId, Long userId);
 
     void deleteLike(Long filmId, Long userId);
-
-    Collection<Film> getPopularFilms(Long count);
 
     Film create(Film film);
 
@@ -23,4 +24,6 @@ public interface FilmService {
     Set<Film> getDirectorFilms(Long directorId, String sortBy);
 
     void deleteFilmById(Long id);
+
+    Collection<Film> getPopularFilms(Long count,Long genreId, Integer year);
 }
