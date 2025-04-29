@@ -33,7 +33,8 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN directors AS d ON fd.director_id = d.director_id\n" +
             "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name\n" +
             "ORDER BY f.film_id;";
-    private static final String SELECT_FILM_BY_ID_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
+    private static final String SELECT_FILM_BY_ID_SQL = "SELECT f.*, r.rating_name, r.rating_id, " +
+            "COUNT(fl.user_id) AS rate, d.director_id, d.name AS director_name\n" +
             "FROM films AS f\n" +
             "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +

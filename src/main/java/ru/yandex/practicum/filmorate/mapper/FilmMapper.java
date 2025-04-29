@@ -17,7 +17,9 @@ public class FilmMapper implements RowMapper<Film> {
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Set<Director> directors = new HashSet<>();
-        directors.add(new Director(rs.getLong("director_id"), rs.getString("name")));
+        if (rs.getLong("director_id") != 0) {
+            directors.add(new Director(rs.getLong("director_id"), rs.getString("name")));
+        }
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("film_name"))
