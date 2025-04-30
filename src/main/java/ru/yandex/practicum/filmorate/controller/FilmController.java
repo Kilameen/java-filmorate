@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-
 import java.util.Collection;
 import java.util.Set;
 
@@ -93,6 +92,13 @@ public class FilmController {
         log.info("Удаление фильма с id {}", filmId);
         filmService.deleteFilmById(filmId);
         log.info("Фильм с id {} успешно удалён", filmId);
+    }
+
+    @GetMapping("/common")
+    public Collection<Film> getCommonFilms(@RequestParam Long userId,
+                                           @RequestParam Long friendId) {
+        log.info("Запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/search")
