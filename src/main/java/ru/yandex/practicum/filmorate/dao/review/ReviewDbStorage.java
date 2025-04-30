@@ -30,6 +30,7 @@ public class ReviewDbStorage implements ReviewDao {
     private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews";
     private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
     private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
+    private static final String CHECK_FILM_ID = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id = ?)";
     private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";
     private static final String GET_REVIEW_ID_BY_FILM_AND_USER_SQL_REQUEST = "SELECT review_id FROM reviews WHERE film_id=? AND user_id=?;";
 
@@ -78,6 +79,7 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Review getReviewById(Long id) {
+
         return jdbcTemplate.query(SELECT_REVIEW_BY_ID_SQL_REQUEST, reviewMapper, id)
                 .stream()
                 .findAny()
