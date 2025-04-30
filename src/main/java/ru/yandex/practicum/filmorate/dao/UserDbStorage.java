@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserExistException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -35,7 +36,6 @@ public class UserDbStorage implements UserStorage {
     private static final String DELETE_USER_BY_ID_SQL_REQUEST = "DELETE FROM users WHERE user_id = ?;";
     private static final String DELETE_USER_FRIENDSHIPS_SQL =
             "DELETE FROM friendship WHERE user_id = ? OR friend_id = ?;";
-
 
     @Override
     public User create(User user) {
