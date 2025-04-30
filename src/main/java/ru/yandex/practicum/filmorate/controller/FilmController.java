@@ -10,8 +10,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 
@@ -65,9 +63,9 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count, @RequestParam(required = false) Long genreId, @RequestParam(required = false) Integer year) {
+    public Collection<Film> getPopularFilms(@RequestParam(required = false) Long count, @RequestParam(required = false) Long genreId, @RequestParam(required = false) Integer year) {
         log.info("Выполняется запрос на список популярных фильмов");
-        if (count <= 0) {
+        if (count != null && count <= 0) {
             throw new ValidationException("Значение переданного параметра количество записей должен быть больше 0");
         }
         return filmService.getPopularFilms(count,genreId,year);

@@ -59,6 +59,9 @@ public class FilmServiceImpl implements FilmService {
         );
         popularFilms.forEach(film -> film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList())));
 
+        if (count != null) {
+            popularFilms = popularFilms.stream().limit(count).collect(Collectors.toList());
+        }
         if (genreId != null && year == null) {
             popularFilms = popularFilms.stream()
                     .filter(film -> film.getGenres().stream()
@@ -76,39 +79,6 @@ public class FilmServiceImpl implements FilmService {
         }
         return popularFilms;
     }
-
-  /*  @Override
-    public Collection<Film> getPopularFilms(Long count,Long genreId,Integer year) {
-        Collection<Film> popularFilms = filmStorage.getPopularFilms(count);
-        Collection<Long> filmIds = popularFilms.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
-        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
-        for (Film film : popularFilms) {
-            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
-        }
-        if(genreId == null && year != null){
-            popularFilms = popularFilms.stream().filter(film -> film.getReleaseDate().getYear() == year).collect(Collectors.toList());
-        }
-      *//*  if(year == null  && genreId != null){
-            popularFilms.forEach(film -> System.out.println(film.getGenres()));
-            System.out.println("\n\n\n\n");
-            popularFilms.forEach(film -> System.out.println(film.getGenres().contains(genreDbStorage.getGenre(genreId))));
-            popularFilms = popularFilms.stream().filter(film -> film.getGenres().contains(genreDbStorage.getGenre(genreId))).collect(Collectors.toList());
-        }*//*
-        if (genreId != null && year == null) {
-            popularFilms = popularFilms.stream()
-                    .filter(film -> film.getGenres().stream()
-                            .anyMatch(genre -> genre.getId().equals(genreId)))
-                    .collect(Collectors.toList());
-        }
-        if(genreId != null && year != null){
-            popularFilms = popularFilms.stream().filter(film -> film.getGenres().contains(genreDbStorage.getGenre(genreId))).filter(film -> film.getReleaseDate().getYear() == year).collect(Collectors.toList());
-        }
-        return popularFilms;
-    }*/
-
-
 
     @Override
     public Film create(Film film) {
