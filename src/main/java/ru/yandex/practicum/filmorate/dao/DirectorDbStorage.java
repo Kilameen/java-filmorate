@@ -30,9 +30,9 @@ public class DirectorDbStorage implements DirectorStorage {
     private static final String GET_FILM_DIRECTOR_BY_ID =
             "SELECT d.director_id, d.name " +
                     "FROM directors AS d " +
-                    "JOIN films_directors AS fd ON d.director_id = fd.director_id " +
+                    "LEFT JOIN films_directors AS fd ON d.director_id = fd.director_id " +
                     "WHERE film_id = ?";
-
+    private static final String DELETE_FILM_DIRECTOR_BY_DIRECTOR_ID = "DELETE FROM films_directors WHERE director_id = ?";
     @Override
     public List<Director> getDirectors() {
         return jdbcTemplate.query(GET_ALL_DIRECTORS, mapper);
@@ -69,8 +69,10 @@ public class DirectorDbStorage implements DirectorStorage {
                 .orElseThrow(() -> new InternalServerException("Ошибка при обновлении режиссера"));
     }
 
+
     @Override
     public void deleteDirector(Long directorId) {
+
         int rowUpdated = jdbcTemplate.update(DELETE_QUERY, directorId);
         if (rowUpdated == 0) {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден и не был удалён.");

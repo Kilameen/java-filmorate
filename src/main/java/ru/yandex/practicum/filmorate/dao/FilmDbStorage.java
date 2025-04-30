@@ -10,11 +10,12 @@ import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rating;
-
+import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component(value = "H2FilmDb")
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class FilmDbStorage implements FilmStorage {
     private final FilmMapper filmMapper;
     private final DirectorStorage directorStorage;
     private final RatingDao ratingStorage;
+    private final GenreDao genreDao;
     private static final String INSERT_FILM_SQL = "INSERT INTO films (film_name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_FILM_SQL = "UPDATE films SET film_name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE film_id = ?;";
     private static final String SELECT_ALL_FILMS_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
@@ -166,9 +168,12 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId());
 
+
         if (rowsAffected == 0) {
             throw new NotFoundException("Фильм с id " + film.getId() + " не найден.");
         }
+        genreDao.clearFilmGenres(film.getId()); // Сначала удаляем старые жанры
+        genreDao.setGenres(film.getId(), film.getGenres().stream().map(Genre::getId).collect(Collectors.toList())); // Затем добавляем новые
         updateFilmDirectors(film);
         return getFilm(film.getId());
     }

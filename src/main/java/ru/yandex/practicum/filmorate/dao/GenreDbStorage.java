@@ -63,7 +63,10 @@ public class GenreDbStorage implements GenreDao {
 
     @Override
     public void setGenres(Long filmId, List<Long> genreIds) {
-        List<Object[]> batchArgs = genreIds.stream()
+        // Преобразуем список genreIds в Set, чтобы удалить дубликаты
+        Set<Long> uniqueGenreIds = new HashSet<>(genreIds);
+
+        List<Object[]> batchArgs = uniqueGenreIds.stream()
                 .map(genreId -> new Object[]{filmId, genreId})
                 .collect(Collectors.toList());
 

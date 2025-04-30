@@ -159,8 +159,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
         List<Film> directorFilms = filmStorage.getDirectorFilms(directorId);
-        if (directorFilms.isEmpty()) {
-            return Collections.emptySet();
+        if (directorFilms == null || directorFilms.isEmpty()) {
+            throw new NotFoundException("Режиссер с ID " + directorId + " не найден или не имеет фильмов.");
         }
         if (sortBy.equals("likes")) {
             return directorFilms.stream()

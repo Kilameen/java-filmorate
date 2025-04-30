@@ -75,11 +75,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        validate(user);
         User updateUser = userStorage.update(user);
         if (isNull(updateUser)) {
             throw new NotFoundException("Пользователя с таким id не существует");
         }
+        validate(user);
         return updateUser;
     }
 
