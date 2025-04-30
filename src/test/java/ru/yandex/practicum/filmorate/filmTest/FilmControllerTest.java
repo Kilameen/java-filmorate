@@ -176,7 +176,7 @@ class FilmControllerTest {
 		filmController.addLike(film.getId(), user1.getId());
 		filmController.addLike(film1.getId(), user2.getId());
 
-		Collection<Film> films = filmController.getPopularFilms(10L);
+		Collection<Film> films = filmController.getPopularFilms(10L,null,null);
 		assertEquals(3, films.size(), "Неверное колличество популярных фильмов");
 		assertEquals("Test Film", films.stream().findFirst().get().getName(), "Первый фильм - Test Film");
 		Optional<Film> secondFilm = films.stream().skip(1).findFirst();

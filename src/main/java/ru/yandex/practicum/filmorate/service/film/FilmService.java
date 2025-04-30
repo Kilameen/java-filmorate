@@ -10,8 +10,6 @@ public interface FilmService {
 
     void deleteLike(Long filmId, Long userId);
 
-    Collection<Film> getPopularFilms(Long count);
-
     Film create(Film film);
 
     Film update(Film film);
@@ -23,6 +21,8 @@ public interface FilmService {
     Set<Film> getDirectorFilms(Long directorId, String sortBy);
 
     void deleteFilmById(Long id);
+
+    Collection<Film> getPopularFilms(Long count,Long genreId, Integer year);
 
     Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter);
 

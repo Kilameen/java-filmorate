@@ -60,14 +60,30 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Collection<Film> getPopularFilms(Long count) {
+    public Collection<Film> getPopularFilms(Long count, Long genreId, Integer year) {
         Collection<Film> popularFilms = filmStorage.getPopularFilms(count);
-        Collection<Long> filmIds = popularFilms.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
-        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
-        for (Film film : popularFilms) {
-            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(
+                popularFilms.stream().map(Film::getId).collect(Collectors.toList())
+        );
+        popularFilms.forEach(film -> film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList())));
+
+        if (count != null) {
+            popularFilms = popularFilms.stream().limit(count).collect(Collectors.toList());
+        }
+        if (genreId != null && year == null) {
+            popularFilms = popularFilms.stream()
+                    .filter(film -> film.getGenres().stream()
+                            .anyMatch(g -> g.getId().equals(genreId))).collect(Collectors.toList());
+        } else if (year != null && genreId == null) {
+            popularFilms = popularFilms.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year)
+                    .collect(Collectors.toList());
+        } else if (genreId != null && year != null) {
+            popularFilms = popularFilms.stream()
+                    .filter(film -> film.getGenres().stream()
+                            .anyMatch(g -> g.getId().equals(genreId)))
+                    .filter(film -> film.getReleaseDate().getYear() == year)
+                    .collect(Collectors.toList());
         }
         return popularFilms;
     }

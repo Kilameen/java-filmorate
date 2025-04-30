@@ -1,25 +1,28 @@
 package ru.yandex.practicum.filmorate.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.dao.DirectorStorage;
+import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class FilmMapper implements RowMapper<Film> {
+
+    private final DirectorStorage directorStorage;
+    private final GenreDbStorage genreDbStorage;
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Set<Director> directors = new HashSet<>();
-        if (rs.getLong("director_id") != 0) {
-            directors.add(new Director(rs.getLong("director_id"), rs.getString("name")));
-        }
         return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("film_name"))
@@ -28,7 +31,8 @@ public class FilmMapper implements RowMapper<Film> {
                 .duration(rs.getInt("duration"))
                 .mpa(new Rating(rs.getLong("rating_id"), rs.getString("rating_name")))
                 .likes(rs.getLong("rate"))
-                .directors(directors)
+                .directors(new HashSet<>(directorStorage.getFilmDirectors(rs.getLong("film_id"))))
+                .genres(new ArrayList<>(genreDbStorage.getFilmGenres(rs.getLong("film_id"))))
                 .build();
     }
 }
