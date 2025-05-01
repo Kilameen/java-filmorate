@@ -24,13 +24,12 @@ public class ReviewDbStorage implements ReviewDao {
 
     private static final String INSERT_REVIEW_SQL_REQUEST = "INSERT INTO reviews (content, is_positive, film_id, user_id, useful)\n" +
             "VALUES (?, ?, ?, ?, 0);"; //В функциональности написано: При создании отзыва рейтинг равен нулю.
-    private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=?, film_id=?, user_id=? WHERE review_id=?;";
+    private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=? WHERE review_id=?;";
     private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE review_id=?";
     private static final String DELETE_REVIEW_SQL_REQUEST = "DELETE FROM reviews WHERE review_id = ?;";
     private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews";
     private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
     private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
-    private static final String CHECK_FILM_ID = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id = ?)";
     private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";
     private static final String GET_REVIEW_ID_BY_FILM_AND_USER_SQL_REQUEST = "SELECT review_id FROM reviews WHERE film_id=? AND user_id=?;";
 
@@ -59,9 +58,7 @@ public class ReviewDbStorage implements ReviewDao {
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, review.getContent());
             preparedStatement.setBoolean(2, review.getIsPositive());
-            preparedStatement.setLong(3, review.getFilmId());
-            preparedStatement.setLong(4, review.getUserId());
-            preparedStatement.setLong(5, review.getReviewId());
+            preparedStatement.setLong(3, review.getReviewId());
             return preparedStatement;
         }, keyHolder);
         return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
