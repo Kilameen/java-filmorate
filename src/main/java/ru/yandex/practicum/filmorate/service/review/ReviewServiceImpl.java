@@ -46,9 +46,9 @@ public class ReviewServiceImpl implements ReviewService {
             reviewDao.getReviewIdByFilmIdAndUserId(review.getUserId(), review.getFilmId());
             throw new DuplicatedDataException("Отзыв пользователя " + review.getUserId() + " на фильм " + review.getFilmId() + " уже существует");
         } catch (NotFoundException ex) {
-
             Review createdReview = reviewDao.create(review);
-            eventDao.create(createdReview.getUserId(), "REVIEW", "ADD", createdReview.getReviewId()); // Используем ID созданного отзыва
+            // Создаем событие после успешного создания отзыва, используя ID созданного отзыва
+            eventDao.create(createdReview.getUserId(), "REVIEW", "ADD", createdReview.getReviewId());
             return createdReview;
         }
     }
@@ -62,13 +62,13 @@ public class ReviewServiceImpl implements ReviewService {
         }
         checkFilmAndUserExist(review.getFilmId(), review.getUserId());
 
-        eventDao.create(review.getUserId(), "REVIEW", "UPDATE", review.getReviewId());
-        return reviewDao.update(review);
+        Review updatedReview = reviewDao.update(review); // Обновляем отзыв и получаем обновленный объект
+        eventDao.create(updatedReview.getUserId(), "REVIEW", "UPDATE", updatedReview.getReviewId()); // Используем ID обновленного отзыва
+        return updatedReview;
     }
 
     @Override
     public void delete(Long id) {
-
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
         }

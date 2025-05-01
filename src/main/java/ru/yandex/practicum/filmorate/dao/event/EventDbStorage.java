@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.model.Event;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -19,11 +18,11 @@ public class EventDbStorage implements EventDao {
 
     private static final String INSERT_EVENT_SQL_REQUEST = "INSERT INTO events (user_id, timestamp, event_type, operation, entity_id)" +
             "VALUES (?, ?, ?, ?, ?)";
-    private static final String SELECT_EVENT_SQL_REQUEST = "SELECT * FROM events WHERE user_id = ? ORDER BY event_id";
+    private static final String SELECT_EVENT_SQL_REQUEST = "SELECT * FROM events WHERE user_id = ? ";
 
     @Override
     public void create(Long userId, String eventType, String operation, Long entityId) {
-        long timestamp = Timestamp.from(Instant.now()).getTime();
+        long timestamp = Instant.now().toEpochMilli();
         jdbcTemplate.update(INSERT_EVENT_SQL_REQUEST, userId, timestamp, eventType, operation, entityId);
     }
 

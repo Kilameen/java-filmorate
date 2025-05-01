@@ -22,7 +22,7 @@ public class ReviewDbStorage implements ReviewDao {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewMapper reviewMapper;
 
-    private static final String INSERT_REVIEW_SQL_REQUEST = "INSERT INTO reviews (content, is_positive, film_id, user_id, useful)\n" +
+    private static final String INSERT_REVIEW_SQL_REQUEST = "INSERT INTO reviews (content, is_positive, user_id,film_id, useful)\n" +
             "VALUES (?, ?, ?, ?, 0);"; //В функциональности написано: При создании отзыва рейтинг равен нулю.
     private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=? WHERE review_id=?;";
     private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE review_id=?";
@@ -42,8 +42,9 @@ public class ReviewDbStorage implements ReviewDao {
                             Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, review.getContent());
             preparedStatement.setBoolean(2, review.getIsPositive());
-            preparedStatement.setLong(3, review.getFilmId());
-            preparedStatement.setLong(4, review.getUserId());
+            preparedStatement.setLong(3, review.getUserId());
+            preparedStatement.setLong(4, review.getFilmId());
+
             return preparedStatement;
         }, keyHolder);
         return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
@@ -51,17 +52,11 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public Review update(Review review) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(UPDATE_REVIEW_SQL_REQUEST,
-                            Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, review.getContent());
-            preparedStatement.setBoolean(2, review.getIsPositive());
-            preparedStatement.setLong(3, review.getReviewId());
-            return preparedStatement;
-        }, keyHolder);
-        return getReviewById(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        jdbcTemplate.update(UPDATE_REVIEW_SQL_REQUEST,
+                review.getContent(),
+                review.getIsPositive(),
+                review.getReviewId()); // Убрал KeyHolder, так как ID берется из объекта
+        return getReviewById(review.getReviewId()); // Используем ID из объекта
     }
 
     @Override
@@ -98,8 +93,8 @@ public class ReviewDbStorage implements ReviewDao {
     }
 
     @Override
-    public Collection<Review> getReviewsByFilmId(Long id, int count) {
-        return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, id, count);
+    public Collection<Review> getReviewsByFilmId(Long filmId, int count) {
+        return jdbcTemplate.query(SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST, reviewMapper, filmId, count);
     }
 
     @Override
@@ -118,12 +113,6 @@ public class ReviewDbStorage implements ReviewDao {
 
     @Override
     public void updateUsefulToReview(Long reviewId, int useful) {
-        jdbcTemplate.update(connection -> {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement(UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST);
-            preparedStatement.setInt(1, useful);
-            preparedStatement.setLong(2, reviewId);
-            return preparedStatement;
-        });
+        jdbcTemplate.update(UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST, useful, reviewId);
     }
 }
