@@ -19,7 +19,7 @@ public class EventDbStorage implements EventDao {
 
     private static final String INSERT_EVENT_SQL_REQUEST = "INSERT INTO events (user_id, timestamp, event_type, operation, entity_id)" +
             "VALUES (?, ?, ?, ?, ?)";
-    private static final String SELECT_EVENT_SQL_REQUEST = "SELECT * FROM events WHERE user_id = ?;";
+    private static final String SELECT_EVENT_SQL_REQUEST = "SELECT * FROM events WHERE user_id = ? ORDER BY event_id";
 
     @Override
     public void create(Long userId, String eventType, String operation, Long entityId) {

@@ -27,7 +27,7 @@ public class ReviewDbStorage implements ReviewDao {
     private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=? WHERE review_id=?;";
     private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE review_id=?";
     private static final String DELETE_REVIEW_SQL_REQUEST = "DELETE FROM reviews WHERE review_id = ?;";
-    private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews";
+    private static final String SELECT_ALL_REVIEWS_SQL_REQUEST = "SELECT * FROM reviews ORDER BY useful DESC";
     private static final String SELECT_REVIEWS_BY_FILM_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE film_id=? ORDER BY useful DESC LIMIT ?";
     private static final String CHECK_REVIEW_IS_EXIST = "SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = ?)";
     private static final String UPDATE_USEFUL_FOR_REVIEW_SQL_REQUEST = "UPDATE reviews SET useful=? WHERE review_id=?;";

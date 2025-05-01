@@ -21,6 +21,7 @@ public class LikeDbStorage implements LikeDao {
             "WHERE film_id = ? AND user_id = ?;";
     private static final String SELECT_ALL_USERS_AND_LIKES =
             "SELECT user_id, film_id FROM film_likes";
+
     @Override
     public void addLike(Long filmId, Long userId) {
         if(hasLike(filmId,userId)){
