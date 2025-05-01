@@ -48,6 +48,7 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void addLike(Long filmId, Long userId) {
         validateUserId(userId);
+        filmStorage.getFilm(filmId);
         likeDbStorage.addLike(filmId, userId);
         eventDao.create(userId, "LIKE", "ADD", filmId);
     }
@@ -107,7 +108,7 @@ public class FilmServiceImpl implements FilmService {
                     .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
                     .collect(Collectors.toList());
             genreDbStorage.setGenres(addFilm.getId(), genreIds);
-            addFilm.setGenres(new ArrayList<>(genres));
+            addFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(addFilm.getId())));
         }
         return addFilm;
     }

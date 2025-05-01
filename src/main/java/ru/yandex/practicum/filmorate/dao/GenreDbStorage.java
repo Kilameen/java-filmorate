@@ -27,9 +27,9 @@ public class GenreDbStorage implements GenreDao {
             "ORDER BY genre_id;";
     private static final String SELECT_FILM_GENRE_SQL_REQUEST = "SELECT genres.genre_id, genre_name\n" +
             "FROM film_genres\n" +
-            "         LEFT JOIN genres ON film_genres.genre_id = genres.genre_id\n" +
+            "LEFT JOIN genres ON film_genres.genre_id = genres.genre_id\n" +
             "WHERE film_id = ?\n" +
-            "ORDER BY genres.genre_id;";
+            "ORDER BY genres.genre_id";
     private static final String SELECT_GENRE_BY_ID_SQL_REQUEST = "SELECT *\n" +
             "FROM genres\n" +
             "WHERE genre_id = ?;";

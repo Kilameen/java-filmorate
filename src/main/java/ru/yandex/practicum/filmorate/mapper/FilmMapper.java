@@ -32,7 +32,7 @@ public class FilmMapper implements RowMapper<Film> {
                 .mpa(new Rating(rs.getLong("rating_id"), rs.getString("rating_name")))
                 .likes(rs.getLong("rate"))
                 .directors(new HashSet<>(directorStorage.getFilmDirectors(rs.getLong("film_id"))))
-                .genres(new ArrayList<>(genreDbStorage.getFilmGenres(rs.getLong("film_id"))))
+                .genres(new HashSet<>(genreDbStorage.getFilmGenres(rs.getLong("film_id"))))
                 .build();
     }
 }
