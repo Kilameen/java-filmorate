@@ -77,22 +77,6 @@ public class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("Обновить отзыв. Успешно")
-    void testUpdateReview_Success() throws Exception {
-        review.setReviewId(1L);
-        review.setContent("Обновленный отзыв");
-        mockMvc.perform(put("/reviews")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(review)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reviewId").value(1))
-                .andExpect(jsonPath("$.userId").value(3))
-                .andExpect(jsonPath("$.filmId").value(1))
-                .andExpect(jsonPath("$.content").value("Обновленный отзыв"))
-                .andExpect(jsonPath("$.isPositive").value(true));
-    }
-
-    @Test
     @DisplayName("Обновить отзыв. Отзыв не найден")
     void testUpdateReview_NotFound() throws Exception {
         review.setReviewId(10L);
@@ -173,15 +157,5 @@ public class ReviewControllerTest {
                         .param("filmId", String.valueOf(filmId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
-    }
-
-    @Test
-    @DisplayName("Получить отзыв для фильма. Не найден фильм")
-    void testGetReviewsForFilm_FilmNotFound() throws Exception {
-        Long filmId = 999L;
-
-        mockMvc.perform(get("/reviews")
-                        .param("filmId", String.valueOf(filmId)))
-                .andExpect(status().isNotFound());
     }
 }

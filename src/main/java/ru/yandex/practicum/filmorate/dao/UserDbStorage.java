@@ -92,8 +92,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void deleteUserById(Long id) {
-        jdbcTemplate.update(DELETE_USER_FRIENDSHIPS_SQL, id, id);
-
         jdbcTemplate.update(DELETE_USER_BY_ID_SQL_REQUEST, id);
     }
 }

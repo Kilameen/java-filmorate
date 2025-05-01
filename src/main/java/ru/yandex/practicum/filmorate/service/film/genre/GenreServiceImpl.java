@@ -35,22 +35,4 @@ public class GenreServiceImpl implements GenreService {
         }
         return genre;
     }
-
-    @Override
-    public Collection<Genre> getFilmGenres(Long filmId) {
-        log.info("Приступаю к поиску жанров для фильма {}", filmId);
-        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(filmId);
-        log.info("Нашел {} жанров к фильму", filmGenres.size());
-        return filmGenres;
-    }
-
-    @Override
-    public void clearFilmGenres(Long filmId) {
-        genreDbStorage.clearFilmGenres(filmId);
-    }
-
-    @Override
-    public Map<Long, Collection<Genre>> getAllFilmsGenres(Collection<Long> filmIds) {
-        return genreDbStorage.getAllFilmsGenres(filmIds);
-    }
 }
