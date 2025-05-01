@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -84,6 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (!reviewDao.isReviewExist(id)) {
             throw new NotFoundException("Отзыв с id " + id + " не найден!");
+            //return null;
         }
         return reviewDao.getReviewById(id);
     }
@@ -95,7 +98,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getReviewsByFilmId(Long filmId, int count) {
-        filmStorage.getFilm(filmId);
         return (List<Review>) reviewDao.getReviewsByFilmId(filmId, count);
     }
 
