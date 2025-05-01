@@ -21,9 +21,11 @@ public class LikeDbStorage implements LikeDao {
             "WHERE film_id = ? AND user_id = ?;";
     private static final String SELECT_ALL_USERS_AND_LIKES =
             "SELECT user_id, film_id FROM film_likes";
-
     @Override
     public void addLike(Long filmId, Long userId) {
+        if(hasLike(filmId,userId)){
+            return;
+        }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection
@@ -60,5 +62,16 @@ public class LikeDbStorage implements LikeDao {
             usersWithLikes.get(userId).add(filmId);
         });
         return usersWithLikes;
+    }
+
+    private List<Long> getUserLikes(Long userId) {
+        String sql = "SELECT film_id FROM film_likes WHERE user_id = ?";
+        return jdbcTemplate.queryForList(sql, Long.class, userId);
+    }
+
+    // Проверка:
+    private boolean hasLike(Long filmId, Long userId) {
+        List<Long> userLikes = getUserLikes(userId);
+        return userLikes != null && userLikes.contains(filmId);
     }
 }
