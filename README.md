@@ -1,6 +1,6 @@
 # java-filmorate
 ## Схема БД
-![Diagram]((newDiagramBD.png))
+![newDiagramBD.png](newDiagramBD.png)
 
 <details>
   <summary>Код схемы БД</summary>
