@@ -31,7 +31,7 @@ public class DirectorServiceImpl implements DirectorService {
 
     @Override
     public Director createDirector(Director director) {
-       validateDirector(director);
+        validateDirector(director);
         director = directorStorage.createDirector(director);
         return director;
     }
@@ -49,11 +49,11 @@ public class DirectorServiceImpl implements DirectorService {
         directorStorage.deleteDirector(directorId);
     }
 
-    private void validateDirector(Director director){
+    private void validateDirector(Director director) {
         if (isNull(director.getName()) || director.getName().trim().isEmpty()) { // trim() убирает пробелы с начала и конца
             log.error("Имя режиссера не заполнено {}", director.getName());
             throw new ValidationException("Имя режиссера должно быть заполнено и не должно содержать только пробелы");
         }
-     }
+    }
 }
 

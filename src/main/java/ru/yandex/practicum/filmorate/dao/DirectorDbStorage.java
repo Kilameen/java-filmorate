@@ -33,6 +33,7 @@ public class DirectorDbStorage implements DirectorStorage {
                     "LEFT JOIN films_directors AS fd ON d.director_id = fd.director_id " +
                     "WHERE film_id = ?";
     private static final String DELETE_FILM_DIRECTOR_BY_DIRECTOR_ID = "DELETE FROM films_directors WHERE director_id = ?";
+
     @Override
     public List<Director> getDirectors() {
         return jdbcTemplate.query(GET_ALL_DIRECTORS, mapper);
