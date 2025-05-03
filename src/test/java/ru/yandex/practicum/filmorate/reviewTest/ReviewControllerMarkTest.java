@@ -18,8 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@AutoConfigureMockMvc // Настройка MockMvc для тестирования контроллеров
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Очищает контекст после каждого теста
+@AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("Тесты для проверки ReviewController. Поведение оценок")
 public class ReviewControllerMarkTest {
     @Autowired
@@ -41,7 +41,7 @@ public class ReviewControllerMarkTest {
         Long userId = 1L;
 
         mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
-                .andExpect(status().isOk()); // Проверяем статус ответа
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ReviewControllerMarkTest {
         Long userId = 3L;
 
         mockMvc.perform(put("/reviews/{id}/like/{userId}", reviewId, userId))
-                .andExpect(status().isOk()); // Проверяем статус ответа
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -111,13 +111,13 @@ public class ReviewControllerMarkTest {
         Long userId = 2L;
 
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
-                .andExpect(status().isOk()); // Проверяем статус ответа
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Удалить лайк. Отзыв не найден")
     void testDeleteLike_ReviewNotFound() throws Exception {
-        Long reviewId = 999L; // reviewId, которого нет в базе данных
+        Long reviewId = 999L;
         Long userId = 1L;
 
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
@@ -128,7 +128,7 @@ public class ReviewControllerMarkTest {
     @DisplayName("Удалить лайк. Пользователь не найден")
     void testDeleteLike_UserNotFound() throws Exception {
         Long reviewId = 1L;
-        Long userId = 999L; // userId, которого нет в базе данных
+        Long userId = 999L;
 
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
                 .andExpect(status().isNotFound());
@@ -141,7 +141,7 @@ public class ReviewControllerMarkTest {
         Long userId = 1L;
 
         mockMvc.perform(delete("/reviews/{id}/like/{userId}", reviewId, userId))
-                .andExpect(status().isNotFound()); // Проверяем сообщение об ошибке
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ReviewControllerMarkTest {
         Long userId = 3L;
 
         mockMvc.perform(delete("/reviews/{id}/dislike/{userId}", reviewId, userId))
-                .andExpect(status().isOk()); // Проверяем статус ответа
+                .andExpect(status().isOk());
     }
 
     @Test

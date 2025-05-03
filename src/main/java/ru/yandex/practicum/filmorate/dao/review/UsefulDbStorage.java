@@ -154,21 +154,17 @@ public class UsefulDbStorage implements UsefulDao {
 
     @Override
     public boolean isLikeExist(Long reviewId, Long userId) {
-        try {
-            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_LIKE_IS_EXIST, Boolean.class, reviewId, userId));
-        } catch (Exception ex) {
-            //throw new RuntimeException("Пользователь " + userId + " не ставил лайк отзыву " + reviewId);
-            return false;
-        }
+        return jdbcTemplate.query(CHECK_LIKE_IS_EXIST, (rs, rowNum) -> rs.getBoolean(1), reviewId, userId)
+                .stream()
+                .findAny()
+                .orElse(false);
     }
 
     @Override
     public boolean isDislikeExist(Long reviewId, Long userId) {
-        try {
-            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_DISLIKE_IS_EXIST, Boolean.class, reviewId, userId));
-        } catch (Exception ex) {
-            //throw new RuntimeException("Пользователь " + userId + " не ставил дизлайк отзыву " + reviewId);
-            return false;
-        }
+       return jdbcTemplate.query(CHECK_DISLIKE_IS_EXIST, (rs, rowNum) -> rs.getBoolean(1), reviewId, userId)
+                .stream()
+                .findAny()
+                .orElse(false);
     }
 }

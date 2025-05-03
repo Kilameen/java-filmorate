@@ -23,7 +23,7 @@ public class ReviewDbStorage implements ReviewDao {
     private final ReviewMapper reviewMapper;
 
     private static final String INSERT_REVIEW_SQL_REQUEST = "INSERT INTO reviews (content, is_positive, user_id,film_id, useful)\n" +
-            "VALUES (?, ?, ?, ?, 0);"; //В функциональности написано: При создании отзыва рейтинг равен нулю.
+            "VALUES (?, ?, ?, ?, 0);";
     private static final String UPDATE_REVIEW_SQL_REQUEST = "UPDATE reviews SET content=?, is_positive=? WHERE review_id=?;";
     private static final String SELECT_REVIEW_BY_ID_SQL_REQUEST = "SELECT * FROM reviews WHERE review_id=?";
     private static final String DELETE_REVIEW_SQL_REQUEST = "DELETE FROM reviews WHERE review_id = ?;";
@@ -55,8 +55,8 @@ public class ReviewDbStorage implements ReviewDao {
         jdbcTemplate.update(UPDATE_REVIEW_SQL_REQUEST,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getReviewId()); // Убрал KeyHolder, так как ID берется из объекта
-        return getReviewById(review.getReviewId()); // Используем ID из объекта
+                review.getReviewId());
+        return getReviewById(review.getReviewId());
     }
 
     @Override
