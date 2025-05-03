@@ -10,6 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Director {
     private Long id;
-    @NotEmpty
+    @NotEmpty (groups = {Marker.OnCreate.class})
     private String name;
 }

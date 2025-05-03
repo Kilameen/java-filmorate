@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -62,12 +64,11 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopularFilms(@RequestParam(required = false) Long count, @RequestParam(required = false) Long genreId, @RequestParam(required = false) Integer year) {
+    public Collection<Film> getPopularFilms(@RequestParam(required = false) @Positive(message = "Значение count должно быть больше 0") Long count,
+                                            @RequestParam(required = false) Long genreId,
+                                            @RequestParam(required = false) Integer year) {
         log.info("Выполняется запрос на список популярных фильмов");
-        if (count != null && count <= 0) {
-            throw new ValidationException("Значение переданного параметра количество записей должен быть больше 0");
-        }
-        return filmService.getPopularFilms(count,genreId,year);
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
