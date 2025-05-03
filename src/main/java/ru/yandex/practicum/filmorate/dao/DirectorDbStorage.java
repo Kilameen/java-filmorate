@@ -83,8 +83,9 @@ public class DirectorDbStorage implements DirectorStorage {
     public List<Director> getFilmDirectors(Long filmId) {
         return jdbcTemplate.query(GET_FILM_DIRECTOR_BY_ID, mapper, filmId);
     }
-@Override
-public void updateFilmDirectors(Film film) {
+
+    @Override
+    public void updateFilmDirectors(Film film) {
         Long filmId = film.getId();
         Set<Director> directors = film.getDirectors();
 
@@ -108,7 +109,6 @@ public void updateFilmDirectors(Film film) {
 
         jdbcTemplate.batchUpdate(sql, batch);
     }
-
 
     private void deleteAllDirectorsForFilm(Long filmId) {
         String sql = "DELETE FROM films_directors WHERE film_id = ?";

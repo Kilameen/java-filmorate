@@ -39,9 +39,8 @@ public class ReviewController {
         return reviewService.update(review);
     }
 
-    //Удаление уже имеющегося отзыва
+
     @DeleteMapping("/{id}")
-    @Validated(Marker.OnCreate.class)
     public void delete(@PathVariable Long id) {
         if (id == null) {
             throw new NotFoundException("ID не может быть пустым");

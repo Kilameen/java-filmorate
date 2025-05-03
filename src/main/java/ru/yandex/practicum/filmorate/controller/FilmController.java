@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public class FilmController {
                                             @RequestParam(required = false) Long genreId,
                                             @RequestParam(required = false) Integer year) {
         log.info("Выполняется запрос на список популярных фильмов");
-        return filmService.getPopularFilms(count,genreId,year);
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
