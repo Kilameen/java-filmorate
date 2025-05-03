@@ -9,11 +9,11 @@ import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -82,5 +82,36 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public List<Director> getFilmDirectors(Long filmId) {
         return jdbcTemplate.query(GET_FILM_DIRECTOR_BY_ID, mapper, filmId);
+    }
+@Override
+public void updateFilmDirectors(Film film) {
+        Long filmId = film.getId();
+        Set<Director> directors = film.getDirectors();
+
+        deleteAllDirectorsForFilm(filmId);
+        saveFilmDirectors(filmId, directors);
+
+        List<Director> filmDirectors = getFilmDirectors(filmId);
+        film.setDirectors(new HashSet<>(filmDirectors));
+    }
+
+    private void saveFilmDirectors(Long filmId, Set<Director> directors) {
+        if (directors == null || directors.isEmpty()) {
+            return;
+        }
+
+        String sql = "INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)";
+        List<Object[]> batch = new ArrayList<>();
+        for (Director director : directors) {
+            batch.add(new Object[]{filmId, director.getId()});
+        }
+
+        jdbcTemplate.batchUpdate(sql, batch);
+    }
+
+
+    private void deleteAllDirectorsForFilm(Long filmId) {
+        String sql = "DELETE FROM films_directors WHERE film_id = ?";
+        jdbcTemplate.update(sql, filmId);
     }
 }

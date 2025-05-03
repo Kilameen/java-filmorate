@@ -52,7 +52,6 @@ public class ReviewController {
 
     //Получение отзыва по идентификатору
     @GetMapping("/{id}")
-    @Validated(Marker.OnCreate.class)
     public Review getReview(@PathVariable Long id) {
         if (id == null) {
             throw new NotFoundException("ID не может быть пустым");
@@ -64,11 +63,10 @@ public class ReviewController {
     //Получение всех отзывов по идентификатору фильма
     @GetMapping
     public List<Review> getReviews(
-            @RequestParam(defaultValue = "-1") Long filmId,
+            @RequestParam(required = false) Long filmId,
             @RequestParam(defaultValue = "10") int count) {
 
-        //Если фильм не указан, то все
-        if (filmId == null || filmId == -1) {
+        if (filmId == null) {
             log.info("Запрос на получение всех отзывов");
             return reviewService.getAllReviews();
         }

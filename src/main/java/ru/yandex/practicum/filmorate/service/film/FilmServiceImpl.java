@@ -94,26 +94,27 @@ public class FilmServiceImpl implements FilmService {
         validateRating(film);
         validate(film);
 
-        Film addFilm = filmStorage.create(film);
-        if (!film.getDirectors().isEmpty()) {
+        Film createdFilm = filmStorage.create(film);
+        Long filmId = createdFilm.getId();
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             for (Director director : film.getDirectors()) {
-                Director filmDirector = directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
+                directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
             }
         }
-
         if (film.getGenres() != null) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
             List<Long> genreIds = genres.stream()
                     .map(Genre::getId)
-                    .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
                     .collect(Collectors.toList());
-            genreDbStorage.setGenres(addFilm.getId(), genreIds);
-            addFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(addFilm.getId())));
+
+            genreDbStorage.clearFilmGenres(filmId);
+            genreDbStorage.setGenres(filmId, genreIds);
+            createdFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(filmId)));
         }
-        return addFilm;
+        return createdFilm;
     }
 
-    @Override
     public Film update(Film film) {
         validateRating(film);
 
@@ -122,18 +123,18 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException("Фильма с таким id не существует");
         }
 
-        Film updatedFilm = filmStorage.update(film);
+        filmStorage.update(film);
 
         genreDbStorage.clearFilmGenres(film.getId());
         Set<Genre> genres = new HashSet<>(film.getGenres());
         if (!genres.isEmpty()) {
             List<Long> genreIds = genres.stream()
                     .map(Genre::getId)
-                    .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
-                    .collect(Collectors.toList());
+                    .toList();
             genreDbStorage.setGenres(film.getId(), genreIds);
         }
-        return updatedFilm;
+        directorStorage.updateFilmDirectors(film);
+        return filmStorage.getFilm(film.getId());
     }
 
     @Override
@@ -154,6 +155,8 @@ public class FilmServiceImpl implements FilmService {
         Film film = filmStorage.getFilm(id);
         Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         film.setGenres(filmGenres);
+        List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
+        film.setDirectors(new HashSet<>(filmDirectors));
         return film;
     }
 
@@ -194,6 +197,8 @@ public class FilmServiceImpl implements FilmService {
 
         filmStorage.deleteFilm(id);
     }
+
+
 
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {

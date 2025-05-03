@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.director.DirectorService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -28,7 +31,7 @@ public class DirectorController {
         log.info("Запрос на получение режиссера с id:{}",id);
         return directorService.getDirectorById(id);
     }
-
+    @Validated(Marker.OnCreate.class)
     @PostMapping("/directors")
     public Director createDirector(@RequestBody Director director) {
         log.info("Запрос на создание режиссера:{}", director);
