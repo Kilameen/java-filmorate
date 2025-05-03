@@ -163,10 +163,6 @@ public class FilmServiceImpl implements FilmService {
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
         sortBy = sortBy.replace(" ", "");
 
-        if (!SortType.isValid(sortBy)) {
-            throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
-        }
-
         SortType sortType = SortType.fromString(sortBy);
 
         List<Film> directorFilms = filmStorage.getDirectorFilms(directorId);
@@ -210,10 +206,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
         searchParameter = searchParameter.replace(" ", "");
-
-        if (!SearchParameter.isValid(searchParameter)) {
-            throw new NotFoundException("Поиск по указанному параметру отсутствует");
-        }
 
         Collection<Film> films;
         SearchParameter parameter = SearchParameter.fromString(searchParameter);

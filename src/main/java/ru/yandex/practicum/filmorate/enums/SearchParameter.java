@@ -16,21 +16,12 @@ public enum SearchParameter {
         return value;
     }
 
-    public static boolean isValid(String str) {
-        for (SearchParameter param : SearchParameter.values()) {
-            if (param.getValue().equals(str)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static SearchParameter fromString(String str) {
         for (SearchParameter param : SearchParameter.values()) {
             if (param.getValue().equals(str)) {
                 return param;
             }
         }
-        throw new IllegalArgumentException("Недопустимый параметр: " + str);
+        throw new IllegalArgumentException("Недопустимый параметр поиска: " + str);
     }
 }
