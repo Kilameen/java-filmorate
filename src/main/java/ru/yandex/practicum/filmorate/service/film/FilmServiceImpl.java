@@ -142,21 +142,21 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Collection<Film> findAll() {
         Collection<Film> allFilms = filmStorage.findAll();
-        Collection<Long> filmIds = allFilms.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
-        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
-        for (Film film : allFilms) {
-            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
-        }
+//        Collection<Long> filmIds = allFilms.stream()
+//                .map(Film::getId)
+//                .collect(Collectors.toList());
+//        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+//        for (Film film : allFilms) {
+//            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
+//        }
         return allFilms;
     }
 
     @Override
     public Film getFilmById(Long id) {
         Film film = filmStorage.getFilm(id);
-        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
-        film.setGenres(filmGenres);
+//        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
+//        film.setGenres(filmGenres);
         List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
         film.setDirectors(new HashSet<>(filmDirectors));
         return film;

@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.enums;
 
-import org.springframework.data.domain.Sort;
-
 public enum SortType {
     YEAR("year"),
     LIKES("likes");
