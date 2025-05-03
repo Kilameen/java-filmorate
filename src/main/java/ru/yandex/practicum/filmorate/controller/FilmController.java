@@ -79,9 +79,6 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public Set<Film> getDirectorFilms(@PathVariable("directorId") Long directorId, @RequestParam(defaultValue = "year") String sortBy) {
-        if (!sortBy.equals("year") && !sortBy.equals("likes")) {
-            throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
-        }
         log.info("Запрос на получение фильмов режиссера с id:{}", directorId);
         return filmService.getDirectorFilms(directorId, sortBy);
     }
@@ -102,17 +99,7 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public Collection<Film> searchFilmByNameOrDirector(HttpServletRequest request) {
-        String query = request.getParameter("query").trim();
-        String by = request.getParameter("by").trim();
-
-        if (query.isEmpty()) {
-            throw new ValidationException("Параметр query не может быть пустым или отсутствовать");
-        }
-        if (by.isEmpty()) {
-            throw new ValidationException("Параметр byList не может быть пустым или отсутствовать");
-        }
-
+    public Collection<Film> searchFilmByNameOrDirector(HttpServletRequest request, @RequestParam String query, @RequestParam String by) {
         log.info("Поиск фильма, содержащего \"{}\" в {}", query, by);
         return filmService.getFilmByNameOrDirector(query, by);
     }

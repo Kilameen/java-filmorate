@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.dao.event.EventDao;
+import ru.yandex.practicum.filmorate.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.enums.SortType;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -159,18 +161,28 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
+        sortBy = sortBy.replace(" ", "");
+
+        if (!SortType.isValid(sortBy)) {
+            throw new IllegalArgumentException("Недопустимый параметр сортировки: " + sortBy);
+        }
+
+        SortType sortType = SortType.fromString(sortBy);
+
         List<Film> directorFilms = filmStorage.getDirectorFilms(directorId);
         if (directorFilms == null || directorFilms.isEmpty()) {
             throw new NotFoundException("Режиссер с ID " + directorId + " не найден или не имеет фильмов.");
         }
-        if (sortBy.equals("likes")) {
-            return directorFilms.stream()
-                    .sorted(Comparator.comparing(Film::getLikes).reversed()) // Сортируем по убыванию лайков
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        switch (sortType) {
+            case LIKES:
+                return directorFilms.stream()
+                        .sorted(Comparator.comparing(Film::getLikes).reversed()) // Сортируем по убыванию лайков
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+            default:
+                return directorFilms.stream()
+                        .sorted(Comparator.comparing(Film::getReleaseDate)) // Сортируем по убыванию года
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        return directorFilms.stream()
-                .sorted(Comparator.comparing(Film::getReleaseDate)) // Сортируем по убыванию года
-                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private void validateUserId(Long id) {
@@ -197,20 +209,20 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
-        Set<String> validParameters = Set.of("director", "title", "director,title", "title,director");
         searchParameter = searchParameter.replace(" ", "");
-        if (!validParameters.contains(searchParameter)) {
+
+        if (!SearchParameter.isValid(searchParameter)) {
             throw new NotFoundException("Поиск по указанному параметру отсутствует");
         }
 
         Collection<Film> films;
-        if (searchParameter.contains(",")) {
-            films = filmStorage.getFilmByNameOrDirector(keyWords);
-        } else if (searchParameter.equals("director")) {
-            films = filmStorage.getFilmByDirector(keyWords);
-        } else {
-            films = filmStorage.getFilmByName(keyWords);
-        }
+        SearchParameter parameter = SearchParameter.fromString(searchParameter);
+
+        films = switch (parameter) {
+            case DIRECTOR -> filmStorage.getFilmByDirector(keyWords);
+            case TITLE -> filmStorage.getFilmByName(keyWords);
+            default -> filmStorage.getFilmByNameOrDirector(keyWords);
+        };
 
         Collection<Long> filmIds = films.stream()
                 .map(Film::getId)
