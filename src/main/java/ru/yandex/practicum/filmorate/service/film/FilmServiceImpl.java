@@ -90,6 +90,13 @@ public class FilmServiceImpl implements FilmService {
                     .filter(film -> film.getReleaseDate().getYear() == year)
                     .collect(Collectors.toList());
         }
+        Collection<Long> filmIds = popularFilms.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+        Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(filmIds);
+        for (Film film : popularFilms) {
+            film.setDirectors(filmDirectors.getOrDefault(film.getId(),Collections.emptyList()));
+        }
         return popularFilms;
     }
 
