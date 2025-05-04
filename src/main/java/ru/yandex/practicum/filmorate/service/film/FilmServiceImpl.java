@@ -105,7 +105,9 @@ public class FilmServiceImpl implements FilmService {
             for (Director director : film.getDirectors()) {
                 directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
             }
+            directorStorage.updateFilmDirectors(film); // Обновляем режиссеров фильма
         }
+
         if (film.getGenres() != null) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
             List<Long> genreIds = genres.stream()
@@ -116,8 +118,10 @@ public class FilmServiceImpl implements FilmService {
             genreDbStorage.setGenres(filmId, genreIds);
             createdFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(filmId)));
         }
+        createdFilm.setDirectors(new HashSet<>(directorStorage.getFilmDirectors(filmId))); // Получаем режиссеров из БД
         return createdFilm;
     }
+
 
     @Override
     public Film update(Film film) {
