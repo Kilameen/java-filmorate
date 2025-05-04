@@ -263,7 +263,10 @@ public class FilmServiceImpl implements FilmService {
                 .map(Film::getId)
                 .collect(Collectors.toList());
         Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+        Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(filmIds);
+
         for (Film film : films) {
+            film.setDirectors(filmDirectors.getOrDefault(film.getId(),Collections.emptyList()));
             film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
         }
         return films;
