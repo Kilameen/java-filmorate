@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.film.rating;
+package ru.yandex.practicum.filmorate.service.serviceimpl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.RatingDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.service.RatingService;
+
 import java.util.Collection;
+
 import static java.util.Objects.isNull;
 
 @Service

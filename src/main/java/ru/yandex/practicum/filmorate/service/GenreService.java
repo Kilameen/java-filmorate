@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.film.genre;
+package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.Collection;

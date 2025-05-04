@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao.review;
+package ru.yandex.practicum.filmorate.dao.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dao.UsefulDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.sql.PreparedStatement;
@@ -162,7 +163,7 @@ public class UsefulDbStorage implements UsefulDao {
 
     @Override
     public boolean isDislikeExist(Long reviewId, Long userId) {
-       return jdbcTemplate.query(CHECK_DISLIKE_IS_EXIST, (rs, rowNum) -> rs.getBoolean(1), reviewId, userId)
+        return jdbcTemplate.query(CHECK_DISLIKE_IS_EXIST, (rs, rowNum) -> rs.getBoolean(1), reviewId, userId)
                 .stream()
                 .findAny()
                 .orElse(false);

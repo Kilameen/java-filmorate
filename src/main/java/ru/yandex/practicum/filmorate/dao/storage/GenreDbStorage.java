@@ -1,17 +1,19 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component (value = "H2GenreDb")
+@Component(value = "H2GenreDb")
 @RequiredArgsConstructor
 public class GenreDbStorage implements GenreDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;

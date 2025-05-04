@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.film;
+package ru.yandex.practicum.filmorate.service.serviceimpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.dao.*;
-import ru.yandex.practicum.filmorate.dao.event.EventDao;
+import ru.yandex.practicum.filmorate.dao.EventDao;
+import ru.yandex.practicum.filmorate.dao.storage.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dao.storage.LikeDbStorage;
+import ru.yandex.practicum.filmorate.dao.storage.RatingDbStorage;
 import ru.yandex.practicum.filmorate.enums.SearchParameter;
 import ru.yandex.practicum.filmorate.enums.SortType;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -14,6 +17,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -95,7 +99,7 @@ public class FilmServiceImpl implements FilmService {
                 .collect(Collectors.toList());
         Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(filmIds);
         for (Film film : popularFilms) {
-            film.setDirectors(filmDirectors.getOrDefault(film.getId(),Collections.emptyList()));
+            film.setDirectors(filmDirectors.getOrDefault(film.getId(), Collections.emptyList()));
         }
         return popularFilms;
     }
@@ -160,7 +164,7 @@ public class FilmServiceImpl implements FilmService {
             genreDbStorage.setGenres(film.getId(), genreIds);
         }
         directorStorage.updateFilmDirectors(film);
-        return  getFilmById(film.getId());
+        return getFilmById(film.getId());
     }
 
 
@@ -210,7 +214,7 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException("Режиссер с ID " + directorId + " не найден или не имеет фильмов.");
         }
         List<Film> films = new ArrayList<>();
-        for(Film film : directorFilms){
+        for (Film film : directorFilms) {
             film.setDirectors(directorStorage.getFilmDirectors(film.getId()));
             film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
             films.add(film);
@@ -252,7 +256,6 @@ public class FilmServiceImpl implements FilmService {
     }
 
 
-
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
         searchParameter = searchParameter.replace(" ", "");
@@ -273,7 +276,7 @@ public class FilmServiceImpl implements FilmService {
         Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(filmIds);
 
         for (Film film : films) {
-            film.setDirectors(filmDirectors.getOrDefault(film.getId(),Collections.emptyList()));
+            film.setDirectors(filmDirectors.getOrDefault(film.getId(), Collections.emptyList()));
             film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
         }
         return films;

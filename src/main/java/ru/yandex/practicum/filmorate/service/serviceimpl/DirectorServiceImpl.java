@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service.director;
+package ru.yandex.practicum.filmorate.service.serviceimpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.util.List;
 
@@ -56,4 +57,3 @@ public class DirectorServiceImpl implements DirectorService {
         }
     }
 }
-

@@ -15,7 +15,7 @@ public class FilmMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Film film = Film.builder()
+        return Film.builder()
                 .id(rs.getLong("film_id"))
                 .name(rs.getString("film_name"))
                 .description(rs.getString("description"))
@@ -24,6 +24,5 @@ public class FilmMapper implements RowMapper<Film> {
                 .mpa(new Rating(rs.getLong("rating_id"), rs.getString("rating_name")))
                 .likes(rs.getLong("rate"))
                 .build();
-        return film;
     }
 }
