@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 @Component
 public class DirectorMapper implements RowMapper<Director> {
+
     @Override
     public Director mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Director.builder()

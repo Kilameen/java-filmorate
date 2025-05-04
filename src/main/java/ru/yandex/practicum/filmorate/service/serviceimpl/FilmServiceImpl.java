@@ -134,7 +134,6 @@ public class FilmServiceImpl implements FilmService {
         return createdFilm;
     }
 
-
     @Override
     public Film update(Film film) {
         validateRating(film);
@@ -166,7 +165,6 @@ public class FilmServiceImpl implements FilmService {
         directorStorage.updateFilmDirectors(film);
         return getFilmById(film.getId());
     }
-
 
     @Override
     public Collection<Film> findAll() {
@@ -201,7 +199,6 @@ public class FilmServiceImpl implements FilmService {
         film.setDirectors(new HashSet<>(filmDirectors));
         return film;
     }
-
 
     @Override
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
@@ -255,7 +252,6 @@ public class FilmServiceImpl implements FilmService {
         filmStorage.deleteFilm(id);
     }
 
-
     @Override
     public Collection<Film> getFilmByNameOrDirector(String keyWords, String searchParameter) {
         searchParameter = searchParameter.replace(" ", "");
@@ -304,6 +300,4 @@ public class FilmServiceImpl implements FilmService {
 
         return films;
     }
-
-
 }

@@ -33,12 +33,12 @@ public class DirectorDbStorage implements DirectorStorage {
     private static final String GET_DIRECTOR_BY_ID = "SELECT * FROM directors WHERE director_id = ?";
     private static final String GET_FILM_DIRECTOR_BY_ID =
             "SELECT d.director_id, d.name " +
-                    "FROM directors AS d " +
-                    "LEFT JOIN films_directors AS fd ON d.director_id = fd.director_id " +
-                    "WHERE film_id = ?";
+            "FROM directors AS d " +
+            "LEFT JOIN films_directors AS fd ON d.director_id = fd.director_id " +
+            "WHERE film_id = ?";
     private static final String SELECT_DIRECTORS_ALL_FILMS_SQL_REQUEST = "SELECT fd.film_id,\n" +
-            "       d.director_id,\n" +
-            "       d.name\n" +
+            "d.director_id,\n" +
+            "d.name\n" +
             "FROM films_directors AS fd\n" +
             "INNER JOIN directors AS d ON fd.director_id = d.director_id\n" +
             "WHERE fd.film_id IN (:filmIds);\n";
@@ -78,7 +78,6 @@ public class DirectorDbStorage implements DirectorStorage {
         return getDirectorById(newDirector.getId())
                 .orElseThrow(() -> new InternalServerException("Ошибка при обновлении режиссера"));
     }
-
 
     @Override
     public void deleteDirector(Long directorId) {

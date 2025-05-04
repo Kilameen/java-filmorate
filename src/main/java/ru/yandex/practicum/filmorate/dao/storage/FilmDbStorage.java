@@ -31,14 +31,12 @@ public class FilmDbStorage implements FilmStorage {
             "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id " +
             "GROUP BY f.film_id, r.rating_id, r.rating_name " +
             "ORDER BY f.film_id;";
-
     private static final String SELECT_FILM_BY_ID_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
             "FROM films AS f\n" +
             "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
             "WHERE f.film_id = ?\n" +
             "GROUP BY f.film_id, r.rating_id";
-
     private static final String SELECT_POPULAR_FILMS_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
             "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
@@ -95,7 +93,6 @@ public class FilmDbStorage implements FilmStorage {
             "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
             "ORDER BY rate DESC;\n";
 
-
     @Override
     public Film create(Film film) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -114,13 +111,12 @@ public class FilmDbStorage implements FilmStorage {
         Long filmId = keyHolder.getKeyAs(Long.class);
         film.setId(filmId);
 
-
         return getFilm(filmId);
     }
 
     @Override
     public Film update(Film film) {
-        int rowsAffected = jdbcTemplate.update(UPDATE_FILM_SQL,
+        jdbcTemplate.update(UPDATE_FILM_SQL,
                 film.getName(),
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
@@ -128,9 +124,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId());
 
-        if (rowsAffected == 0) {
-            throw new NotFoundException("Фильм с id " + film.getId() + " не найден.");
-        }
         return film;
     }
 
@@ -177,7 +170,6 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getFilmByNameOrDirector(String keyWords) {
         return jdbcTemplate.query(SELECT_FILMS_WITH_KEY_WORD_BY_DIRECTOR_AND_NAME_SQL, filmMapper, "%" + keyWords + "%", "%" + keyWords + "%");
     }
-
 
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {

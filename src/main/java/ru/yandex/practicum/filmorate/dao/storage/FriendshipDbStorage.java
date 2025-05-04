@@ -27,23 +27,21 @@ public class FriendshipDbStorage implements FriendshipDao {
             "WHERE user_id = ? AND friend_id = ?;";
     private static final String SELECT_ALL_USER_FRIENDS_SQL_REQUEST = "SELECT users.*\n" +
             "FROM users\n" +
-            "         INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
+            "INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
             "WHERE friendship.user_id = ?;";
     private static final String SELECT_STATUS_FRIENDS_SQL_REQUEST = "SELECT COUNT(*) AS status\n" +
             "FROM friendship\n" +
             "WHERE (user_id = ? AND friend_id = ?)\n" +
-            "   OR (user_id = ? AND friend_id = ?)\n" +
+            "OR (user_id = ? AND friend_id = ?)\n" +
             "HAVING COUNT(*) = 2;";
     private static final String SELECT_MUTUAL_FRIENDS_SQL_REQUEST = "SELECT users.*\n" +
             "FROM users\n" +
-            "         INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
+            "INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
             "WHERE friendship.user_id = ?\n" +
-            "\n" +
             "INTERSECT\n" +
-            "\n" +
             "SELECT users.*\n" +
             "FROM users\n" +
-            "         INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
+            "INNER JOIN friendship ON users.user_id = friendship.friend_id\n" +
             "WHERE friendship.user_id = ?;";
 
     @Override
