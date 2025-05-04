@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
+
     Long id;
 
     @NotBlank(message = "Название не может быть пустым",
@@ -41,5 +42,5 @@ public class Film {
     Collection<Genre> genres = new HashSet<>();
 
     @NotNull
-    Set<Director> directors = new HashSet<>();
+    Collection<Director> directors = new HashSet<>();
 }

@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,7 @@ import java.util.*;
 public class DirectorDbStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final DirectorMapper mapper;
 
     private static final String INSERT_INTO_QUERY = "INSERT INTO directors(name) VALUES(?)";
@@ -32,6 +35,12 @@ public class DirectorDbStorage implements DirectorStorage {
                     "FROM directors AS d " +
                     "LEFT JOIN films_directors AS fd ON d.director_id = fd.director_id " +
                     "WHERE film_id = ?";
+    private static final String SELECT_DIRECTORS_ALL_FILMS_SQL_REQUEST = "SELECT fd.film_id,\n" +
+            "       d.director_id,\n" +
+            "       d.name\n" +
+            "FROM films_directors AS fd\n" +
+            "INNER JOIN directors AS d ON fd.director_id = d.director_id\n" +
+            "WHERE fd.film_id IN (:filmIds);\n";
 
     @Override
     public List<Director> getDirectors() {
@@ -85,9 +94,27 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
+    public Map<Long, Collection<Director>> getAllFilmsDirectors(Collection<Long> filmIds) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("filmIds", filmIds);
+        return namedParameterJdbcTemplate.query(SELECT_DIRECTORS_ALL_FILMS_SQL_REQUEST, parameters, rs -> {
+            Map<Long, Collection<Director>> result = new HashMap<>();
+            while (rs.next()) {
+                long filmId = rs.getLong("film_id");
+                Director director = new Director(
+                        rs.getLong("director_id"),
+                        rs.getString("name")
+                );
+                result.computeIfAbsent(filmId, k -> new ArrayList<>()).add(director);
+            }
+            return result;
+        });
+    }
+
+    @Override
     public void updateFilmDirectors(Film film) {
         Long filmId = film.getId();
-        Set<Director> directors = film.getDirectors();
+        Collection<Director> directors = film.getDirectors();
 
         deleteAllDirectorsForFilm(filmId);
         saveFilmDirectors(filmId, directors);
@@ -96,7 +123,7 @@ public class DirectorDbStorage implements DirectorStorage {
         film.setDirectors(new HashSet<>(filmDirectors));
     }
 
-    private void saveFilmDirectors(Long filmId, Set<Director> directors) {
+    private void saveFilmDirectors(Long filmId, Collection<Director> directors) {
         if (directors == null || directors.isEmpty()) {
             return;
         }

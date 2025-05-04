@@ -39,7 +39,7 @@ public class GenreDbStorage implements GenreDao {
             "WHERE fg.film_id IN (:filmIds);";
 
     @Override
-    public Collection<Genre> getFilmGenres(Long filmId) {
+    public List<Genre> getFilmGenres(Long filmId) {
         return jdbcTemplate.query(SELECT_FILM_GENRE_SQL_REQUEST, genreMapper, filmId);
     }
 
@@ -55,7 +55,7 @@ public class GenreDbStorage implements GenreDao {
                         rs.getLong("genre_id"),
                         rs.getString("genre_name")
                 );
-                result.computeIfAbsent(filmId, k -> new ArrayList<>()).add(genre);
+                result.computeIfAbsent(filmId, k -> new HashSet<>()).add(genre);
             }
             return result;
         });
@@ -73,7 +73,7 @@ public class GenreDbStorage implements GenreDao {
     }
 
     @Override
-    public Collection<Genre> getGenres() {
+    public List<Genre> getGenres() {
         return jdbcTemplate.query(SELECT_ALL_GENRE_SQL_REQUEST, genreMapper);
     }
 

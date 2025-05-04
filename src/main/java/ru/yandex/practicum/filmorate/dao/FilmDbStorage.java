@@ -26,38 +26,20 @@ public class FilmDbStorage implements FilmStorage {
 
     private static final String INSERT_FILM_SQL = "INSERT INTO films (film_name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?);";
     private static final String UPDATE_FILM_SQL = "UPDATE films SET film_name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE film_id = ?;";
-    private static final String SELECT_ALL_FILMS_SQL = "SELECT \n" +
-            "    f.film_id AS id,\n" +
-            "    f.film_name AS name,\n" +
-            "    f.description,\n" +
-            "    f.release_date,\n" +
-            "    f.duration,\n" +
-            "    COUNT(fl.user_id) AS likes,\n" +
-            "    r.rating_id AS mpa_id,\n" +
-            "    r.rating_name AS mpa_name,\n" +
-            "    g.genre_id,\n" +
-            "    g.genre_name,\n" +
-            "    d.director_id,\n" +
-            "    d.name AS director_name\n" +
-            "FROM films f\n" +
-            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
-            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
-            "LEFT JOIN film_genres fg ON f.film_id = fg.film_id\n" +
-            "LEFT JOIN genres g ON fg.genre_id = g.genre_id\n" +
-            "LEFT JOIN films_directors fd ON f.film_id = fd.film_id\n" +
-            "LEFT JOIN directors d ON fd.director_id = d.director_id\n" +
-            "WHERE f.film_id = ?\n" +
-            "GROUP BY \n" +
-            "    f.film_id, r.rating_id, r.rating_name, g.genre_id, g.genre_name, d.director_id, d.name;";
+    private static final String SELECT_ALL_FILMS_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate " +
+            "FROM films AS f " +
+            "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id " +
+            "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id " +
+            "GROUP BY f.film_id, r.rating_id, r.rating_name " +
+            "ORDER BY f.film_id;";
+
     private static final String SELECT_FILM_BY_ID_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
             "FROM films AS f\n" +
             "LEFT JOIN rating_mpa AS r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id\n" +
-            "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id\n" +
-            "LEFT JOIN genres AS g ON g.genre_id = fg.genre_id\n" +
-            "LEFT JOIN films_directors AS fd ON f.film_id = fd.film_id\n" +
-            "LEFT JOIN directors AS d ON fd.director_id = d.director_id WHERE f.film_id = ?\n" +
-            "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name,g.genre_id,g.genre_name";
+            "WHERE f.film_id = ?\n" +
+            "GROUP BY f.film_id, r.rating_id";
+
     private static final String SELECT_POPULAR_FILMS_SQL = "SELECT f.*, r.rating_name, r.rating_id, COUNT(fl.user_id) AS rate\n" +
             "FROM films f LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
             "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
@@ -113,51 +95,7 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id, r.rating_id, r.rating_name, d.director_id, d.name, g.genre_id, g.genre_name\n" +
             "HAVING COUNT(DISTINCT l.user_id) = 2\n" +
             "ORDER BY rate DESC;\n";
-    private static final String NEW_SQL_GET_FILM = "SELECT \n" +
-            "    f.film_id AS id,\n" +
-            "    f.film_name AS name,\n" +
-            "    f.description,\n" +
-            "    f.release_date,\n" +
-            "    f.duration,\n" +
-            "    COUNT(fl.user_id) AS likes,\n" +
-            "    r.rating_id AS mpa_id,\n" +
-            "    r.rating_name AS mpa_name,\n" +
-            "    g.genre_id,\n" +
-            "    g.genre_name,\n" +
-            "    d.director_id,\n" +
-            "    d.name AS director_name\n" +
-            "FROM films f\n" +
-            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
-            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
-            "LEFT JOIN film_genres fg ON f.film_id = fg.film_id\n" +
-            "LEFT JOIN genres g ON fg.genre_id = g.genre_id\n" +
-            "LEFT JOIN films_directors fd ON f.film_id = fd.film_id\n" +
-            "LEFT JOIN directors d ON fd.director_id = d.director_id\n" +
-            "WHERE f.film_id = ?\n" +
-            "GROUP BY \n" +
-            "    f.film_id, r.rating_id, r.rating_name, g.genre_id, g.genre_name, d.director_id, d.name;";
-    private static final String NEW_SQL_GET_ALL_FILMs = "SELECT \n" +
-            "    f.film_id AS id,\n" +
-            "    f.film_name AS name,\n" +
-            "    f.description,\n" +
-            "    f.release_date,\n" +
-            "    f.duration,\n" +
-            "    COUNT(fl.user_id) AS likes,\n" +
-            "    r.rating_id AS mpa_id,\n" +
-            "    r.rating_name AS mpa_name,\n" +
-            "    g.genre_id,\n" +
-            "    g.genre_name,\n" +
-            "    d.director_id,\n" +
-            "    d.name AS director_name\n" +
-            "FROM films f\n" +
-            "LEFT JOIN rating_mpa r ON f.mpa_id = r.rating_id\n" +
-            "LEFT JOIN film_likes fl ON f.film_id = fl.film_id\n" +
-            "LEFT JOIN film_genres fg ON f.film_id = fg.film_id\n" +
-            "LEFT JOIN genres g ON fg.genre_id = g.genre_id\n" +
-            "LEFT JOIN films_directors fd ON f.film_id = fd.film_id\n" +
-            "LEFT JOIN directors d ON fd.director_id = d.director_id\n" +
-            "GROUP BY \n" +
-            "    f.film_id, r.rating_id, r.rating_name, g.genre_id, g.genre_name, d.director_id, d.name;";
+
 
     @Override
     public Film create(Film film) {
@@ -197,8 +135,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
-        CustomFilmExtractor extractor = new CustomFilmExtractor();
-        return jdbcTemplate.query(NEW_SQL_GET_ALL_FILMs, new NewFilmMapper());
+        return jdbcTemplate.query(SELECT_ALL_FILMS_SQL, filmMapper);
     }
 
     @Override

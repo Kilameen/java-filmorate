@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.dao.event.EventDao;
 import ru.yandex.practicum.filmorate.enums.SearchParameter;
@@ -117,6 +119,7 @@ public class FilmServiceImpl implements FilmService {
         return createdFilm;
     }
 
+    @Override
     public Film update(Film film) {
         validateRating(film);
 
@@ -124,43 +127,65 @@ public class FilmServiceImpl implements FilmService {
         if (isNull(existingFilm)) {
             throw new NotFoundException("Фильма с таким id не существует");
         }
-
         filmStorage.update(film);
 
         genreDbStorage.clearFilmGenres(film.getId());
-        Set<Genre> genres = new HashSet<>(film.getGenres());
+
+        Collection<Genre> existingGenres = genreDbStorage.getFilmGenres(film.getId());
+        Set<Genre> genres = new HashSet<>();
+
+        if (film.getGenres() != null) {
+            genres = new HashSet<>(film.getGenres());
+        } else if (existingGenres != null) {
+            genres.addAll(existingGenres);
+        }
+
         if (!genres.isEmpty()) {
             List<Long> genreIds = genres.stream()
                     .map(Genre::getId)
-                    .toList();
+                    .filter(genreId -> genreDbStorage.getGenre(genreId) != null)
+                    .collect(Collectors.toList());
             genreDbStorage.setGenres(film.getId(), genreIds);
         }
         directorStorage.updateFilmDirectors(film);
-        return filmStorage.getFilm(film.getId());
+        return  filmStorage.getFilm(film.getId());
     }
+
 
     @Override
     public Collection<Film> findAll() {
         Collection<Film> allFilms = filmStorage.findAll();
-//        Collection<Long> filmIds = allFilms.stream()
-//                .map(Film::getId)
-//                .collect(Collectors.toList());
-//        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
-//        for (Film film : allFilms) {
-//            film.setGenres(filmsGenres.getOrDefault(film.getId(), Collections.emptyList()));
-//        }
+        List<Long> filmIds = allFilms.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(filmIds);
+        Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(filmIds);
+
+        for (Film film : allFilms) {
+            Long filmId = film.getId();
+            film.setGenres(filmsGenres.getOrDefault(filmId, Collections.emptyList()));
+            film.setDirectors(filmDirectors.getOrDefault(filmId, Collections.emptyList()));
+        }
         return allFilms;
     }
 
     @Override
     public Film getFilmById(Long id) {
         Film film = filmStorage.getFilm(id);
-//        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
-//        film.setGenres(filmGenres);
+
+        if (film == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film with id " + id + " not found");
+        }
+
+        Collection<Genre> filmGenres = genreDbStorage.getFilmGenres(id);
         List<Director> filmDirectors = directorStorage.getFilmDirectors(id);
+
+        film.setGenres(new HashSet<>(filmGenres));
         film.setDirectors(new HashSet<>(filmDirectors));
         return film;
     }
+
 
     @Override
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
