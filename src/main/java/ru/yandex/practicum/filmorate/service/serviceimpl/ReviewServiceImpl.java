@@ -3,11 +3,7 @@ package ru.yandex.practicum.filmorate.service.serviceimpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.dao.UserStorage;
-import ru.yandex.practicum.filmorate.dao.EventDao;
-import ru.yandex.practicum.filmorate.dao.ReviewDao;
-import ru.yandex.practicum.filmorate.dao.UsefulDao;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -97,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getReviewsByFilmId(Long filmId, int count) {
-        if(filmId==null){
+        if (filmId == null) {
             log.info("Тип запроса изменен на: Запрос всех фильмов. (filmId=null)");
             return getAllReviews();
         }
