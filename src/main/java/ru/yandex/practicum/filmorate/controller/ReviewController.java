@@ -57,11 +57,6 @@ public class ReviewController {
     public List<Review> getReviews(
             @RequestParam(required = false) Long filmId,
             @RequestParam(defaultValue = "10") int count) {
-
-        if (filmId == null) {
-            log.info("Запрос на получение всех отзывов");
-            return reviewService.getAllReviews();
-        }
         log.info("Запрос на получение {} отзывов фильма с id {}", count, filmId);
         return reviewService.getReviewsByFilmId(filmId, count);
     }

@@ -73,4 +73,10 @@ public class ErrorHandler {
     public ErrorResponse handleTypeMismatch() {
         return new ErrorResponse("Ошибка преобразования строки в число. ID должен быть числом.");
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
 }

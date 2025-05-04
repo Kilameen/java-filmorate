@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Component(value = "H2FilmDb")
 @RequiredArgsConstructor
