@@ -97,6 +97,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getReviewsByFilmId(Long filmId, int count) {
+        if(filmId==null){
+            log.info("Тип запроса изменен на: Запрос всех фильмов. (filmId=null)");
+            return getAllReviews();
+        }
+        log.info("Обработка запроса на получение {} отзывов фильма с id {}", count, filmId);
         return (List<Review>) reviewDao.getReviewsByFilmId(filmId, count);
     }
 
