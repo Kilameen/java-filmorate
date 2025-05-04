@@ -9,13 +9,13 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.CustomFilmExtractor;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.NewFilmMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component(value = "H2FilmDb")
 @RequiredArgsConstructor
@@ -114,7 +114,9 @@ public class FilmDbStorage implements FilmStorage {
 
         Long filmId = keyHolder.getKeyAs(Long.class);
         film.setId(filmId);
-        return film;
+
+
+        return getFilm(filmId);
     }
 
     @Override

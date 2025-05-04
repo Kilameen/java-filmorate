@@ -119,6 +119,7 @@ public class FilmServiceImpl implements FilmService {
             createdFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(filmId)));
         }
         createdFilm.setDirectors(new HashSet<>(directorStorage.getFilmDirectors(filmId))); // Получаем режиссеров из БД
+
         return createdFilm;
     }
 
@@ -201,6 +202,14 @@ public class FilmServiceImpl implements FilmService {
         if (directorFilms == null || directorFilms.isEmpty()) {
             throw new NotFoundException("Режиссер с ID " + directorId + " не найден или не имеет фильмов.");
         }
+        List<Film> films = new ArrayList<>();
+        for(Film film : directorFilms){
+            film.setDirectors(directorStorage.getFilmDirectors(film.getId()));
+            film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
+            films.add(film);
+        }
+        directorFilms.removeAll(directorFilms);
+        directorFilms.addAll(films);
         switch (sortType) {
             case LIKES:
                 return directorFilms.stream()
@@ -282,4 +291,6 @@ public class FilmServiceImpl implements FilmService {
 
         return films;
     }
+
+
 }
