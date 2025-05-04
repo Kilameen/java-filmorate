@@ -9,15 +9,14 @@ import ru.yandex.practicum.filmorate.dao.event.EventDao;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
@@ -28,18 +27,23 @@ public class UserServiceImpl implements UserService {
     private final LikeDao likeDao;
     private final FilmStorage filmStorage;
     private final EventDao eventDao;
+    private final GenreDbStorage genreDbStorage;
+    private final DirectorStorage directorStorage;
+
 
     @Autowired
     public UserServiceImpl(@Qualifier("H2UserDb") UserStorage userStorage,
                            @Qualifier("H2FriendDb") FriendshipDao friendshipDao,
                            @Qualifier("H2LikeDb") LikeDao likeDao,
                            @Qualifier("H2FilmDb") FilmStorage filmStorage,
-                           @Qualifier("H2EventDb") EventDao eventDao) {
+                           @Qualifier("H2EventDb") EventDao eventDao, GenreDbStorage genreDbStorage, DirectorStorage directorDbStorage) {
         this.userStorage = userStorage;
         this.friendshipDao = friendshipDao;
         this.likeDao = likeDao;
         this.filmStorage = filmStorage;
         this.eventDao = eventDao;
+        this.genreDbStorage = genreDbStorage;
+        this.directorStorage = directorDbStorage;
     }
 
     @Override
@@ -134,9 +138,22 @@ public class UserServiceImpl implements UserService {
         Set<Long> similarUserLikes = mostSimilarUser.get().getValue();
         similarUserLikes.removeAll(userLikeFilms);
 
-        return similarUserLikes.stream()
+        List<Film> films = similarUserLikes.stream()
                 .map(filmStorage::getFilm)
-                .collect(Collectors.toList());
+                .collect(toList());
+        Map<Long, Collection<Genre>> filmsGenres = genreDbStorage.getAllFilmsGenres(films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList()));
+        Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList()));
+
+        for (Film film : films) {
+            Long filmId = film.getId();
+            film.setGenres(filmsGenres.getOrDefault(filmId, Collections.emptyList()));
+            film.setDirectors(filmDirectors.getOrDefault(filmId, Collections.emptyList()));
+        }
+        return films;
     }
 
     private long intersectionSize(Set<Long> set1, Set<Long> set2) {
