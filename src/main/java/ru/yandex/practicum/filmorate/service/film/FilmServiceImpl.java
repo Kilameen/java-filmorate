@@ -148,7 +148,7 @@ public class FilmServiceImpl implements FilmService {
             genreDbStorage.setGenres(film.getId(), genreIds);
         }
         directorStorage.updateFilmDirectors(film);
-        return  filmStorage.getFilm(film.getId());
+        return  getFilmById(film.getId());
     }
 
 
