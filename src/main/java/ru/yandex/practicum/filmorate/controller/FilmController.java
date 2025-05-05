@@ -99,7 +99,7 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public Collection<Film> searchFilmByNameOrDirector(HttpServletRequest request, @RequestParam String query, @RequestParam String by) {
+    public Collection<Film> searchFilmByNameOrDirector(@RequestParam String query, @RequestParam String by) {
         log.info("Поиск фильма, содержащего \"{}\" в {}", query, by);
         return filmService.getFilmByNameOrDirector(query, by);
     }

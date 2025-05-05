@@ -113,10 +113,19 @@ public class FilmServiceImpl implements FilmService {
         Long filmId = createdFilm.getId();
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                directorStorage.getDirectorById(director.getId()).orElseThrow(() -> new NotFoundException("Режиссер с id:" + director.getId() + " не найден"));
+            Set<Long> directorIds = film.getDirectors().stream().map(Director::getId).collect(Collectors.toSet());
+            Map<Long, Director> existingDirectors = new HashMap<>();
+            for (Long directorId : directorIds) {
+                directorStorage.getDirectorById(directorId).ifPresent(director -> existingDirectors.put(directorId, director));
             }
-            directorStorage.updateFilmDirectors(film); // Обновляем режиссеров фильма
+
+            if (existingDirectors.size() != directorIds.size()) {
+                List<Long> notFoundIds = directorIds.stream()
+                        .filter(id -> !existingDirectors.containsKey(id))
+                        .collect(Collectors.toList());
+                throw new NotFoundException("Режиссеры с id: " + notFoundIds + " не найдены");
+            }
+            directorStorage.updateFilmDirectors(film);
         }
 
         if (film.getGenres() != null) {
@@ -128,8 +137,15 @@ public class FilmServiceImpl implements FilmService {
             genreDbStorage.clearFilmGenres(filmId);
             genreDbStorage.setGenres(filmId, genreIds);
             createdFilm.setGenres(new ArrayList<>(genreDbStorage.getFilmGenres(filmId)));
+
         }
-        createdFilm.setDirectors(new HashSet<>(directorStorage.getFilmDirectors(filmId))); // Получаем режиссеров из БД
+
+        Map<Long, Collection<Director>> filmDirectors = directorStorage.getAllFilmsDirectors(Collections.singletonList(filmId));
+        if (filmDirectors.containsKey(filmId)) {
+            createdFilm.setDirectors(new HashSet<>(filmDirectors.get(filmId)));
+        } else {
+            createdFilm.setDirectors(new HashSet<>());
+        }
 
         return createdFilm;
     }
@@ -203,29 +219,31 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Set<Film> getDirectorFilms(Long directorId, String sortBy) {
         sortBy = sortBy.replace(" ", "");
-
         SortType sortType = SortType.fromString(sortBy);
 
         List<Film> directorFilms = filmStorage.getDirectorFilms(directorId);
         if (directorFilms == null || directorFilms.isEmpty()) {
             throw new NotFoundException("Режиссер с ID " + directorId + " не найден или не имеет фильмов.");
         }
-        List<Film> films = new ArrayList<>();
+
+        List<Long> filmIds = directorFilms.stream().map(Film::getId).collect(Collectors.toList());
+
+        Map<Long, Collection<Director>> filmDirectorsMap = directorStorage.getAllFilmsDirectors(filmIds);
+        Map<Long, Collection<Genre>> filmGenresMap = genreDbStorage.getAllFilmsGenres(filmIds);
+
         for (Film film : directorFilms) {
-            film.setDirectors(directorStorage.getFilmDirectors(film.getId()));
-            film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
-            films.add(film);
+            film.setDirectors(new HashSet<>(filmDirectorsMap.getOrDefault(film.getId(), Collections.emptyList())));
+            film.setGenres(new HashSet<>(filmGenresMap.getOrDefault(film.getId(), Collections.emptyList())));
         }
-        directorFilms.removeAll(directorFilms);
-        directorFilms.addAll(films);
+
         switch (sortType) {
             case LIKES:
                 return directorFilms.stream()
-                        .sorted(Comparator.comparing(Film::getLikes).reversed()) // Сортируем по убыванию лайков
+                        .sorted(Comparator.comparing(Film::getLikes).reversed())
                         .collect(Collectors.toCollection(LinkedHashSet::new));
             default:
                 return directorFilms.stream()
-                        .sorted(Comparator.comparing(Film::getReleaseDate)) // Сортируем по убыванию года
+                        .sorted(Comparator.comparing(Film::getReleaseDate))
                         .collect(Collectors.toCollection(LinkedHashSet::new));
         }
     }
