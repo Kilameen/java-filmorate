@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
@@ -16,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
+
     Long id;
 
     @NotBlank(message = "Название не может быть пустым",
@@ -37,4 +39,7 @@ public class Film {
     @NotNull(message = "Рейтинг MPA не может быть пустым", groups = Marker.OnCreate.class)
     Rating mpa;
     Collection<Genre> genres = new HashSet<>();
+
+    @NotNull
+    Collection<Director> directors = new HashSet<>();
 }

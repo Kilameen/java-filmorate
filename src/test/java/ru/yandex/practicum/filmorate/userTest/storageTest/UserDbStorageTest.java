@@ -9,7 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.dao.storage.UserDbStorage;
+import ru.yandex.practicum.filmorate.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Reader;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 @JdbcTest
 @AutoConfigureTestDatabase
-@Import({UserDbStorage.class, UserMapper.class})
+@Import({UserDbStorage.class, UserMapper.class, EventMapper.class})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageTest {
     private final UserDbStorage userStorage;

@@ -6,10 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.UserService;
+
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -20,8 +24,6 @@ public class UserController {
 
     private final UserService userService;
 
-//Storage
-
     @GetMapping
     public Collection<User> findAll() {
         log.info("Получен запрос на список пользователей");
@@ -30,7 +32,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        log.info("Запрос на получение фильма по id");
+        log.info("Запрос на получение пользователя по id");
         return userService.getUserById(id);
     }
 
@@ -51,7 +53,13 @@ public class UserController {
         return userService.update(updateUser);
     }
 
-    //Service
+    @DeleteMapping("{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long userId) {
+        log.info("Запрос на удаление пользователя с id {}", userId);
+        userService.deleteUserById(userId);
+        log.info("Пользователь с id {} удален", userId);
+    }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long userFriendId) {
@@ -72,10 +80,24 @@ public class UserController {
         return userService.getMutualFriends(userId, userFriendId);
     }
 
+    @GetMapping("{id}/recommendations")
+    public Collection<Film> getRecommendation(@PathVariable("id") Long userId) {
+        log.info("Список рекомендаций, на основе ваших предпочтиний");
+        return userService.getRecommendation(userId);
+    }
+
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long userFriendId) {
         log.info("Пользователь {}, хочет удалить из друзей {}", userId, userFriendId);
         userService.deleteFriend(userId, userFriendId);
         log.info("Пользователь {} удален из вашего списка друзей.", userFriendId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Event> getEvent(@PathVariable("id") Long userId) {
+        List<Event> feeds = userService.getUserEvents(userId);
+        log.info("Лента событий пользователя - {}, количество записей {}",
+                userService.getUserById(userId).getName(), feeds.size());
+        return feeds;
     }
 }
